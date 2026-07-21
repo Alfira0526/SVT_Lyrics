@@ -397,31 +397,26 @@
    모든 상태는 localStorage(key: svt_lyrics_quiz_v1)에 저장.
    ========================================================================= */
 
-/* ---- 기본 곡 목록: 48문항 (상17 / 중23 / 신곡8) · 초기 40 + 확장 8 ---- */
+/* ---- 기본 곡 목록: 40문항 (상14 / 중20 / 신곡6) · 전곡 가사 입력 완료 ---- */
 const DEFAULT_SONGS = [
-  // 상 (13) — 기본
-  {id:"s1", name:"Trauma", part:"랩 벌스 · 힙합팀", diff:"상"},
+  // 상 — 기본
   {id:"s2", name:"13월의 춤 (Lilili Yabbay)", part:"브릿지 · 퍼포먼스팀", diff:"상"},
   {id:"s3", name:"바람개비 (Pinwheel)", part:"1절 벌스 · 보컬팀", diff:"상"},
   {id:"s4", name:"Habit (입버릇)", part:"브릿지 · 보컬팀", diff:"상"},
-  {id:"s5", name:"Space (끝이 안보여)", part:"1절 벌스", diff:"상"},
   {id:"s6", name:"My I", part:"1절 벌스 · 보컬팀", diff:"상"},
   {id:"s7", name:"Snap Shoot", part:"2절 벌스", diff:"상"},
   {id:"s8", name:"Kidult (어른 아이)", part:"브릿지 · Director's Cut", diff:"상"},
-  {id:"s9", name:"Shhh", part:"랩 파트 · 퍼포먼스팀", diff:"상"},
   {id:"s10", name:"Imperfect Love (매일 그대라서 행복하다)", part:"브릿지 · 보컬팀", diff:"상"},
   {id:"s11", name:"Domino", part:"1절 벌스", diff:"상"},
   {id:"s12", name:"Back It Up", part:"랩 파트 · 힙합팀", diff:"상"},
   {id:"s13", name:"March", part:"1절 벌스", diff:"상"},
-  // 중 (19)
+  // 중 — 기본
   {id:"s14", name:"아낀다 (Adore U)", part:"1절 벌스", diff:"중"},
   {id:"s15", name:"만세 (Mansae)", part:"1절 벌스", diff:"중"},
   {id:"s16", name:"예쁘다 (Pretty U)", part:"1절 벌스", diff:"중"},
   {id:"s17", name:"아주 NICE (Very Nice)", part:"브릿지", diff:"중"},
   {id:"s18", name:"붐붐 (BOOMBOOM)", part:"1절 벌스", diff:"중"},
-  {id:"s19", name:"박수 (CLAP)", part:"1절 벌스", diff:"중"},
   {id:"s20", name:"울고 싶지 않아 (Don't Wanna Cry)", part:"1절 벌스", diff:"중"},
-  {id:"s21", name:"어쩌나 (Oh My!)", part:"1절 벌스", diff:"중"},
   {id:"s22", name:"웃음꽃 (Smile Flower)", part:"1절 벌스", diff:"중"},
   {id:"s23", name:"숨이 차 (Getting Closer)", part:"1절 벌스", diff:"중"},
   {id:"s24", name:"독 : Fear", part:"1절 벌스", diff:"중"},
@@ -431,15 +426,12 @@ const DEFAULT_SONGS = [
   {id:"s28", name:"손오공 (Super)", part:"1절 벌스", diff:"중"},
   {id:"s29", name:"음악의 신 (God of Music)", part:"1절 벌스", diff:"중"},
   {id:"s30", name:"F*ck My Life", part:"1절 벌스", diff:"중"},
-  {id:"s31", name:"거침없이 (Just do it)", part:"1절 벌스 · 부석순", diff:"중"},
   {id:"s32", name:"파이팅 해야지 (Fighting)", part:"1절 벌스 · 부석순", diff:"중"},
-  // 신곡 (8)
+  // 신곡 — 기본
   {id:"s33", name:"MAESTRO", part:"1절 벌스 · 2024", diff:"신곡"},
   {id:"s34", name:"LALALI", part:"랩 파트 · 2024", diff:"신곡"},
-  {id:"s35", name:"Spell", part:"1절 벌스 · 2024", diff:"신곡"},
   {id:"s36", name:"어젯밤 (Last Night)", part:"1절 벌스 · 정한 X 원우", diff:"신곡"},
   {id:"s37", name:"CBZ (Prime time)", part:"랩 파트 · 부석순 2025", diff:"신곡"},
-  {id:"s38", name:"Bad Influence", part:"1절 벌스 · 2025", diff:"신곡"},
   {id:"s39", name:"THUNDER", part:"1절 벌스 · 정규 5집", diff:"신곡"},
   {id:"s40", name:"청춘찬가 (Cheers to Youth)", part:"1절 벌스 · 보컬팀", diff:"신곡"},
   // 확장 추가곡 (2차)
@@ -458,15 +450,12 @@ const DEFAULT_SONGS = [
    mv  : 공식 유튜브(있는 곡만) · time: 운영자가 파트 시점으로 조정 권장 */
 /* time(시작 시간)은 MV·가사가 모두 있는 곡에 한해 "가사 3초 앞" 추정값(리허설 시 보정 권장) */
 const DEFAULT_CONTENT = {
-  s1:  {lyrics:"", mv:"", time:""},
   s2:  {lyrics:"1월부터 12월 매번 돌아도 늘 널 찾고 있어 두 눈 말고 진정으로", mv:"https://youtu.be/MLlq4gtC55Q", time:"2:05"},
   s3:  {lyrics:"너를 기다리다 바라봤어 저기 저기 멀리", mv:"", time:""},
   s4:  {lyrics:"너를 부르며 애타게 찾았었다고", mv:"", time:""},
-  s5:  {lyrics:"", mv:"", time:""},
   s6:  {lyrics:"안개 속 흐릿하지만 그 속에 누군가 있어", mv:"", time:""},
   s7:  {lyrics:"너 IN 뷰파인더 초점은 Auto 자연스러운 움직임 따라 널 따라가", mv:"https://youtu.be/VqfiJCCbTjY", time:"1:55"},
   s8:  {lyrics:"맘속엔 어린아이가 있어", mv:"", time:""},
-  s9:  {lyrics:"", mv:"", time:""},
   s10: {lyrics:"겉으로는 낡고 헤져버려 쓸모없는 날 찾아와도", mv:"", time:""},
   s11: {lyrics:"옆에 서 있을 때 위태로워 자연스러운 긴장이 좋은 나", mv:"https://youtu.be/EECg4lPL_nE", time:"0:15"},
   s12: {lyrics:"그래서 우린 늘 안 들지 백기를", mv:"https://youtu.be/c0kBQiiRWBg", time:"0:12"},
@@ -476,9 +465,7 @@ const DEFAULT_CONTENT = {
   s16: {lyrics:"어떤 표현법을 써야만 내 맘이 전해질까", mv:"https://youtu.be/j59LLNMEOZk", time:"0:18"},
   s17: {lyrics:"너가 나의 모든 의문점에 대한 정답인 것 같애", mv:"https://youtu.be/J-wFp43XOrA", time:"0:10"},
   s18: {lyrics:"마주치면 좋아지는 기분 넌 내 바이오리듬", mv:"https://youtu.be/IzplmS-VeBc", time:"0:20"},
-  s19: {lyrics:"", mv:"https://youtu.be/S7gn3fl6Sr0", time:""},
   s20: {lyrics:"널 찾아가야 돼 찾아가야 돼", mv:"https://youtu.be/97cx53Tpp6g", time:"0:12"},
-  s21: {lyrics:"", mv:"https://youtu.be/_5PELxP8Udg", time:""},
   s22: {lyrics:"그냥 왜인지 모르게 가끔씩 문득 그런 생각이 자꾸만 들어", mv:"https://youtu.be/PFCQiURzLkk", time:"0:12"},
   s23: {lyrics:"내 머릿속을 파고들어 더 더 더 구석구석 파헤치고", mv:"https://youtu.be/cr_lx0GSfrA", time:"0:15"},
   s24: {lyrics:"영원한 건 절대 없단 걸 알면서도 끝낼 수도 없어", mv:"https://youtu.be/ap14O5-G7UA", time:"0:20"},
@@ -488,14 +475,11 @@ const DEFAULT_CONTENT = {
   s28: {lyrics:"땅을 보고 계속 올랐지 정상까지", mv:"https://youtu.be/-GQg25oP0S4", time:"0:12"},
   s29: {lyrics:"전 세계, ah 공통의 language", mv:"https://youtu.be/Vl3SURrGP9g", time:"0:10"},
   s30: {lyrics:"이런 빌어먹을 세상 나만 혼자 바보 됐어", mv:"https://youtu.be/9kpuOoIh3wU", time:"0:15"},
-  s31: {lyrics:"", mv:"https://youtu.be/YGXiVHTy0JE", time:""},
   s32: {lyrics:"아뿔싸 일어나야지 아침인데", mv:"https://youtu.be/mBXBOLG06Wc", time:"0:10"},
   s33: {lyrics:"시작하자, tuning 맞춰볼까?", mv:"https://youtu.be/ThI0pBAbFnk", time:"0:10"},
   s34: {lyrics:"내가 네 말을 듣겠냐고 그렇게 할 일 없냐고", mv:"https://youtu.be/F2qZWD0F7rM", time:"0:12"},
-  s35: {lyrics:"", mv:"", time:""},
   s36: {lyrics:"달이 오른 밤 소리 없는 밤 맘에 없는 말들로 어지러운 맘", mv:"https://youtu.be/aPG_2rMAtVU", time:"0:12"},
   s37: {lyrics:"뭣도 아닌 일에 입이 거칠어지는 평일", mv:"https://youtu.be/Mt9SBZam4X4", time:"0:15"},
-  s38: {lyrics:"", mv:"https://youtu.be/skso_fkQcg0", time:""},
   s39: {lyrics:"떨어져 flash 온몸이 crash 회로가 미쳐버렸어 제멋대로", mv:"https://youtu.be/pS57UX6s-xw", time:"0:15"},
   s40: {lyrics:"어쩌다 보니 처음으로 마주하는 오늘이라서", mv:"", time:""},
   s41: {lyrics:"내가 뭘 어쩌겠어 나는 너가 없으면 낡은 로봇처럼 맘이 멈추고", mv:"https://youtu.be/R9VDPMk5ls0", time:"0:10"},

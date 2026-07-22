@@ -199,6 +199,12 @@
   .mc-opt.correct .mc-key{background:var(--green);color:#06281c}
   .mc-opt.wrong{background:rgba(255,107,107,.16);border-color:var(--red)}
   .mc-opt.wrong .mc-key{background:var(--red);color:#3a0d0d}
+  .mc-opt .mc-name{flex:1}
+  .mc-opt .mc-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .mc-badge{font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;white-space:nowrap}
+  .mc-turn{margin-top:14px;font-size:14px;font-weight:700;text-align:center;color:var(--serene);background:rgba(124,143,255,.12);border-radius:11px;padding:11px}
+  .mc-turn b{color:var(--rose);font-weight:900}
+  .mc-turn.done{color:var(--txt);background:var(--panel2)}
   @media(max-width:560px){.mc-options{grid-template-columns:1fr}}
 
   /* ---- 힌트 ---- */
@@ -391,6 +397,7 @@
         <div class="hints" id="g-hints"></div>
       </div>
 
+      <div class="mc-turn" id="g-mc-turn" style="display:none"></div>
       <div class="mc-options" id="g-mc" style="display:none"></div>
 
       <div class="controls">
@@ -979,25 +986,78 @@ function buildMcOptions(){
   const opts=[{name:correct,correct:true}].concat(pool.slice(0,3).map(n=>({name:n,correct:false})));
   mcOptions=shuffleArr(opts);
 }
+/* 팀전 4지선다: 각 팀이 순서대로 선택 → 자동 채점 (개인전/솔로는 먼저 맞히기) */
+let teamPicks=[], pickingOrder=[], pickIdx=0, teamRoundDone=false;
+function teamCount(){ return (config.teamNames||[]).length||1; }
+function resetTeamRound(){
+  const n=teamCount();
+  teamPicks=new Array(n).fill(null);
+  pickingOrder=[]; for(let k=0;k<n;k++) pickingOrder.push((turn+k)%n);   // 시작 팀부터 순환
+  pickIdx=0; teamRoundDone=false;
+}
 function renderMc(){
-  const box=document.getElementById("g-mc"); if(!box) return;
-  if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; return; }
+  const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
+  if(!box) return;
+  if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; if(turnEl) turnEl.style.display="none"; return; }
   box.style.display="grid"; box.innerHTML="";
   const keys=["A","B","C","D"];
   mcOptions.forEach((o,i)=>{
     const b=document.createElement("button"); b.className="mc-opt"; b.type="button";
-    b.innerHTML=`<span class="mc-key">${keys[i]}</span><span>${escapeHtml(o.name)}</span>`;
-    b.addEventListener("click",()=>pickMc(i));
+    b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(o.name)}</span><span class="mc-badges"></span>`;
+    if(config.teamMode) b.addEventListener("click",()=>pickMcTeam(i));
+    else b.addEventListener("click",()=>pickMc(i));
     box.appendChild(b);
   });
+  if(config.teamMode){ turnEl.style.display="block"; renderTeamRound(); }
+  else { turnEl.style.display="none"; }
 }
+/* --- 개인전/솔로: 먼저 맞히기 (선택한 보기 하나만 표시) --- */
 function pickMc(i){
-  const box=document.getElementById("g-mc");
-  const btns=[...box.querySelectorAll(".mc-opt")];
+  const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
   btns.forEach(b=>{ b.disabled=true; });
-  // 선택한 보기 하나만 표시(정답이면 초록·오답이면 빨강). 정답 곡명은 아래 정답 공개 카드로 안내.
   btns[i].classList.add(mcOptions[i].correct?"correct":"wrong");
   toast(mcOptions[i].correct?"✔ 정답!":"✘ 오답");
+  showAnswer();
+}
+/* --- 팀전: 팀별 순차 선택 --- */
+function renderTeamRound(){
+  const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
+  const btns=[...box.querySelectorAll(".mc-opt")]; const names=config.teamNames||[];
+  btns.forEach(b=>{ const c=b.querySelector(".mc-badges"); if(c) c.innerHTML=""; });
+  teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=names[t]||("팀"+(t+1)); c.appendChild(s); } } });
+  if(!turnEl) return;
+  if(teamRoundDone){
+    turnEl.className="mc-turn done";
+    const ci=mcOptions.findIndex(o=>o.correct);
+    turnEl.innerHTML="채점 완료 · "+teamPicks.map((p,t)=>`${escapeHtml(names[t]||("팀"+(t+1)))} ${p===ci?"✔":"✘"}`).join(" · ");
+  } else {
+    turnEl.className="mc-turn";
+    const cur=pickingOrder[pickIdx];
+    turnEl.innerHTML=`🎤 <b>${escapeHtml(names[cur]||("팀"+(cur+1)))}</b> 차례 · 보기를 선택하세요 (${pickIdx+1}/${pickingOrder.length})`;
+  }
+}
+function pickMcTeam(i){
+  if(teamRoundDone) return;
+  teamPicks[pickingOrder[pickIdx]]=i; pickIdx++;
+  if(pickIdx>=pickingOrder.length) finalizeTeamRound();
+  else { renderTeamRound(); if(config.teamMode) renderTeamBoard(); }
+}
+function finalizeTeamRound(){
+  if(teamRoundDone) return;
+  teamRoundDone=true; stopTimer();
+  const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
+  const ci=mcOptions.findIndex(o=>o.correct);
+  const bonus=config.timerOn? Math.max(0,Math.ceil(timerLeft/5)):0;
+  btns.forEach((b,idx)=>{ b.disabled=true; if(idx===ci) b.classList.add("correct"); });
+  let anyCorrect=false;
+  teamPicks.forEach((p,t)=>{
+    if(p==null) return;
+    if(p===ci){ teamScores[t]=(teamScores[t]||0)+(1+bonus); anyCorrect=true; }
+    else if(btns[p]) btns[p].classList.add("wrong");
+  });
+  marks[order[pos]]=anyCorrect?"correct":"wrong";
+  turn=(turn+1)%teamCount();   // 다음 문항은 다음 팀부터 시작
+  updateCounters(); renderTeamBoard(); renderTeamRound();
   showAnswer();
 }
 
@@ -1048,16 +1108,18 @@ function renderGame(){
 
   applyHide(); hideAnswer(); updateCounters();
   resetTimer(); if(config.timerOn && gameActive) startTimer();   // 게임 시작·문항 전환 시 타이머 시작
-  resetHints(); buildMcOptions(); renderMc();
+  resetHints(); buildMcOptions(); resetTeamRound(); renderMc();
   scheduleAutoTTS();   // 카드 전환 시 2초 뒤 자동 낭독
 }
 
 function renderTeamBoard(){
   const board=document.getElementById("team-board");
   board.innerHTML="";
+  // 4지선다 팀전 진행 중엔 지금 선택할 팀을 하이라이트
+  const activeTeam=(config.mc && !teamRoundDone && pickingOrder.length) ? pickingOrder[pickIdx] : turn;
   (config.teamNames||[]).forEach((nm,i)=>{
     const d=document.createElement("div");
-    d.className="team"+(i===turn?" active":"");
+    d.className="team"+(i===activeTeam?" active":"");
     d.innerHTML=`<span class="turn-tag">▶ 차례</span>
       <div class="tn">${escapeHtml(nm)}</div>
       <div class="ts">${teamScores[i]||0}</div>
@@ -1104,7 +1166,15 @@ function showAnswer(){
   // scoring UI
   document.getElementById("g-solo-score").style.display=config.teamMode?"none":"flex";
   document.getElementById("g-team-score").style.display=config.teamMode?"block":"none";
-  if(config.teamMode) renderAwardRow();
+  if(config.teamMode){
+    if(config.mc){   // 4지선다 팀전은 팀별 선택으로 이미 자동 채점 → 수동 버튼 숨김
+      document.getElementById("g-award-row").innerHTML="";
+      document.getElementById("g-noone").style.display="none";
+    } else {
+      renderAwardRow();
+      document.getElementById("g-noone").style.display="";
+    }
+  }
   stopTimer();
   els.answer.classList.add("show");
   els.answer.scrollIntoView({behavior:"smooth",block:"nearest"});
@@ -1200,7 +1270,11 @@ els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els
 els.hide.addEventListener("change",applyHide);
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
-document.getElementById("g-reveal").addEventListener("click",showAnswer);
+document.getElementById("g-reveal").addEventListener("click",()=>{
+  // 팀전 4지선다에서 아직 팀 선택이 안 끝났으면 현재까지의 선택으로 채점
+  if(config.mc && config.teamMode && !teamRoundDone && order.length) finalizeTeamRound();
+  else showAnswer();
+});
 document.getElementById("g-hint").addEventListener("click",revealHint);
 document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));

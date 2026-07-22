@@ -6,6 +6,10 @@
 
 설치·빌드·서버 없이 `index.html` **파일 하나**로 동작합니다. · 팬 제작 · 비영리
 
+### ▶︎ [지금 바로 플레이하기](https://htmlpreview.github.io/?https://github.com/Alfira0526/SVT_Lyrics/blob/main/index.html)
+
+<sub>브라우저에서 바로 실행됩니다 · Chrome/Edge 권장 · GitHub Pages 링크는 아래 [웹으로 공유하기](#-웹으로-공유하기) 참고</sub>
+
 </div>
 
 ---

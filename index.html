@@ -994,8 +994,9 @@ function renderMc(){
 function pickMc(i){
   const box=document.getElementById("g-mc");
   const btns=[...box.querySelectorAll(".mc-opt")];
-  btns.forEach((b,idx)=>{ b.disabled=true; if(mcOptions[idx].correct) b.classList.add("correct"); });
-  if(!mcOptions[i].correct) btns[i].classList.add("wrong");
+  btns.forEach(b=>{ b.disabled=true; });
+  // 선택한 보기 하나만 표시(정답이면 초록·오답이면 빨강). 정답 곡명은 아래 정답 공개 카드로 안내.
+  btns[i].classList.add(mcOptions[i].correct?"correct":"wrong");
   toast(mcOptions[i].correct?"✔ 정답!":"✘ 오답");
   showAnswer();
 }

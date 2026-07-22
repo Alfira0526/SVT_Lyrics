@@ -209,6 +209,13 @@
   .auto-btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 13px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
   .auto-btn:hover{border-color:var(--serene)}
   .auto-status{margin-left:auto;font-size:13px;font-weight:700;color:var(--serene)}
+  .room-host-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .rhb-code{font-size:15px;font-weight:700}
+  .rhb-code b{font-size:22px;font-weight:900;letter-spacing:3px;color:var(--rose)}
+  .rhb-info{margin-left:auto;font-size:13px;font-weight:700;color:var(--serene)}
+  .rg-status{font-size:15px;font-weight:800;color:var(--serene);background:rgba(124,143,255,.12);border-radius:11px;padding:12px;margin-bottom:14px}
+  .rg-lyric{font-size:18px;font-weight:800;line-height:1.5;min-height:40px}
+  .rg-score{margin-top:14px;font-size:14px;font-weight:700;color:var(--muted)}
   @media(max-width:560px){.mc-options{grid-template-columns:1fr}}
 
   /* ---- 힌트 ---- */
@@ -285,7 +292,30 @@
       <span>🔊 TTS 낭독</span><span>🙈 가사 가리기</span><span>👥 팀전</span><span>⏱️ 타이머</span>
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
+    <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
     <p class="intro-note">설정 탭에서 문항·가사를 편집할 수 있어요</p>
+  </div>
+</div>
+
+<!-- ================= 참가자(온라인 방) 화면 ================= -->
+<div class="intro" id="room-guest" style="display:none">
+  <div class="intro-inner" style="max-width:420px">
+    <h1 class="intro-title" style="font-size:24px">방 참가</h1>
+    <div id="rg-join">
+      <p class="intro-desc">사회자 화면의 <b>방 코드</b>와 <b>팀 이름</b>을 입력하세요.</p>
+      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase;margin-bottom:10px" />
+      <input class="num-input" id="rg-name" placeholder="팀 이름" maxlength="20" />
+      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%">참가하기</button>
+      <div class="sl-err" id="rg-err"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-back" style="margin-top:14px">← 뒤로</button>
+    </div>
+    <div id="rg-play" style="display:none">
+      <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
+      <div class="rg-lyric" id="rg-lyric"></div>
+      <div class="mc-options" id="rg-mc" style="display:none;margin-top:14px"></div>
+      <div class="rg-score" id="rg-score"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-leave" style="margin-top:16px">방 나가기</button>
+    </div>
   </div>
 </div>
 
@@ -353,6 +383,14 @@
       <div class="setup-tip">자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.</div>
     </div>
 
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-online" /><span class="slider"></span></label>
+        <span style="font-size:14px">온라인 방 (각 팀 폰 참가) <span style="color:var(--muted)">· 실험적</span></span>
+      </div>
+      <div class="setup-tip">켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개로 답 제출</b> → 방장 화면에서 자동 채점됩니다.<br>같은 브라우저(멀티탭)에선 바로 동작하고, <b>다른 기기 간</b>에는 공개 릴레이를 통해 연결돼요(베스트에포트 · 인터넷 필요). 안정적 운영이 필요하면 방장 화면 한 곳에서 진행(팀 선택 가리기)을 권장해요.</div>
+    </div>
+
     <div class="setup-actions">
       <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
       <button class="intro-start" id="setup-start" style="flex:1;padding:15px">▶ 게임 시작</button>
@@ -379,6 +417,10 @@
 
   <!-- ================= GAME ================= -->
   <section class="view active" id="view-game">
+    <div class="card room-host-bar" id="room-host-bar" style="display:none">
+      <div class="rhb-code">방 코드 <b id="rhb-code">----</b></div>
+      <div class="rhb-info" id="rhb-info">참가 팀 0 · 대기 중</div>
+    </div>
     <div class="card" id="team-card" style="display:none">
       <div class="teams" id="team-board"></div>
     </div>
@@ -718,7 +760,7 @@ const DEFAULT_CONTENT = {
 
 const DEFAULT_CONFIG = {
   timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
-  autoHost:false, autoHideControls:false, autoInterval:7
+  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -1146,6 +1188,7 @@ function renderGame(){
   resetHints(); buildMcOptions(); resetTeamRound(); renderMc();
   scheduleAutoTTS();   // 카드 전환 시 2초 뒤 자동 낭독
   autoStartQuestion();   // 오토 호스트: 응답창 후 자동 공개 예약 + 컨트롤 바 갱신
+  if(Room.host.active){ Room.hostPushState(); }   // 온라인 방: 새 문항 참가자에게 전송
 }
 
 function renderTeamBoard(){
@@ -1214,6 +1257,7 @@ function showAnswer(){
   stopTimer();
   els.answer.classList.add("show");
   els.answer.scrollIntoView({behavior:"smooth",block:"nearest"});
+  if(Room.host.active){ Room.hostReveal(); }   // 온라인 방: 참가자 답 채점·정답 전송
   autoAfterReveal();   // 오토 호스트: 공개 후 다음 문항 자동 예약
 }
 
@@ -1493,6 +1537,7 @@ document.getElementById("c-teamblind").addEventListener("change",e=>{ config.tea
 document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
 document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });
 document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||7)); saveState(); });
+document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");
@@ -1592,8 +1637,139 @@ function renderSetup(){
   document.getElementById("c-autohost").checked=!!config.autoHost;
   document.getElementById("c-autohide").checked=!!config.autoHideControls;
   document.getElementById("c-autointerval").value=config.autoInterval||7;
+  document.getElementById("c-online").checked=!!config.onlineRoom;
   renderTeamEditor();
 }
+/* =====================  온라인 방(Room)  =====================
+   전송 계층: 같은 브라우저는 BroadcastChannel(검증됨), 다른 기기는 공개 MQTT 릴레이(베스트에포트).
+   타입별 처리라 자기 메시지 에코는 무시됨. mqtt.js는 온라인 방 사용 시에만 CDN 지연 로드. */
+const Room = (function(){
+  let mqttTried=false;
+  function loadMqtt(){
+    return new Promise(res=>{
+      if(window.mqtt || mqttTried) return res(!!window.mqtt);
+      mqttTried=true;
+      if(!(location.protocol==="http:"||location.protocol==="https:")) return res(false); // file://은 릴레이 불가
+      const s=document.createElement("script");
+      s.src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js";
+      s.onload=()=>res(!!window.mqtt); s.onerror=()=>res(false);
+      document.head.appendChild(s);
+      setTimeout(()=>res(!!window.mqtt), 5000);
+    });
+  }
+  function makeTransport(code){
+    const outs=[]; let cb=null;
+    const bc=new BroadcastChannel("svtq-"+code);
+    bc.onmessage=e=>{ if(cb) cb(e.data); };
+    outs.push({send:m=>bc.postMessage(m), close:()=>bc.close()});
+    if(window.mqtt){
+      try{
+        const client=window.mqtt.connect("wss://broker.hivemq.com:8884/mqtt",{connectTimeout:4000,reconnectPeriod:3000});
+        const topic="svt-lyrics-quiz-v1/"+code;
+        client.on("connect",()=>client.subscribe(topic));
+        client.on("message",(t,p)=>{ if(cb){ try{ cb(JSON.parse(p.toString())); }catch(e){} } });
+        outs.push({send:m=>{ try{ client.publish(topic, JSON.stringify(m)); }catch(e){} }, close:()=>{ try{ client.end(); }catch(e){} }});
+      }catch(e){}
+    }
+    return { send:m=>outs.forEach(o=>o.send(m)), onmsg:c=>{cb=c;}, close:()=>outs.forEach(o=>o.close&&o.close()) };
+  }
+  function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+
+  /* ---- 호스트 ---- */
+  const host={ active:false, code:null, tx:null, roster:{}, answers:{} };
+  async function hostOpen(){
+    await loadMqtt();
+    host.active=true; host.code=gen(); host.roster={}; host.answers={};
+    host.tx=makeTransport(host.code);
+    host.tx.onmsg(m=>{
+      if(m.type==="join"){ host.roster[m.teamId]=host.roster[m.teamId]||{name:m.name,score:0}; host.roster[m.teamId].name=m.name; hostPushState(); hostPushRoster(); hostBar(); }
+      else if(m.type==="answer"){ (host.answers[m.qid]=host.answers[m.qid]||{})[m.teamId]=m.pick; hostBar(); }
+    });
+    document.getElementById("rhb-code").textContent=host.code;
+    document.getElementById("room-host-bar").style.display="flex";
+    hostBar(); hostPushState();   // 접속 준비되면 현재 문항 상태 브로드캐스트
+  }
+  function hostClose(){ if(host.tx) host.tx.close(); host.active=false; host.tx=null; document.getElementById("room-host-bar").style.display="none"; }
+  function hostState(phase){
+    if(order.length===0) return null;
+    return { type:"state", qid:pos, index:pos+1, total:order.length,
+      lyric:(getC(order[pos]).lyrics||"").trim(),
+      options:mcOptions.map(o=>o.name), phase:phase||"answer" };
+  }
+  function hostPushState(){ if(!host.active) return; const s=hostState("answer"); if(s) host.tx.send(s); }
+  function hostPushRoster(){ if(!host.active) return; host.tx.send({type:"roster", roster:Object.entries(host.roster).map(([id,t])=>({id,name:t.name,score:t.score}))}); }
+  function hostReveal(){
+    if(!host.active) return;
+    const ci=mcOptions.findIndex(o=>o.correct);
+    const ans=host.answers[pos]||{};
+    Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci && host.roster[tid]) host.roster[tid].score+=1; });
+    host.tx.send({type:"reveal", qid:pos, correctIdx:ci, answer:songById(order[pos]).name,
+      roster:Object.entries(host.roster).map(([id,t])=>({id,name:t.name,score:t.score}))});
+    hostBar();
+  }
+  function hostBar(){
+    if(!host.active) return;
+    const n=Object.keys(host.roster).length;
+    const sub=Object.keys(host.answers[pos]||{}).length;
+    const top=Object.values(host.roster).sort((a,b)=>b.score-a.score).slice(0,3).map(t=>escapeHtml(t.name)+" "+t.score).join(" · ");
+    document.getElementById("rhb-info").textContent=`참가 팀 ${n} · 제출 ${sub}/${n}`+(top?` · ${top}`:"");
+  }
+
+  /* ---- 참가자 ---- */
+  const guest={ active:false, code:null, tx:null, teamId:null, name:null, qid:null, answered:false };
+  async function guestJoin(code,name){
+    await loadMqtt();
+    guest.active=true; guest.code=code; guest.name=name;
+    guest.teamId=localStorage.getItem("svtq_teamid")||("t"+Math.random().toString(36).slice(2,8));
+    localStorage.setItem("svtq_teamid",guest.teamId);
+    guest.tx=makeTransport(code);
+    guest.tx.onmsg(m=>{
+      if(m.type==="state"){ guestRenderState(m); }
+      else if(m.type==="reveal"){ guestRenderReveal(m); }
+      else if(m.type==="roster"){ guestRenderRoster(m); }
+    });
+    guest.tx.send({type:"join", teamId:guest.teamId, name:guest.name});
+    document.getElementById("rg-join").style.display="none";
+    document.getElementById("rg-play").style.display="block";
+    document.getElementById("rg-status").textContent="사회자를 기다리는 중…";
+  }
+  function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.tx=null; }
+  function guestRenderState(m){
+    if(m.qid!==guest.qid){ guest.qid=m.qid; guest.answered=false; }
+    document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
+    document.getElementById("rg-lyric").textContent=m.lyric||"";
+    const box=document.getElementById("rg-mc"); box.style.display="grid"; box.innerHTML="";
+    const keys=["A","B","C","D"];
+    (m.options||[]).forEach((nm,i)=>{
+      const b=document.createElement("button"); b.className="mc-opt"; b.type="button";
+      b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(nm)}</span>`;
+      b.disabled=guest.answered;
+      b.addEventListener("click",()=>guestAnswer(i));
+      box.appendChild(b);
+    });
+  }
+  function guestAnswer(i){
+    if(guest.answered) return; guest.answered=true;
+    [...document.querySelectorAll("#rg-mc .mc-opt")].forEach(b=>b.disabled=true);
+    guest.tx.send({type:"answer", qid:guest.qid, teamId:guest.teamId, name:guest.name, pick:i});
+    document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
+  }
+  function guestRenderReveal(m){
+    const btns=[...document.querySelectorAll("#rg-mc .mc-opt")];
+    btns.forEach((b,idx)=>{ b.disabled=true; if(idx===m.correctIdx) b.classList.add("correct"); });
+    document.getElementById("rg-status").textContent=`정답: ${m.answer}`;
+    guestRenderRoster(m);
+  }
+  function guestRenderRoster(m){
+    if(!m.roster) return;
+    const me=m.roster.find(t=>t.id===guest.teamId);
+    const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
+    document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,4).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
+  }
+
+  return { hostOpen, hostClose, hostPushState, hostReveal, host, guestJoin, guestLeave, guest };
+})();
+
 (function(){
   const intro=document.getElementById("intro");
   const setup=document.getElementById("setup");
@@ -1611,12 +1787,34 @@ function renderSetup(){
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
     autoRun=!!config.autoHost;               // 오토 호스트면 자동 진행 시작
+    if(config.onlineRoom){ config.mc=true; Room.hostOpen(); }   // 온라인 방: 보기 필요 → 4지선다 강제, 방 개설
     startNewGame(true); renderGame();       // 자동 셔플 1회 + (타이머 켜짐 시) 타이머 시작
     setup.style.display="none";
   }
   document.getElementById("intro-start").addEventListener("click",showSetup);
   document.getElementById("setup-start").addEventListener("click",startGame);
   document.getElementById("setup-back").addEventListener("click",backToIntro);
+
+  // 참가자(온라인 방) 진입
+  const guestView=document.getElementById("room-guest");
+  document.getElementById("intro-join").addEventListener("click",()=>{ intro.classList.add("hide"); guestView.style.display="flex"; });
+  document.getElementById("rg-back").addEventListener("click",()=>{ guestView.style.display="none"; intro.classList.remove("hide"); });
+  document.getElementById("rg-enter").addEventListener("click",()=>{
+    const code=(document.getElementById("rg-code").value||"").trim().toUpperCase();
+    const name=(document.getElementById("rg-name").value||"").trim();
+    const err=document.getElementById("rg-err");
+    if(code.length<4){ err.textContent="방 코드를 확인하세요."; return; }
+    if(!name){ err.textContent="팀 이름을 입력하세요."; return; }
+    err.textContent=""; Room.guestJoin(code,name);
+  });
+  document.getElementById("rg-leave").addEventListener("click",()=>{
+    Room.guestLeave();
+    document.getElementById("rg-play").style.display="none";
+    document.getElementById("rg-join").style.display="block";
+    guestView.style.display="none"; intro.classList.remove("hide");
+  });
+  // URL #room=CODE 로 바로 참가 화면
+  if((location.hash||"").indexOf("room=")>=0){ intro.classList.add("hide"); guestView.style.display="flex"; document.getElementById("rg-code").value=(location.hash.split("room=")[1]||"").toUpperCase(); }
 })();
 
 // 저장 슬롯 잠금 (비밀번호로 슬롯 수정 보호)

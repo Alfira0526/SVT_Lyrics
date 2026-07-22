@@ -180,6 +180,18 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* ---- 4지선다 ---- */
+  .mc-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .mc-opt{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:15px;font-weight:700;color:var(--txt);cursor:pointer;text-align:left;display:flex;gap:10px;align-items:center;transition:.12s;font-family:inherit}
+  .mc-opt .mc-key{width:24px;height:24px;flex:none;border-radius:7px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--muted)}
+  .mc-opt:hover:not(:disabled){border-color:var(--serene);transform:translateY(-1px)}
+  .mc-opt:disabled{cursor:default}
+  .mc-opt.correct{background:rgba(61,220,151,.18);border-color:var(--green)}
+  .mc-opt.correct .mc-key{background:var(--green);color:#06281c}
+  .mc-opt.wrong{background:rgba(255,107,107,.16);border-color:var(--red)}
+  .mc-opt.wrong .mc-key{background:var(--red);color:#3a0d0d}
+  @media(max-width:560px){.mc-options{grid-template-columns:1fr}}
+
   /* ---- 힌트 ---- */
   .hint-area{display:flex;align-items:flex-start;gap:10px;margin-top:14px;flex-wrap:wrap}
   .hint-area > button{flex:none}
@@ -298,6 +310,8 @@
         <div class="hints" id="g-hints"></div>
       </div>
 
+      <div class="mc-options" id="g-mc" style="display:none"></div>
+
       <div class="controls">
         <button class="btn btn-play" id="g-play">▶ 가사 낭독</button>
         <button class="btn btn-stop" id="g-stopread" title="멈춤">⏹</button>
@@ -363,6 +377,10 @@
           <div class="team-editor" id="c-team-editor"></div>
           <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
         </div>
+      </div>
+      <div class="toggle-row" style="margin-top:14px">
+        <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
+        <span style="font-size:14px">4지선다 (객관식) — 문항마다 곡명 보기 4개 중 정답 고르기</span>
       </div>
       <p class="hint">팀전 모드에서는 정답 공개 후 맞힌 팀 버튼을 눌러 점수를 부여합니다. 타이머를 함께 켜면 남은 시간에 비례한 <b>시간 보너스</b>가 가산됩니다.</p>
     </div>
@@ -573,8 +591,15 @@ const DEFAULT_CONTENT = {
 };
 
 const DEFAULT_CONFIG = {
-  timerOn:false, timerSec:15, teamMode:false, teamNames:["팀 1","팀 2"]
+  timerOn:false, timerSec:15, teamMode:false, teamNames:["팀 1","팀 2"], mc:false
 };
+
+/* 4지선다 오답 보기용 세븐틴 곡명 풀 (웹서치로 확보한 실제 곡 · 정답 40곡과 함께 사용) */
+const EXTRA_TITLES = [
+  "Trauma","Space (끝이 안보여)","Shhh","박수 (CLAP)","어쩌나 (Oh My!)","거침없이 (Just do it)","Spell","Bad Influence",
+  "Shining Diamond","Fast Pace","Healing","Change Up (체인지업)","HIGHLIGHT","Rocket","Campfire","Good to Me",
+  "20","Home;Run","2 MINUS 1","Circles","Ash","_WORLD","HIT","Anyone","Darl+ing","24H","Fallin' Flower","Dream"
+];
 
 /* ---- 상태 ---- */
 const STORE_KEY = "svt_lyrics_quiz_v1";
@@ -807,6 +832,39 @@ function renderHints(){
 function revealHint(){ if(order.length===0) return; if(hintLevel<3){ hintLevel++; renderHints(); } }
 function resetHints(){ hintLevel=0; renderHints(); }
 
+/* ---- 4지선다 (객관식) ---- */
+let mcOptions=[];
+function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildMcOptions(){
+  mcOptions=[];
+  if(!config.mc || order.length===0) return;
+  const correct=songById(order[pos]).name;
+  const pool=Array.from(new Set(songs.map(s=>s.name).concat(EXTRA_TITLES))).filter(n=>n && n!==correct);
+  shuffleArr(pool);
+  const opts=[{name:correct,correct:true}].concat(pool.slice(0,3).map(n=>({name:n,correct:false})));
+  mcOptions=shuffleArr(opts);
+}
+function renderMc(){
+  const box=document.getElementById("g-mc"); if(!box) return;
+  if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; return; }
+  box.style.display="grid"; box.innerHTML="";
+  const keys=["A","B","C","D"];
+  mcOptions.forEach((o,i)=>{
+    const b=document.createElement("button"); b.className="mc-opt"; b.type="button";
+    b.innerHTML=`<span class="mc-key">${keys[i]}</span><span>${escapeHtml(o.name)}</span>`;
+    b.addEventListener("click",()=>pickMc(i));
+    box.appendChild(b);
+  });
+}
+function pickMc(i){
+  const box=document.getElementById("g-mc");
+  const btns=[...box.querySelectorAll(".mc-opt")];
+  btns.forEach((b,idx)=>{ b.disabled=true; if(mcOptions[idx].correct) b.classList.add("correct"); });
+  if(!mcOptions[i].correct) btns[i].classList.add("wrong");
+  toast(mcOptions[i].correct?"✔ 정답!":"✘ 오답");
+  showAnswer();
+}
+
 function buildOrder(filter, shuffle){
   let list=songs.map(s=>s.id);
   if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
@@ -831,7 +889,7 @@ function renderGame(){
   if(total===0){
     els.index.textContent=0;
     els.lyric.innerHTML='<span class="placeholder">선택한 난이도에 해당하는 문항이 없습니다.</span>';
-    els.bar.style.width="0%"; hideAnswer(); stopTimer(); resetHints(); return;
+    els.bar.style.width="0%"; hideAnswer(); stopTimer(); resetHints(); buildMcOptions(); renderMc(); return;
   }
   if(pos>=total) pos=total-1; if(pos<0) pos=0;
   const id=order[pos]; const song=songById(id); const c=getC(id);
@@ -844,6 +902,7 @@ function renderGame(){
   else els.lyric.innerHTML='<span class="placeholder">이 문항의 가사가 아직 입력되지 않았습니다.<br>설정 탭에서 입력하세요.</span>';
 
   applyHide(); hideAnswer(); updateCounters(); resetTimer(); resetHints();
+  buildMcOptions(); renderMc();
 }
 
 function renderTeamBoard(){
@@ -1016,6 +1075,7 @@ function renderSettings(){
   document.getElementById("c-timer").checked=!!config.timerOn;
   document.getElementById("c-timersec").value=config.timerSec;
   document.getElementById("c-team").checked=!!config.teamMode;
+  document.getElementById("c-mc").checked=!!config.mc;
   renderTeamEditor();
 
   // counts on chips
@@ -1122,6 +1182,7 @@ document.getElementById("c-team-add").addEventListener("click",()=>{ config.team
 document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
+document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");

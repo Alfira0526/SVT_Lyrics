@@ -249,6 +249,8 @@
   .setup-sub{color:var(--muted);text-align:center;font-size:14px;margin:6px 0 22px}
   .setup-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;text-align:left}
   .setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:10px}
+  .setup-tip{font-size:12.5px;line-height:1.55;color:var(--serene);background:rgba(124,143,255,.09);border-radius:9px;padding:8px 11px;margin-top:11px}
+  .setup-tip b{color:var(--rose);font-weight:800}
   .setup-actions{display:flex;gap:10px;margin-top:8px}
   .slot-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
   .intro-setup{margin:2px 0 26px}
@@ -292,6 +294,7 @@
         <button type="button" data-n="0" class="on">전체</button>
       </div>
       <label class="intro-unit" style="margin-top:14px"><input type="checkbox" id="intro-unit" checked /><span>유닛곡 비중 높이기</span></label>
+      <div class="setup-tip">처음 모이는 자리라면 <b>10문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
     </div>
 
     <div class="setup-card">
@@ -300,7 +303,8 @@
         <span style="font-size:14px">타이머 사용 <span style="color:var(--muted)">(시작 시 카운트다운)</span></span>
       </div>
       <label class="hint" style="display:block;margin:10px 0 4px">문항별 제한 시간(초)</label>
-      <input class="num-input" type="number" id="c-timersec" min="5" max="120" value="15" />
+      <input class="num-input" type="number" id="c-timersec" min="5" max="120" value="20" />
+      <div class="setup-tip"><b>20초</b>면 충분해요! 곡을 떠올리고 손들기 딱 좋은 길이예요 ⏱️<br>더 쫄깃하게 즐기고 싶다면 <b>10초</b>에 도전해보세요.</div>
     </div>
 
     <div class="setup-card">
@@ -310,6 +314,7 @@
       </div>
       <div class="team-editor" id="c-team-editor"></div>
       <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+      <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 빨리 맞힐수록 <b>남은 시간이 보너스 점수</b>로 쌓여요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
     </div>
 
     <div class="setup-card">
@@ -317,6 +322,7 @@
         <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
         <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기</span>
       </div>
+      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요.<br>어려운 모드를 원한다면 <b>OFF</b>로 두고 곡명을 직접 맞혀보세요 🔥</div>
     </div>
 
     <div class="setup-actions">
@@ -684,6 +690,7 @@ let teamScores = [];
 let turn = 0;
 let activeFilter = "all";
 let timerHandle = null, timerLeft = 0;
+let autoTTSHandle = null;   // 카드 전환 후 자동 낭독 예약 핸들
 let quizCount = null;        // 출제 문제 수 (null = 전체)
 let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
 
@@ -998,6 +1005,7 @@ function renderGame(){
   applyHide(); hideAnswer(); updateCounters();
   resetTimer(); if(config.timerOn && gameActive) startTimer();   // 게임 시작·문항 전환 시 타이머 시작
   resetHints(); buildMcOptions(); renderMc();
+  scheduleAutoTTS();   // 카드 전환 시 2초 뒤 자동 낭독
 }
 
 function renderTeamBoard(){
@@ -1083,7 +1091,17 @@ function awardTeam(i,pts){
 let koVoice=null;
 function pickVoice(){ const vs=speechSynthesis.getVoices(); koVoice=vs.find(v=>v.lang==="ko-KR")||vs.find(v=>v.lang&&v.lang.startsWith("ko"))||null; }
 if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-function stopTTS(){ if("speechSynthesis" in window) speechSynthesis.cancel(); }
+function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
+function scheduleAutoTTS(){
+  clearAutoTTS();
+  if(!gameActive) return;                       // 게임 시작 전에는 예약 안 함
+  const gv=document.getElementById("view-game");
+  if(!gv || !gv.classList.contains("active")) return;   // 게임 화면일 때만
+  if(order.length===0) return;
+  const c=getC(order[pos]); if(!c || !(c.lyrics||"").trim()) return;   // 가사 있을 때만
+  autoTTSHandle=setTimeout(()=>{ autoTTSHandle=null; speak(); }, 2000);
+}
+function stopTTS(){ clearAutoTTS(); if("speechSynthesis" in window) speechSynthesis.cancel(); }
 function speak(){
   if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
   if(order.length===0) return;

@@ -180,9 +180,41 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* ---- 시작(랜딩) 화면 ---- */
+  .intro{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(1000px 520px at 50% 0%, #2a1f5e 0%, var(--bg) 62%);
+    transition:opacity .45s ease, visibility .45s;}
+  .intro.hide{opacity:0;visibility:hidden}
+  .intro-inner{text-align:center;max-width:460px;animation:fade .5s ease}
+  .intro-diamond{width:76px;height:76px;margin:0 auto 24px;background:linear-gradient(135deg,var(--rose),var(--serene));transform:rotate(45deg);border-radius:18px;box-shadow:0 0 55px rgba(240,79,138,.6);animation:floaty 3.2s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-9px)}}
+  .intro-title{font-size:clamp(28px,7vw,36px);font-weight:900;margin:0;letter-spacing:.5px}
+  .intro-sub{color:var(--muted);letter-spacing:3px;margin:6px 0 20px;font-size:12px}
+  .intro-desc{color:var(--txt);font-size:16px;line-height:1.75;margin:0 0 22px}
+  .intro-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:30px}
+  .intro-chips span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--muted)}
+  .intro-start{border:0;border-radius:14px;padding:16px 44px;font-size:18px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--rose),var(--serene));box-shadow:0 10px 30px rgba(240,79,138,.4);transition:.15s}
+  .intro-start:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(240,79,138,.5)}
+  .intro-start:active{transform:scale(.97)}
+  .intro-note{color:var(--muted);font-size:12px;margin-top:20px}
 </style>
 </head>
 <body>
+<!-- ================= 시작(랜딩) 화면 ================= -->
+<div class="intro" id="intro">
+  <div class="intro-inner">
+    <div class="intro-diamond"></div>
+    <h1 class="intro-title">세븐틴 가사 퀴즈</h1>
+    <p class="intro-sub">SVT LYRICS QUIZ</p>
+    <p class="intro-desc">세븐틴 가사를 듣고 원곡을 맞혀보세요.<br>사회자와 함께 즐기는 오프라인 팬 퀴즈쇼 🎤</p>
+    <div class="intro-chips">
+      <span>🔊 TTS 낭독</span><span>🙈 가사 가리기</span><span>👥 팀전</span><span>⏱️ 타이머</span>
+    </div>
+    <button class="intro-start" id="intro-start">▶ 시작하기</button>
+    <p class="intro-note">설정 탭에서 문항·가사·MV를 편집할 수 있어요</p>
+  </div>
+</div>
+
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -1002,6 +1034,14 @@ document.getElementById("r-restart").addEventListener("click",()=>{
 });
 
 /* =====================  INIT  ===================== */
+// 시작(랜딩) 화면 → 시작하기
+(function(){
+  const intro=document.getElementById("intro");
+  function start(){ intro.classList.add("hide"); }
+  document.getElementById("intro-start").addEventListener("click",start);
+  document.addEventListener("keydown",e=>{ if(!intro.classList.contains("hide") && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); start(); } });
+})();
+
 loadState();
 els.speedval.textContent="1.0×";
 startNewGame();

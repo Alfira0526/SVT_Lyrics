@@ -42,6 +42,14 @@
 
 ## 📸 스크린샷
 
+<div align="center">
+
+![시작 화면](docs/img/landing.png)
+
+<sub>시작 화면 · ▶ 시작하기</sub>
+
+</div>
+
 | 게임 (문항 낭독) | 정답 공개 + MV |
 |:---:|:---:|
 | ![게임 화면](docs/img/game.png) | ![정답 공개](docs/img/game-answer.png) |

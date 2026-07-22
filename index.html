@@ -180,6 +180,15 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* ---- 힌트 ---- */
+  .hint-area{display:flex;align-items:flex-start;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .hint-area > button{flex:none}
+  .hints{display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+  .hint-chip{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:8px 12px;font-size:14px;animation:fade .25s ease;display:flex;gap:8px;align-items:baseline}
+  .hint-chip .hk{font-size:11px;font-weight:800;color:var(--gold);flex:none}
+  .hint-chip .hv{color:var(--txt)}
+  .hint-chip .hv b{letter-spacing:2px;font-size:16px}
+
   /* ---- 저장 슬롯 ---- */
   .slot-save-row{display:flex;gap:8px;margin-bottom:12px}
   .slot-save-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14px}
@@ -282,6 +291,11 @@
       <div class="toggle-row">
         <label class="switch"><input type="checkbox" id="g-hide" /><span class="slider"></span></label>
         <span style="font-size:14px">가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span></span>
+      </div>
+
+      <div class="hint-area">
+        <button class="btn btn-ghost btn-sm" id="g-hint">💡 힌트 <span id="g-hint-n">(0/3)</span></button>
+        <div class="hints" id="g-hints"></div>
       </div>
 
       <div class="controls">
@@ -747,6 +761,52 @@ const els={
 
 function songById(id){ return songs.find(s=>s.id===id); }
 
+/* ---- 3단계 힌트 (곡 메타에서 자동 생성) ---- */
+const CHOSEONG=["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+function toChoseong(str){
+  let out=[], prevSpace=true;
+  for(const ch of str){
+    const c=ch.charCodeAt(0);
+    if(c>=0xAC00 && c<=0xD7A3){ out.push(CHOSEONG[Math.floor((c-0xAC00)/588)]); prevSpace=false; }
+    else if(/[A-Za-z]/.test(ch)){ if(prevSpace) out.push(ch.toUpperCase()); prevSpace=false; }
+    else if(/\s/.test(ch)){ out.push(" "); prevSpace=true; }
+    else { out.push(ch); prevSpace=false; }
+  }
+  return out.join("").replace(/\s+/g," ").trim();
+}
+function primaryTitle(name){ const i=name.indexOf("("); return (i>0? name.slice(0,i):name).trim(); }
+function maskTitle(t){
+  let shown=false;
+  return [...t].map(ch=>{ if(/\s/.test(ch)) return " "; if(!shown){ shown=true; return ch; } return "○"; }).join("");
+}
+function buildHints(song){
+  const t=primaryTitle(song.name);
+  return [
+    {k:"1단계", v:"파트 · "+escapeHtml(song.part)},
+    {k:"2단계", v:"제목 초성 <b>"+escapeHtml(toChoseong(t))+"</b>"},
+    {k:"3단계", v:"첫 글자 <b>"+escapeHtml(maskTitle(t))+"</b>"},
+  ];
+}
+let hintLevel=0;
+function renderHints(){
+  const box=document.getElementById("g-hints");
+  const nEl=document.getElementById("g-hint-n");
+  const btn=document.getElementById("g-hint");
+  if(!box) return;
+  box.innerHTML="";
+  if(order.length===0){ nEl.textContent="(0/3)"; btn.disabled=true; return; }
+  const hints=buildHints(songById(order[pos]));
+  for(let i=0;i<hintLevel && i<hints.length;i++){
+    const d=document.createElement("div"); d.className="hint-chip";
+    d.innerHTML='<span class="hk">'+hints[i].k+'</span><span class="hv">'+hints[i].v+'</span>';
+    box.appendChild(d);
+  }
+  nEl.textContent="("+hintLevel+"/3)";
+  btn.disabled = hintLevel>=3;
+}
+function revealHint(){ if(order.length===0) return; if(hintLevel<3){ hintLevel++; renderHints(); } }
+function resetHints(){ hintLevel=0; renderHints(); }
+
 function buildOrder(filter, shuffle){
   let list=songs.map(s=>s.id);
   if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
@@ -771,7 +831,7 @@ function renderGame(){
   if(total===0){
     els.index.textContent=0;
     els.lyric.innerHTML='<span class="placeholder">선택한 난이도에 해당하는 문항이 없습니다.</span>';
-    els.bar.style.width="0%"; hideAnswer(); stopTimer(); return;
+    els.bar.style.width="0%"; hideAnswer(); stopTimer(); resetHints(); return;
   }
   if(pos>=total) pos=total-1; if(pos<0) pos=0;
   const id=order[pos]; const song=songById(id); const c=getC(id);
@@ -783,7 +843,7 @@ function renderGame(){
   if(c.lyrics && c.lyrics.trim()) els.lyric.textContent=c.lyrics.trim();
   else els.lyric.innerHTML='<span class="placeholder">이 문항의 가사가 아직 입력되지 않았습니다.<br>설정 탭에서 입력하세요.</span>';
 
-  applyHide(); hideAnswer(); updateCounters(); resetTimer();
+  applyHide(); hideAnswer(); updateCounters(); resetTimer(); resetHints();
 }
 
 function renderTeamBoard(){
@@ -926,6 +986,7 @@ els.hide.addEventListener("change",applyHide);
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
 document.getElementById("g-reveal").addEventListener("click",showAnswer);
+document.getElementById("g-hint").addEventListener("click",revealHint);
 document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));
 document.getElementById("g-mark-wrong").addEventListener("click",()=>mark("wrong"));

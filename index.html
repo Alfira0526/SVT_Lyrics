@@ -904,9 +904,9 @@ function buildOrder(filter, shuffle){
   if(quizCount!=null && quizCount>0) list=list.slice(0, quizCount);
   order=list; pos=0;
 }
-function startNewGame(){
+function startNewGame(shuffle){
   marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0;
-  buildOrder(activeFilter,false);
+  buildOrder(activeFilter, !!shuffle);
 }
 
 function renderGame(){
@@ -1094,7 +1094,7 @@ document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
 document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(activeFilter,true); renderGame(); toast("🔀 순서를 섞었습니다"); });
 document.getElementById("g-restart").addEventListener("click",()=>{
   if(!confirm("채점 기록·팀 점수를 지우고 처음부터 다시 시작할까요?")) return;
-  startNewGame(); renderGame(); toast("처음부터 다시 시작");
+  startNewGame(true); renderGame(); toast("처음부터 다시 시작");
 });
 
 /* =====================  SETTINGS  ===================== */
@@ -1302,7 +1302,7 @@ function grade(rate,answered){
   return {emoji:"🐣",title:"입덕 준비생",desc:"이제부터 세븐틴 정주행 시작해볼까요?"};
 }
 document.getElementById("r-restart").addEventListener("click",()=>{
-  startNewGame();
+  startNewGame(true);
   document.querySelector('nav.tabs button[data-view="game"]').click();
   toast("다시 시작합니다");
 });
@@ -1321,7 +1321,7 @@ document.getElementById("r-restart").addEventListener("click",()=>{
     const n=sel? (parseInt(sel.dataset.n,10)||0):0;
     quizCount = n>0 ? n : null;
     quizUnitBoost = document.getElementById("intro-unit").checked;
-    startNewGame(); renderGame();
+    startNewGame(true); renderGame();   // 시작 시 자동 셔플 1회
     intro.classList.add("hide");
   }
   document.getElementById("intro-start").addEventListener("click",start);

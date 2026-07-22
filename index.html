@@ -180,6 +180,21 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* ---- 저장 슬롯 ---- */
+  .slot-save-row{display:flex;gap:8px;margin-bottom:12px}
+  .slot-save-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14px}
+  .slot-save-row input:focus{outline:0;border-color:var(--rose)}
+  .slot-item{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px}
+  .slot-item .si-main{flex:1;min-width:0}
+  .slot-item .si-name{font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .slot-item .si-time{font-size:11px;color:var(--muted);margin-top:2px}
+  .slot-item .si-btns{display:flex;gap:6px;flex:none}
+  .slot-item .si-btns button{border:0;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer}
+  .si-load{background:linear-gradient(135deg,var(--serene),#5a6fd6);color:#fff}
+  .si-file{background:var(--panel2);color:var(--txt);border:1px solid var(--line)!important}
+  .si-del{background:transparent;color:var(--muted);border:1px solid var(--line)!important}
+  .si-del:hover{color:var(--red);border-color:var(--red)!important}
+
   /* ---- 시작(랜딩) 화면 ---- */
   .intro{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;
     background:radial-gradient(1000px 520px at 50% 0%, #2a1f5e 0%, var(--bg) 62%);
@@ -336,6 +351,22 @@
         </div>
       </div>
       <p class="hint">팀전 모드에서는 정답 공개 후 맞힌 팀 버튼을 눌러 점수를 부여합니다. 타이머를 함께 켜면 남은 시간에 비례한 <b>시간 보너스</b>가 가산됩니다.</p>
+    </div>
+
+    <!-- 저장 슬롯 -->
+    <div class="card">
+      <div class="set-head">
+        <div>
+          <h2>저장 슬롯 <span style="font-size:12px;color:var(--muted);font-weight:600">여러 벌 저장</span></h2>
+          <div class="fill-count">저장된 구성 <b id="slot-count">0</b>개</div>
+        </div>
+      </div>
+      <div class="slot-save-row">
+        <input id="slot-name" placeholder="저장 이름 (예: 1차 모임용)" maxlength="40" />
+        <button class="btn btn-reveal btn-sm" id="slot-save">+ 현재 상태 저장</button>
+      </div>
+      <div id="slot-list"></div>
+      <p class="hint" style="margin-bottom:0">현재 설정(곡·가사·MV·팀·타이머)을 이름 붙여 <b>여러 벌</b> 저장하고 언제든 불러올 수 있습니다. 저장 슬롯은 이 기기에 보관됩니다. <b>파일</b> 버튼으로 개별 슬롯을 내려받아 커밋할 수도 있습니다.</p>
     </div>
 
     <div class="card">
@@ -582,6 +613,68 @@ function downloadDataFile(){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
   toast("svt-data.json 저장됨 · 저장소에 커밋하면 배포본에 반영");
+}
+
+/* ---- 저장 슬롯 (여러 벌 저장) ---- */
+const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
+function loadSlots(){ try{ return JSON.parse(localStorage.getItem(SLOTS_KEY))||[]; }catch(e){ return []; } }
+function persistSlots(s){ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }
+function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config})); }
+function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
+
+function addSlot(){
+  const inp=document.getElementById("slot-name");
+  let name=(inp.value||"").trim();
+  const slots=loadSlots();
+  if(!name) name="저장 "+(slots.length+1);
+  slots.unshift({id:slotId(), name, savedAt:nowStamp(), data:snapshotState()});
+  persistSlots(slots); inp.value=""; renderSlots(); toast(`'${name}' 저장됨`);
+}
+function loadSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  if(!confirm(`'${s.name}' 구성을 불러올까요? 현재 편집 내용은 대체됩니다.`)) return;
+  songs=JSON.parse(JSON.stringify(s.data.songs));
+  content=JSON.parse(JSON.stringify(s.data.content));
+  config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
+  saveState(); renderSettings(); startNewGame(); toast(`'${s.name}' 불러옴`);
+}
+function delSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  if(!confirm(`'${s.name}' 저장을 삭제할까요?`)) return;
+  persistSlots(loadSlots().filter(x=>x.id!==id)); renderSlots();
+}
+function fileSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  const blob=new Blob([JSON.stringify(s.data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=(s.name.replace(/[^\w가-힣\- ]/g,"").trim()||"svt-data")+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000); toast("파일로 저장됨");
+}
+function renderSlots(){
+  const slots=loadSlots();
+  const cnt=document.getElementById("slot-count"); if(cnt) cnt.textContent=slots.length;
+  const list=document.getElementById("slot-list"); if(!list) return;
+  if(!slots.length){ list.innerHTML='<p class="hint" style="margin:4px 0 12px">아직 저장된 구성이 없습니다. 이름을 입력하고 <b>현재 상태 저장</b>을 눌러 보세요.</p>'; return; }
+  list.innerHTML="";
+  slots.forEach(s=>{
+    const n=(s.data.songs||[]).length;
+    const f=Object.values(s.data.content||{}).filter(c=>c&&c.lyrics&&c.lyrics.trim()).length;
+    const el=document.createElement("div"); el.className="slot-item";
+    el.innerHTML=`<div class="si-main"><div class="si-name">${escapeHtml(s.name)}</div>
+      <div class="si-time">${escapeHtml(s.savedAt||"")} · 곡 ${n} · 가사 ${f}</div></div>
+      <div class="si-btns">
+        <button class="si-load" data-load="${s.id}">불러오기</button>
+        <button class="si-file" data-file="${s.id}">파일</button>
+        <button class="si-del" data-del="${s.id}">삭제</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll("[data-load]").forEach(b=>b.addEventListener("click",()=>loadSlot(b.dataset.load)));
+  list.querySelectorAll("[data-file]").forEach(b=>b.addEventListener("click",()=>fileSlot(b.dataset.file)));
+  list.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>delSlot(b.dataset.del)));
 }
 function saveState(){
   localStorage.setItem(STORE_KEY, JSON.stringify({songs, content, config}));
@@ -902,7 +995,7 @@ function renderSettings(){
       </div>`;
     list.appendChild(slot);
   });
-  bindSlotInputs(); updateFilled();
+  bindSlotInputs(); updateFilled(); renderSlots();
 }
 function bindSlotInputs(){
   document.querySelectorAll("#s-list [data-f]").forEach(inp=>{
@@ -1071,6 +1164,8 @@ document.getElementById("r-restart").addEventListener("click",()=>{
 })();
 
 document.getElementById("s-savefile").addEventListener("click",downloadDataFile);
+document.getElementById("slot-save").addEventListener("click",addSlot);
+document.getElementById("slot-name").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); addSlot(); } });
 
 els.speedval.textContent="1.0×";
 (async ()=>{

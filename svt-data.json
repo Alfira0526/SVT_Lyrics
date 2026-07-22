@@ -239,6 +239,12 @@
       "name": "Network Love",
       "part": "1절 벌스 · 유닛",
       "diff": "상"
+    },
+    {
+      "id": "s49",
+      "name": "자꾸만 웃게 돼",
+      "part": "1절 벌스 · 부석순",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -441,6 +447,11 @@
       "lyrics": "너무 멀어 우리의 거리 이렇게라도 너를 만난 기적",
       "mv": "https://youtu.be/4GWunY73yzU",
       "time": "0:08"
+    },
+    "s49": {
+      "lyrics": "너의 마법에 걸린 것 같아 나는",
+      "mv": "",
+      "time": ""
     }
   },
   "config": {

@@ -233,6 +233,14 @@
   .intro-start:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(240,79,138,.5)}
   .intro-start:active{transform:scale(.97)}
   .intro-note{color:var(--muted);font-size:12px;margin-top:20px}
+  .intro-setup{margin:2px 0 26px}
+  .intro-setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:9px;letter-spacing:.3px}
+  .intro-counts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+  .intro-counts button{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:10px 18px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;min-width:58px;transition:.12s}
+  .intro-counts button:hover{border-color:var(--serene)}
+  .intro-counts button.on{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  .intro-unit{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .intro-unit input{width:16px;height:16px;accent-color:var(--rose)}
 </style>
 </head>
 <body>
@@ -245,6 +253,16 @@
     <p class="intro-desc">세븐틴 가사를 듣고 원곡을 맞혀보세요.<br>사회자와 함께 즐기는 오프라인 팬 퀴즈쇼 🎤</p>
     <div class="intro-chips">
       <span>🔊 TTS 낭독</span><span>🙈 가사 가리기</span><span>👥 팀전</span><span>⏱️ 타이머</span>
+    </div>
+    <div class="intro-setup">
+      <div class="intro-setup-label">문제 수</div>
+      <div class="intro-counts" id="intro-counts">
+        <button type="button" data-n="10">10</button>
+        <button type="button" data-n="20">20</button>
+        <button type="button" data-n="30">30</button>
+        <button type="button" data-n="0" class="on">전체</button>
+      </div>
+      <label class="intro-unit"><input type="checkbox" id="intro-unit" checked /><span>유닛곡 비중 높이기</span></label>
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
     <p class="intro-note">설정 탭에서 문항·가사·MV를 편집할 수 있어요</p>
@@ -541,6 +559,7 @@ const DEFAULT_SONGS = [
   {id:"s46", name:"엄지척 (Chuck)", part:"1절 벌스", diff:"중"},
   {id:"s47", name:"Fire", part:"1절 벌스", diff:"상"},
   {id:"s48", name:"Network Love", part:"1절 벌스 · 유닛", diff:"상"},
+  {id:"s49", name:"자꾸만 웃게 돼", part:"1절 벌스 · 부석순", diff:"신곡"},
 ];
 
 /* ---- 기본 콘텐츠 ----
@@ -588,6 +607,7 @@ const DEFAULT_CONTENT = {
   s46: {lyrics:"무대만 서도 시선은 끌었지 반응에 반응해 온몸은 땀 범벅임", mv:"https://youtu.be/rnTJtf2YSHc", time:"0:12"},
   s47: {lyrics:"조심해 손 델라 눈떠도 코 베인다", mv:"https://youtu.be/HJYmVv-lOkg", time:"0:05"},
   s48: {lyrics:"너무 멀어 우리의 거리 이렇게라도 너를 만난 기적", mv:"https://youtu.be/4GWunY73yzU", time:"0:08"},
+  s49: {lyrics:"너의 마법에 걸린 것 같아 나는", mv:"", time:""},
 };
 
 const DEFAULT_CONFIG = {
@@ -614,6 +634,8 @@ let teamScores = [];
 let turn = 0;
 let activeFilter = "all";
 let timerHandle = null, timerLeft = 0;
+let quizCount = null;        // 출제 문제 수 (null = 전체)
+let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
 
 /* ---- 저장/로드 ---- */
 async function loadState(){
@@ -865,12 +887,21 @@ function pickMc(i){
   showAnswer();
 }
 
+function isUnitSong(s){ return /팀|부석순|유닛|정한/.test((s&&s.part)||""); }
 function buildOrder(filter, shuffle){
   let list=songs.map(s=>s.id);
   if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
-  if(shuffle){
-    for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+  const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
+  if(doShuffle){
+    if(quizUnitBoost){
+      // 유닛곡 가중치 2배 → 부분 출제 시 유닛곡이 더 자주 뽑힘
+      list = list.map(id=>({id, k:Math.pow(Math.random(), 1/(isUnitSong(songById(id))?2:1))}))
+                 .sort((a,b)=>b.k-a.k).map(o=>o.id);
+    }else{
+      for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+    }
   }
+  if(quizCount!=null && quizCount>0) list=list.slice(0, quizCount);
   order=list; pos=0;
 }
 function startNewGame(){
@@ -1277,12 +1308,24 @@ document.getElementById("r-restart").addEventListener("click",()=>{
 });
 
 /* =====================  INIT  ===================== */
-// 시작(랜딩) 화면 → 시작하기
+// 시작(랜딩) 화면 → 문제 수 선택 후 시작하기
 (function(){
   const intro=document.getElementById("intro");
-  function start(){ intro.classList.add("hide"); }
+  const counts=document.getElementById("intro-counts");
+  counts.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    counts.querySelectorAll("button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+  }));
+  function start(){
+    const sel=counts.querySelector("button.on");
+    const n=sel? (parseInt(sel.dataset.n,10)||0):0;
+    quizCount = n>0 ? n : null;
+    quizUnitBoost = document.getElementById("intro-unit").checked;
+    startNewGame(); renderGame();
+    intro.classList.add("hide");
+  }
   document.getElementById("intro-start").addEventListener("click",start);
-  document.addEventListener("keydown",e=>{ if(!intro.classList.contains("hide") && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); start(); } });
+  document.addEventListener("keydown",e=>{ if(!intro.classList.contains("hide") && e.key==="Enter" && e.target.tagName!=="INPUT"){ e.preventDefault(); start(); } });
 })();
 
 document.getElementById("s-savefile").addEventListener("click",downloadDataFile);

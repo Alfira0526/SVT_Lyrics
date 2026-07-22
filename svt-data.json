@@ -1,5 +1,5 @@
 {
-  "rev": 1784736915403,
+  "rev": 1784738375872,
   "songs": [
     {
       "id": "s2",
@@ -240,119 +240,113 @@
       "name": "Network Love",
       "part": "1절 벌스 · 유닛",
       "diff": "상"
-    },
-    {
-      "id": "s49",
-      "name": "자꾸만 웃게 돼",
-      "part": "1절 벌스 · 부석순",
-      "diff": "신곡"
     }
   ],
   "content": {
     "s2": {
       "lyrics": "1월부터 12월 매번 돌아도 늘 널 찾고 있어 두 눈 말고 진정으로",
-      "mv": "https://youtu.be/MLlq4gtC55Q",
-      "time": "2:05"
+      "mv": "https://youtu.be/VKuvYk-FsPM?si=S1rjXJ2uiaosyGh5",
+      "time": "2:53"
     },
     "s3": {
       "lyrics": "너를 기다리다 바라봤어 저기 저기 멀리",
       "mv": "https://youtu.be/3kPFq_seRUc",
-      "time": "0:15"
+      "time": "0:10"
     },
     "s4": {
       "lyrics": "너를 부르며 애타게 찾았었다고",
-      "mv": "https://youtu.be/co34EipkpYY",
-      "time": "0:05"
+      "mv": "https://youtu.be/XLObCU6iKOI?si=88IPOseHlwn2z6Hq",
+      "time": "1:17"
     },
     "s6": {
       "lyrics": "안개 속 흐릿하지만 그 속에 누군가 있어",
-      "mv": "https://youtu.be/SMwEkjcEACM",
-      "time": "0:08"
+      "mv": "https://youtu.be/8ZA8PW48QTk?si=0gRJPoqa3MG7HI10",
+      "time": "0:24"
     },
     "s7": {
       "lyrics": "너 IN 뷰파인더 초점은 Auto 자연스러운 움직임 따라 널 따라가",
       "mv": "https://youtu.be/VqfiJCCbTjY",
-      "time": "1:55"
+      "time": "1:27"
     },
     "s8": {
       "lyrics": "맘속엔 어린아이가 있어",
-      "mv": "https://youtu.be/i438AbRPUpk",
-      "time": "0:05"
+      "mv": "https://youtu.be/qwFr8DxW3SM?si=rXpL_vrxocPpl9IZ",
+      "time": "0:12"
     },
     "s10": {
       "lyrics": "겉으로는 낡고 헤져버려 쓸모없는 날 찾아와도",
-      "mv": "https://youtu.be/mLCWceUCo-U",
-      "time": "0:08"
+      "mv": "https://youtu.be/xqwocp2dndE?si=_UhlrPTCGh4rQHtP",
+      "time": "1:12"
     },
     "s11": {
       "lyrics": "옆에 서 있을 때 위태로워 자연스러운 긴장이 좋은 나",
       "mv": "https://youtu.be/EECg4lPL_nE",
-      "time": "0:15"
+      "time": "0:17"
     },
     "s12": {
       "lyrics": "그래서 우린 늘 안 들지 백기를",
-      "mv": "https://youtu.be/c0kBQiiRWBg",
-      "time": "0:12"
+      "mv": "https://youtu.be/iIgHSq59JrQ?si=RHNOvZBXs1rb1x1j",
+      "time": "0:24"
     },
     "s13": {
       "lyrics": "세상은 그저 내겐 놀이터 all day 새로운 느낌 그게 날 숨 쉬게 해",
-      "mv": "https://youtu.be/xKGy27P89_o",
-      "time": "0:15"
+      "mv": "https://youtu.be/2GTyTEvCoQI?si=FXKxMTlJpv7DCw1c",
+      "time": "4:19"
     },
     "s14": {
       "lyrics": "너의 아픔 나로 덮어도 돼",
       "mv": "https://youtu.be/E_PfhU7y9bo",
-      "time": "0:15"
+      "time": "2:20"
     },
     "s15": {
       "lyrics": "무뚝뚝한 내가 이젠 평소에도 널 걱정해",
       "mv": "https://youtu.be/MKbwrcIjfy8",
-      "time": "0:15"
+      "time": "0:59"
     },
     "s16": {
       "lyrics": "어떤 표현법을 써야만 내 맘이 전해질까",
       "mv": "https://youtu.be/j59LLNMEOZk",
-      "time": "0:18"
+      "time": "0:10"
     },
     "s17": {
       "lyrics": "너가 나의 모든 의문점에 대한 정답인 것 같애",
       "mv": "https://youtu.be/J-wFp43XOrA",
-      "time": "0:10"
+      "time": "1:05"
     },
     "s18": {
       "lyrics": "마주치면 좋아지는 기분 넌 내 바이오리듬",
       "mv": "https://youtu.be/IzplmS-VeBc",
-      "time": "0:20"
+      "time": "0:40"
     },
     "s20": {
       "lyrics": "널 찾아가야 돼 찾아가야 돼",
       "mv": "https://youtu.be/97cx53Tpp6g",
-      "time": "0:12"
+      "time": "1:45"
     },
     "s22": {
       "lyrics": "그냥 왜인지 모르게 가끔씩 문득 그런 생각이 자꾸만 들어",
       "mv": "https://youtu.be/PFCQiURzLkk",
-      "time": "0:12"
+      "time": "1:22"
     },
     "s23": {
       "lyrics": "내 머릿속을 파고들어 더 더 더 구석구석 파헤치고",
       "mv": "https://youtu.be/cr_lx0GSfrA",
-      "time": "0:15"
+      "time": "0:10"
     },
     "s24": {
       "lyrics": "영원한 건 절대 없단 걸 알면서도 끝낼 수도 없어",
       "mv": "https://youtu.be/ap14O5-G7UA",
-      "time": "0:20"
+      "time": "0:15"
     },
     "s25": {
       "lyrics": "태양 위를 달리는 마차",
       "mv": "https://youtu.be/gRnuFC4Ualw",
-      "time": "0:08"
+      "time": "0:04"
     },
     "s26": {
       "lyrics": "지금 이 노래가 내가 될 수 있게 만들어 준 네가 다가온다",
       "mv": "https://youtu.be/WpuatuzSDK4",
-      "time": "0:12"
+      "time": "0:00"
     },
     "s27": {
       "lyrics": "널 만나 내 마음이 계속 더 자라서",
@@ -366,103 +360,98 @@
     },
     "s29": {
       "lyrics": "전 세계, ah 공통의 language",
-      "mv": "https://youtu.be/Vl3SURrGP9g",
-      "time": "0:10"
+      "mv": "https://youtu.be/zSQ48zyWZrY?si=QiT0ljLfZlkDAtpA",
+      "time": "0:38"
     },
     "s30": {
       "lyrics": "이런 빌어먹을 세상 나만 혼자 바보 됐어",
       "mv": "https://youtu.be/9kpuOoIh3wU",
-      "time": "0:15"
+      "time": "0:28"
     },
     "s32": {
       "lyrics": "아뿔싸 일어나야지 아침인데",
       "mv": "https://youtu.be/mBXBOLG06Wc",
-      "time": "0:10"
+      "time": "0:06"
     },
     "s33": {
       "lyrics": "시작하자, tuning 맞춰볼까?",
       "mv": "https://youtu.be/ThI0pBAbFnk",
-      "time": "0:10"
+      "time": "0:27"
     },
     "s34": {
       "lyrics": "내가 네 말을 듣겠냐고 그렇게 할 일 없냐고",
       "mv": "https://youtu.be/F2qZWD0F7rM",
-      "time": "0:12"
+      "time": "0:14"
     },
     "s36": {
       "lyrics": "달이 오른 밤 소리 없는 밤 맘에 없는 말들로 어지러운 맘",
-      "mv": "https://youtu.be/aPG_2rMAtVU",
-      "time": "0:12"
+      "mv": "https://youtu.be/EJF2PV3BQtQ?si=dTuSrlmhpJ2KrR40",
+      "time": "0:28"
     },
     "s37": {
       "lyrics": "뭣도 아닌 일에 입이 거칠어지는 평일",
       "mv": "https://youtu.be/Mt9SBZam4X4",
-      "time": "0:15"
+      "time": "0:22"
     },
     "s39": {
       "lyrics": "떨어져 flash 온몸이 crash 회로가 미쳐버렸어 제멋대로",
       "mv": "https://youtu.be/pS57UX6s-xw",
-      "time": "0:15"
+      "time": "0:07"
     },
     "s40": {
       "lyrics": "어쩌다 보니 처음으로 마주하는 오늘이라서",
       "mv": "https://youtu.be/bw4AuPrLWeA",
-      "time": "0:12"
+      "time": "0:15"
     },
     "s41": {
       "lyrics": "내가 뭘 어쩌겠어 나는 너가 없으면 낡은 로봇처럼 맘이 멈추고",
       "mv": "https://youtu.be/R9VDPMk5ls0",
-      "time": "0:10"
+      "time": "0:20"
     },
     "s42": {
       "lyrics": "잊지 말아야 해 출발선에 설 때 두 눈 부릅뜨고 고갤 들어",
       "mv": "https://youtu.be/HdZdxocqzq4",
-      "time": "0:15"
+      "time": "0:06"
     },
     "s43": {
       "lyrics": "난 그랬던 것 같아 네가 어디 있던지 들릴 때라면 고민도 없이 뛰어 갔었던",
       "mv": "https://youtu.be/gZItyr1SNjU",
-      "time": "0:15"
+      "time": "0:10"
     },
     "s44": {
       "lyrics": "셀 수 없는 별들과 모래알 그 사이 폭죽을 쏘는 탕탕 소리에",
-      "mv": "https://youtu.be/sNWs7WbmR9A",
-      "time": "0:08"
+      "mv": "https://youtu.be/7FVieh_RjgU?si=yluoNY1l5UwJvr_6",
+      "time": "0:07"
     },
     "s45": {
       "lyrics": "오늘 멋은 챙겨줘 겉옷 챙겨서 나와",
-      "mv": "https://youtu.be/O9_hcs5yk_0",
-      "time": "0:12"
+      "mv": "https://youtu.be/M3crDLspdtY?si=2D-11lz8WVafl9IZ",
+      "time": "0:28"
     },
     "s46": {
       "lyrics": "무대만 서도 시선은 끌었지 반응에 반응해 온몸은 땀 범벅임",
-      "mv": "https://youtu.be/rnTJtf2YSHc",
-      "time": "0:12"
+      "mv": "https://youtu.be/U3fSv7ZEoTs?si=EelOF-o0pkVf1vGX",
+      "time": "0:08"
     },
     "s47": {
       "lyrics": "조심해 손 델라 눈떠도 코 베인다",
-      "mv": "https://youtu.be/HJYmVv-lOkg",
-      "time": "0:05"
+      "mv": "https://youtu.be/l3fh_AgFY44?si=pD_ofj2lpywuXvup",
+      "time": "0:07"
     },
     "s48": {
       "lyrics": "너무 멀어 우리의 거리 이렇게라도 너를 만난 기적",
       "mv": "https://youtu.be/4GWunY73yzU",
       "time": "0:08"
-    },
-    "s49": {
-      "lyrics": "너의 마법에 걸린 것 같아 나는",
-      "mv": "",
-      "time": ""
     }
   },
   "config": {
-    "timerOn": false,
-    "timerSec": 15,
+    "timerOn": true,
+    "timerSec": 20,
     "teamMode": false,
     "teamNames": [
       "팀 1",
       "팀 2"
     ],
-    "mc": false
+    "mc": true
   }
 }

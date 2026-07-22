@@ -328,7 +328,11 @@
         <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
         <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기</span>
       </div>
-      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요.<br>어려운 모드를 원한다면 <b>OFF</b>로 두고 곡명을 직접 맞혀보세요 🔥</div>
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-teamblind" /><span class="slider"></span></label>
+        <span style="font-size:14px">팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span></span>
+      </div>
+      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요 — 온라인·동시 진행에서 먼저 고른 팀 선택이 드러나지 않아요.</div>
     </div>
 
     <div class="setup-actions">
@@ -689,7 +693,7 @@ const DEFAULT_CONTENT = {
 };
 
 const DEFAULT_CONFIG = {
-  timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true
+  timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -1024,7 +1028,10 @@ function renderTeamRound(){
   const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
   const btns=[...box.querySelectorAll(".mc-opt")]; const names=config.teamNames||[];
   btns.forEach(b=>{ const c=b.querySelector(".mc-badges"); if(c) c.innerHTML=""; });
-  teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=names[t]||("팀"+(t+1)); c.appendChild(s); } } });
+  const blind=config.teamBlind!==false;
+  // 가리기 모드에선 채점 전까지 어느 팀이 뭘 골랐는지 표시하지 않음(동시/온라인)
+  const showBadges = teamRoundDone || !blind;
+  if(showBadges) teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=names[t]||("팀"+(t+1)); c.appendChild(s); } } });
   if(!turnEl) return;
   if(teamRoundDone){
     turnEl.className="mc-turn done";
@@ -1033,7 +1040,9 @@ function renderTeamRound(){
   } else {
     turnEl.className="mc-turn";
     const cur=pickingOrder[pickIdx];
-    turnEl.innerHTML=`🎤 <b>${escapeHtml(names[cur]||("팀"+(cur+1)))}</b> 차례 · 보기를 선택하세요 (${pickIdx+1}/${pickingOrder.length})`;
+    const done=teamPicks.filter(p=>p!=null).length;
+    const note=blind?' · <span style="color:var(--muted)">선택은 비공개</span>':'';
+    turnEl.innerHTML=`🎤 <b>${escapeHtml(names[cur]||("팀"+(cur+1)))}</b> 차례 · 보기를 선택하세요 (${done+1}/${pickingOrder.length})${note}`;
   }
 }
 function pickMcTeam(i){
@@ -1406,6 +1415,7 @@ document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
 document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); });
+document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");
@@ -1501,6 +1511,7 @@ function renderSetup(){
   document.getElementById("c-timersec").value=config.timerSec;
   document.getElementById("c-team").checked=!!config.teamMode;
   document.getElementById("c-mc").checked=!!config.mc;
+  document.getElementById("c-teamblind").checked=config.teamBlind!==false;
   renderTeamEditor();
 }
 (function(){

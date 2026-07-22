@@ -345,12 +345,14 @@
           <div class="fill-count">가사 입력 완료 <b id="s-filled">0</b> / <span id="s-total">40</span></div>
         </div>
         <div class="set-actions">
+          <button class="btn btn-reveal btn-sm" id="s-savefile">💾 저장</button>
           <button class="btn btn-ghost btn-sm" id="s-bulk">📋 일괄 입력</button>
           <button class="btn btn-ghost btn-sm" id="s-export">⬇ 내보내기</button>
           <button class="btn btn-ghost btn-sm" id="s-import">⬆ 불러오기</button>
           <button class="btn btn-ghost btn-sm" id="s-reset">↺ 기본값</button>
         </div>
       </div>
+      <p class="hint" style="margin-bottom:0">💾 <b>저장</b> — 현재 설정을 <code>svt-data.json</code> 파일로 저장합니다. 이 파일을 저장소에 <b>커밋</b>하면(또는 제작자에게 전달하면) 배포된 웹 페이지의 기본값에 반영됩니다. <span style="color:var(--muted)">(입력값은 이 기기에도 자동 저장됩니다.)</span></p>
       <div class="filter-bar">
         <span class="chip active" data-sfilter="all">전체</span>
         <span class="chip" data-sfilter="상">상</span>
@@ -544,16 +546,42 @@ let activeFilter = "all";
 let timerHandle = null, timerLeft = 0;
 
 /* ---- 저장/로드 ---- */
-function loadState(){
+async function loadState(){
   let saved=null;
   try{ saved=JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){}
   if(saved && Array.isArray(saved.songs) && saved.content){
+    // 이 기기의 편집본 우선
     songs=saved.songs;
     content=saved.content;
     config=Object.assign({}, DEFAULT_CONFIG, saved.config||{});
-  }else{
-    resetToDefault(false);
+    return;
   }
+  // 편집본이 없으면 저장소에 커밋된 svt-data.json을 우선 사용 (호스팅 http/https 시)
+  if(location.protocol==="http:"||location.protocol==="https:"){
+    try{
+      const r=await fetch("svt-data.json",{cache:"no-store"});
+      if(r.ok){
+        const j=await r.json();
+        if(j && Array.isArray(j.songs) && j.content){
+          songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{});
+          return;
+        }
+      }
+    }catch(e){/* 파일이 없으면 내장 기본값 사용 */}
+  }
+  resetToDefault(false);
+}
+/* 현재 설정을 커밋용 파일로 저장(다운로드) */
+function downloadDataFile(){
+  saveState();
+  const text=JSON.stringify({songs,content,config},null,2);
+  const blob=new Blob([text],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="svt-data.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast("svt-data.json 저장됨 · 저장소에 커밋하면 배포본에 반영");
 }
 function saveState(){
   localStorage.setItem(STORE_KEY, JSON.stringify({songs, content, config}));
@@ -1042,10 +1070,14 @@ document.getElementById("r-restart").addEventListener("click",()=>{
   document.addEventListener("keydown",e=>{ if(!intro.classList.contains("hide") && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); start(); } });
 })();
 
-loadState();
+document.getElementById("s-savefile").addEventListener("click",downloadDataFile);
+
 els.speedval.textContent="1.0×";
-startNewGame();
-renderGame();
+(async ()=>{
+  await loadState();
+  startNewGame();
+  renderGame();
+})();
 </script>
 </body>
 </html>

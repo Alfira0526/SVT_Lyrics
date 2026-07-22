@@ -598,6 +598,14 @@ const DEFAULT_SONGS = [
   {id:"s46", name:"엄지척 (Chuck)", part:"1절 벌스", diff:"중"},
   {id:"s47", name:"Fire", part:"1절 벌스", diff:"상"},
   {id:"s48", name:"Network Love", part:"1절 벌스 · 유닛", diff:"상"},
+  // 유닛·솔로 확장 (3차) — 공식 MV 보유 서브유닛·페어링·솔로곡
+  {id:"s50", name:"거침없이 (Just do it)", part:"1절 벌스 · 부석순", diff:"상"},
+  {id:"s51", name:"CHEERS (건배)", part:"1절 벌스 · SVT LEADERS", diff:"상"},
+  {id:"s52", name:"Bittersweet (feat. 이하이)", part:"벌스 · 원우X민규", diff:"상"},
+  {id:"s53", name:"Spider", part:"벌스 · 호시 솔로", diff:"상"},
+  {id:"s54", name:"나란히 (Side By Side)", part:"1절 벌스 · 디에잇 솔로", diff:"상"},
+  {id:"s55", name:"You're My Christmas", part:"1절 벌스 · 도겸 솔로", diff:"중"},
+  {id:"s56", name:"동갑내기 (96ers)", part:"1절 벌스 · 호시X우지", diff:"신곡"},
 ];
 
 /* ---- 기본 콘텐츠 ----
@@ -645,6 +653,13 @@ const DEFAULT_CONTENT = {
   s46: {lyrics:"무대만 서도 시선은 끌었지 반응에 반응해 온몸은 땀 범벅임", mv:"https://youtu.be/U3fSv7ZEoTs?si=EelOF-o0pkVf1vGX", time:"0:08"},
   s47: {lyrics:"조심해 손 델라 눈떠도 코 베인다", mv:"https://youtu.be/l3fh_AgFY44?si=pD_ofj2lpywuXvup", time:"0:07"},
   s48: {lyrics:"너무 멀어 우리의 거리 이렇게라도 너를 만난 기적", mv:"https://youtu.be/4GWunY73yzU", time:"0:08"},
+  s50: {lyrics:"근심걱정 가득 찬 세상살이 걷어차 걷어차 걷어차", mv:"https://youtu.be/YGXiVHTy0JE", time:"0:12"},
+  s51: {lyrics:"우린 지하 방에서 건물을 올리지", mv:"https://youtu.be/RnO0HhILXi4", time:"0:32"},
+  s52: {lyrics:"진심을 숨기고서 괜찮은 척 빗속에 난 숨어 늘 웃고 있어", mv:"https://youtu.be/gvdACvfuGFA", time:"1:07"},
+  s53: {lyrics:"난 느낄 수 있어 내가 위험하단 걸 도망칠 수 없단 걸", mv:"https://youtu.be/eOOsAeOx5a0", time:"0:30"},
+  s54: {lyrics:"나의 마음을 너에게 다 주고 싶지만 나는 왜 네 앞에 서면 말을 못 할까", mv:"https://youtu.be/e5bqgvfz84E", time:"0:18"},
+  s55: {lyrics:"하얀 눈이 쌓인 고요한 밤 별빛마저 우릴 비추죠", mv:"https://youtu.be/mHJNduifECM", time:"0:08"},
+  s56: {lyrics:"첫 만남은 코찔찔이 중2", mv:"https://youtu.be/rEBHjYQ8HoI", time:"0:12"},
 };
 
 const DEFAULT_CONFIG = {
@@ -666,8 +681,10 @@ const ALBUM_INFO = {
   s32:{year:2023,type:"싱글"}, s41:{year:2018,type:"미니"}, s42:{year:2020,type:"미니"},
   s43:{year:2018,type:"스페셜"}, s46:{year:2016,type:"정규"},
   s33:{year:2024,type:"베스트"}, s34:{year:2024,type:"베스트"}, s36:{year:2024,type:"싱글"},
-  s37:{year:2025,type:"싱글"}, s39:{year:2025,type:"정규"}, s40:{year:2024,type:"베스트"}
-
+  s37:{year:2025,type:"싱글"}, s39:{year:2025,type:"정규"}, s40:{year:2024,type:"베스트"},
+  s50:{year:2018,type:"싱글"}, s51:{year:2022,type:"정규"}, s52:{year:2021,type:"디지털 싱글"},
+  s53:{year:2021,type:"디지털 싱글"}, s54:{year:2021,type:"디지털 싱글"}, s55:{year:2021,type:"디지털 싱글"},
+  s56:{year:2025,type:"싱글"}
 };
 
 /* 4지선다 오답 보기용 세븐틴 곡명 풀 (웹서치로 확보한 실제 곡 · 정답 40곡과 함께 사용) */
@@ -957,7 +974,7 @@ function pickMc(i){
   showAnswer();
 }
 
-function isUnitSong(s){ return /팀|부석순|유닛|정한/.test((s&&s.part)||""); }
+function isUnitSong(s){ return /팀|부석순|유닛|정한|LEADERS|솔로|[가-힣]X[가-힣]/.test((s&&s.part)||""); }
 function buildOrder(filter, shuffle){
   let list=songs.map(s=>s.id);
   if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);

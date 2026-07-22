@@ -1,5 +1,5 @@
 {
-  "rev": 1784738375872,
+  "rev": 1784741924860,
   "songs": [
     {
       "id": "s2",
@@ -240,6 +240,48 @@
       "name": "Network Love",
       "part": "1절 벌스 · 유닛",
       "diff": "상"
+    },
+    {
+      "id": "s50",
+      "name": "거침없이 (Just do it)",
+      "part": "1절 벌스 · 부석순",
+      "diff": "상"
+    },
+    {
+      "id": "s51",
+      "name": "CHEERS (건배)",
+      "part": "1절 벌스 · SVT LEADERS",
+      "diff": "상"
+    },
+    {
+      "id": "s52",
+      "name": "Bittersweet (feat. 이하이)",
+      "part": "벌스 · 원우X민규",
+      "diff": "상"
+    },
+    {
+      "id": "s53",
+      "name": "Spider",
+      "part": "벌스 · 호시 솔로",
+      "diff": "상"
+    },
+    {
+      "id": "s54",
+      "name": "나란히 (Side By Side)",
+      "part": "1절 벌스 · 디에잇 솔로",
+      "diff": "상"
+    },
+    {
+      "id": "s55",
+      "name": "You're My Christmas",
+      "part": "1절 벌스 · 도겸 솔로",
+      "diff": "중"
+    },
+    {
+      "id": "s56",
+      "name": "동갑내기 (96ers)",
+      "part": "1절 벌스 · 호시X우지",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -442,6 +484,41 @@
       "lyrics": "너무 멀어 우리의 거리 이렇게라도 너를 만난 기적",
       "mv": "https://youtu.be/4GWunY73yzU",
       "time": "0:08"
+    },
+    "s50": {
+      "lyrics": "근심걱정 가득 찬 세상살이 걷어차 걷어차 걷어차",
+      "mv": "https://youtu.be/YGXiVHTy0JE",
+      "time": "0:12"
+    },
+    "s51": {
+      "lyrics": "우린 지하 방에서 건물을 올리지",
+      "mv": "https://youtu.be/RnO0HhILXi4",
+      "time": "0:32"
+    },
+    "s52": {
+      "lyrics": "진심을 숨기고서 괜찮은 척 빗속에 난 숨어 늘 웃고 있어",
+      "mv": "https://youtu.be/gvdACvfuGFA",
+      "time": "1:07"
+    },
+    "s53": {
+      "lyrics": "난 느낄 수 있어 내가 위험하단 걸 도망칠 수 없단 걸",
+      "mv": "https://youtu.be/eOOsAeOx5a0",
+      "time": "0:30"
+    },
+    "s54": {
+      "lyrics": "나의 마음을 너에게 다 주고 싶지만 나는 왜 네 앞에 서면 말을 못 할까",
+      "mv": "https://youtu.be/e5bqgvfz84E",
+      "time": "0:18"
+    },
+    "s55": {
+      "lyrics": "하얀 눈이 쌓인 고요한 밤 별빛마저 우릴 비추죠",
+      "mv": "https://youtu.be/mHJNduifECM",
+      "time": "0:08"
+    },
+    "s56": {
+      "lyrics": "첫 만남은 코찔찔이 중2",
+      "mv": "https://youtu.be/rEBHjYQ8HoI",
+      "time": "0:12"
     }
   },
   "config": {

@@ -247,6 +247,7 @@
         <div class="song-name" id="g-answer-name"></div>
         <div class="part-label" id="g-answer-part"></div>
         <div class="video-wrap" id="g-video"></div>
+        <button class="btn btn-ghost btn-sm" id="g-video-reload" style="margin-top:10px;width:100%">🔄 영상 다시 불러오기</button>
 
         <!-- solo scoring -->
         <div class="controls" id="g-solo-score">
@@ -658,17 +659,29 @@ function updateCounters(){
 }
 function hideAnswer(){ els.answer.classList.remove("show"); els.video.innerHTML=""; }
 
-function showAnswer(){
+function renderVideo(){
   if(order.length===0) return;
-  const id=order[pos]; const song=songById(id); const c=getC(id);
-  els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
+  const c=getC(order[pos]);
   const vid=parseYouTube(c.mv);
+  const reloadBtn=document.getElementById("g-video-reload");
   if(vid){
     const start=parseTime(c.time);
-    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    // cache-busting param forces the iframe to reload even on the same video
+    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&rel=0&_=${videoReloadNonce}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    if(reloadBtn) reloadBtn.style.display="inline-flex";
   }else{
     els.video.innerHTML=`<div class="no-video">🎬 등록된 MV 주소가 없습니다.<br>설정 탭에서 유튜브 주소를 입력하면 재생됩니다.</div>`;
+    if(reloadBtn) reloadBtn.style.display="none";
   }
+}
+let videoReloadNonce=0;
+function reloadVideo(){ videoReloadNonce++; renderVideo(); toast("영상을 다시 불러옵니다"); }
+
+function showAnswer(){
+  if(order.length===0) return;
+  const id=order[pos]; const song=songById(id);
+  els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
+  renderVideo();
   // scoring UI
   document.getElementById("g-solo-score").style.display=config.teamMode?"none":"flex";
   document.getElementById("g-team-score").style.display=config.teamMode?"block":"none";
@@ -760,6 +773,7 @@ els.hide.addEventListener("change",applyHide);
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
 document.getElementById("g-reveal").addEventListener("click",showAnswer);
+document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));
 document.getElementById("g-mark-wrong").addEventListener("click",()=>mark("wrong"));
 document.getElementById("g-noone").addEventListener("click",()=>{ if(order.length){ marks[order[pos]]="wrong"; turn=(turn+1)%(config.teamNames.length||1); updateCounters(); renderTeamBoard(); } next(); });

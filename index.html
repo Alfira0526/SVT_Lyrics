@@ -677,32 +677,37 @@ let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
 async function loadState(){
   let saved=null;
   try{ saved=JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){}
-  if(saved && Array.isArray(saved.songs) && saved.content){
-    // 이 기기의 편집본 우선
-    songs=saved.songs;
-    content=saved.content;
-    config=Object.assign({}, DEFAULT_CONFIG, saved.config||{});
-    return;
-  }
-  // 편집본이 없으면 저장소에 커밋된 svt-data.json을 우선 사용 (호스팅 http/https 시)
+  const localValid = !!(saved && Array.isArray(saved.songs) && saved.content);
+  const appliedRev = localValid ? (saved.rev||0) : 0;
+  // 호스팅(http/https) 시: 커밋된 svt-data.json의 rev가 더 최신이면 모든 기기에 동일 반영
   if(location.protocol==="http:"||location.protocol==="https:"){
     try{
       const r=await fetch("svt-data.json",{cache:"no-store"});
       if(r.ok){
         const j=await r.json();
         if(j && Array.isArray(j.songs) && j.content){
-          songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{});
-          return;
+          const committedRev = j.rev||0;
+          if(!localValid || committedRev>appliedRev){
+            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{});
+            saveState(committedRev);   // 이 커밋 버전을 적용 완료로 기록
+            return;
+          }
         }
       }
-    }catch(e){/* 파일이 없으면 내장 기본값 사용 */}
+    }catch(e){/* 파일이 없으면 로컬/내장 사용 */}
+  }
+  if(localValid){   // 커밋본이 더 최신이 아니면 이 기기 편집본 유지
+    currentRev=appliedRev;
+    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{});
+    return;
   }
   resetToDefault(false);
 }
-/* 현재 설정을 커밋용 파일로 저장(다운로드) */
+/* 현재 설정을 커밋용 파일로 저장(다운로드) · 새 rev를 부여해 커밋 시 다른 기기에 전파 */
 function downloadDataFile(){
-  saveState();
-  const text=JSON.stringify({songs,content,config},null,2);
+  const rev=Date.now();
+  saveState(rev);
+  const text=JSON.stringify({rev, songs, content, config},null,2);
   const blob=new Blob([text],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
@@ -773,8 +778,10 @@ function renderSlots(){
   list.querySelectorAll("[data-file]").forEach(b=>b.addEventListener("click",()=>fileSlot(b.dataset.file)));
   list.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>delSlot(b.dataset.del)));
 }
-function saveState(){
-  localStorage.setItem(STORE_KEY, JSON.stringify({songs, content, config}));
+let currentRev=0;
+function saveState(rev){
+  if(rev!=null) currentRev=rev;
+  localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config}));
 }
 function resetToDefault(doSave){
   songs = DEFAULT_SONGS.map(s=>Object.assign({},s));

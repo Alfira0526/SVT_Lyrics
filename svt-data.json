@@ -1,5 +1,5 @@
 {
-  "rev": 1784743162892,
+  "rev": 1784744284743,
   "songs": [
     {
       "id": "s2",
@@ -300,6 +300,42 @@
       "name": "5, 4, 3 (Pretty woman)",
       "part": "1절 벌스 · 쿱스X민규 (영어)",
       "diff": "신곡"
+    },
+    {
+      "id": "s60",
+      "name": "singasong",
+      "part": "1절 벌스 · V8 · 버논X디에잇",
+      "diff": "신곡"
+    },
+    {
+      "id": "s61",
+      "name": "미아 (mia)",
+      "part": "벌스 · 버논 솔로 · V8",
+      "diff": "신곡"
+    },
+    {
+      "id": "s62",
+      "name": "girlsnboys",
+      "part": "벌스 · V8 · 버논X디에잇 (영어)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s63",
+      "name": "Blue",
+      "part": "1절 벌스 · 도겸X승관 (D&S)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s64",
+      "name": "For you",
+      "part": "벌스 · 쿱스X민규 (영어)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s65",
+      "name": "STUPID IDIOT",
+      "part": "벌스 · 호시X우지",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -552,6 +588,36 @@
       "lyrics": "You make me heat up, trip up, act up, what'd you do?",
       "mv": "https://youtu.be/u89aNeJlyg0",
       "time": "0:12"
+    },
+    "s60": {
+      "lyrics": "Let's kill the sunrise",
+      "mv": "https://youtu.be/pBpr9TnhhkE",
+      "time": "0:32"
+    },
+    "s61": {
+      "lyrics": "말을 좀 더 가려야 해",
+      "mv": "https://youtu.be/ltZuC48-PuQ",
+      "time": "0:20"
+    },
+    "s62": {
+      "lyrics": "She can't get out of bed when she home",
+      "mv": "https://youtu.be/pGxN5BYWssU",
+      "time": "0:32"
+    },
+    "s63": {
+      "lyrics": "하얗게 메마른 너의 그 표정에",
+      "mv": "https://youtu.be/N9X1o0q4aIc",
+      "time": "0:12"
+    },
+    "s64": {
+      "lyrics": "You're my favorite homie, never leave me lonely",
+      "mv": "https://youtu.be/Yly-1O7hMUA",
+      "time": "0:08"
+    },
+    "s65": {
+      "lyrics": "오늘은 밤새 노세 가득 채우고 건배 건배",
+      "mv": "https://youtu.be/hbZZmSb2I-s",
+      "time": "0:18"
     }
   },
   "config": {

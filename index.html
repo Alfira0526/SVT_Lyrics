@@ -205,6 +205,10 @@
   .mc-turn{margin-top:14px;font-size:14px;font-weight:700;text-align:center;color:var(--serene);background:rgba(124,143,255,.12);border-radius:11px;padding:11px}
   .mc-turn b{color:var(--rose);font-weight:900}
   .mc-turn.done{color:var(--txt);background:var(--panel2)}
+  .auto-bar{display:flex;gap:8px;align-items:center;margin-top:12px;background:rgba(124,143,255,.1);border:1px solid var(--line);border-radius:11px;padding:8px 10px}
+  .auto-btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 13px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+  .auto-btn:hover{border-color:var(--serene)}
+  .auto-status{margin-left:auto;font-size:13px;font-weight:700;color:var(--serene)}
   @media(max-width:560px){.mc-options{grid-template-columns:1fr}}
 
   /* ---- 힌트 ---- */
@@ -335,6 +339,20 @@
       <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요 — 온라인·동시 진행에서 먼저 고른 팀 선택이 드러나지 않아요.</div>
     </div>
 
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-autohost" /><span class="slider"></span></label>
+        <span style="font-size:14px">자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span></span>
+      </div>
+      <label class="hint" style="display:block;margin:10px 0 4px">정답 공개 후 다음까지(초)</label>
+      <input class="num-input" type="number" id="c-autointerval" min="2" max="60" value="7" />
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-autohide" /><span class="slider"></span></label>
+        <span style="font-size:14px">진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span></span>
+      </div>
+      <div class="setup-tip">자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.</div>
+    </div>
+
     <div class="setup-actions">
       <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
       <button class="intro-start" id="setup-start" style="flex:1;padding:15px">▶ 게임 시작</button>
@@ -408,6 +426,12 @@
         <button class="btn btn-play" id="g-play">▶ 가사 낭독</button>
         <button class="btn btn-stop" id="g-stopread" title="멈춤">⏹</button>
         <button class="btn btn-reveal" id="g-reveal">정답 공개</button>
+      </div>
+
+      <div class="auto-bar" id="g-auto-bar" style="display:none">
+        <button class="auto-btn" id="g-auto-toggle">⏸ 일시정지</button>
+        <button class="auto-btn" id="g-auto-skip">⏭ 다음</button>
+        <span class="auto-status" id="g-auto-status">자동 진행 중</span>
       </div>
 
       <div class="answer" id="g-answer">
@@ -693,7 +717,8 @@ const DEFAULT_CONTENT = {
 };
 
 const DEFAULT_CONFIG = {
-  timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true
+  timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
+  autoHost:false, autoHideControls:false, autoInterval:7
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -903,6 +928,7 @@ document.querySelectorAll("nav.tabs button").forEach(b=>{
     b.classList.add("active");
     document.getElementById("view-"+b.dataset.view).classList.add("active");
     stopTTS(); stopTimer();
+    if(b.dataset.view!=="game") autoStopTimers();   // 게임 화면 벗어나면 자동 진행 예약 정지
     if(b.dataset.view==="result") renderResult();
     if(b.dataset.view==="settings") renderSettings();
     if(b.dataset.view==="game") renderGame();
@@ -1119,6 +1145,7 @@ function renderGame(){
   resetTimer(); if(config.timerOn && gameActive) startTimer();   // 게임 시작·문항 전환 시 타이머 시작
   resetHints(); buildMcOptions(); resetTeamRound(); renderMc();
   scheduleAutoTTS();   // 카드 전환 시 2초 뒤 자동 낭독
+  autoStartQuestion();   // 오토 호스트: 응답창 후 자동 공개 예약 + 컨트롤 바 갱신
 }
 
 function renderTeamBoard(){
@@ -1187,6 +1214,7 @@ function showAnswer(){
   stopTimer();
   els.answer.classList.add("show");
   els.answer.scrollIntoView({behavior:"smooth",block:"nearest"});
+  autoAfterReveal();   // 오토 호스트: 공개 후 다음 문항 자동 예약
 }
 
 function renderAwardRow(){
@@ -1265,6 +1293,50 @@ function startTimer(){
 }
 function stopTimer(){ if(timerHandle){ clearInterval(timerHandle); timerHandle=null; } }
 
+/* ---- 오토 호스트(자동 진행) ---- */
+let autoRun=false, autoAnsT=null, autoNextT=null, autoCdI=null, autoCdLeft=0;
+function autoStopTimers(){ if(autoAnsT){clearTimeout(autoAnsT);autoAnsT=null;} if(autoNextT){clearTimeout(autoNextT);autoNextT=null;} if(autoCdI){clearInterval(autoCdI);autoCdI=null;} }
+function answerShown(){ return els.answer.classList.contains("show"); }
+function autoBarVisible(){ return config.autoHost && !config.autoHideControls; }
+function updateAutoBar(){
+  const bar=document.getElementById("g-auto-bar");
+  if(!bar) return;
+  bar.style.display=(autoBarVisible() && gameActive)?"flex":"none";
+  const tg=document.getElementById("g-auto-toggle");
+  const st=document.getElementById("g-auto-status");
+  if(tg) tg.textContent=autoRun?"⏸ 일시정지":"▶ 재생";
+  if(st) st.textContent = !autoRun ? "일시정지됨" : (autoCdI ? `다음까지 ${Math.max(0,autoCdLeft)}초` : "자동 진행 중");
+}
+function autoStartQuestion(){   // 문항 표시 직후: 응답창 후 자동 공개 예약
+  autoStopTimers();
+  if(!(config.autoHost && autoRun && gameActive) || order.length===0) { updateAutoBar(); return; }
+  const winSec=(config.timerOn?config.timerSec:12)+1;   // TTS 낭독 리드타임 +1초
+  autoAnsT=setTimeout(()=>{ autoAnsT=null; autoReveal(); }, winSec*1000);
+  updateAutoBar();
+}
+function autoReveal(){
+  if(answerShown()) return;
+  if(config.mc && config.teamMode && !teamRoundDone && order.length) finalizeTeamRound();
+  else showAnswer();   // 두 경로 모두 끝에서 autoAfterReveal() 호출
+}
+function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드면 다음 예약
+  if(!(config.autoHost && autoRun && gameActive)) { updateAutoBar(); return; }
+  autoStopTimers();
+  const sec=Math.max(2, config.autoInterval||7);
+  autoCdLeft=sec;
+  autoCdI=setInterval(()=>{ autoCdLeft--; updateAutoBar(); if(autoCdLeft<=0){ clearInterval(autoCdI); autoCdI=null; } },1000);
+  autoNextT=setTimeout(()=>{ autoNextT=null; autoAdvance(); }, sec*1000);
+  updateAutoBar();
+}
+function autoAdvance(){
+  autoStopTimers();
+  if(pos<order.length-1){ next(); }   // next→renderGame→autoStartQuestion 로 순환
+  else { autoRun=false; document.querySelector('nav.tabs button[data-view="result"]').click(); }
+}
+function autoPause(){ autoRun=false; autoStopTimers(); stopTimer(); stopTTS(); updateAutoBar(); }
+function autoResume(){ autoRun=true; if(answerShown()) autoAfterReveal(); else autoStartQuestion(); updateAutoBar(); }
+function autoSkip(){ if(!answerShown()) autoReveal(); else autoAdvance(); }
+
 /* ---- 채점 / 이동 ---- */
 function mark(kind){
   if(order.length===0) return;
@@ -1284,6 +1356,8 @@ document.getElementById("g-reveal").addEventListener("click",()=>{
   if(config.mc && config.teamMode && !teamRoundDone && order.length) finalizeTeamRound();
   else showAnswer();
 });
+document.getElementById("g-auto-toggle").addEventListener("click",()=>{ if(autoRun) autoPause(); else autoResume(); });
+document.getElementById("g-auto-skip").addEventListener("click",autoSkip);
 document.getElementById("g-hint").addEventListener("click",revealHint);
 document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));
@@ -1416,6 +1490,9 @@ document.getElementById("c-timersec").addEventListener("input",e=>{ config.timer
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
 document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); });
 document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
+document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
+document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });
+document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||7)); saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");
@@ -1512,6 +1589,9 @@ function renderSetup(){
   document.getElementById("c-team").checked=!!config.teamMode;
   document.getElementById("c-mc").checked=!!config.mc;
   document.getElementById("c-teamblind").checked=config.teamBlind!==false;
+  document.getElementById("c-autohost").checked=!!config.autoHost;
+  document.getElementById("c-autohide").checked=!!config.autoHideControls;
+  document.getElementById("c-autointerval").value=config.autoInterval||7;
   renderTeamEditor();
 }
 (function(){
@@ -1530,6 +1610,7 @@ function renderSetup(){
     quizCount = n>0 ? n : null;
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
+    autoRun=!!config.autoHost;               // 오토 호스트면 자동 진행 시작
     startNewGame(true); renderGame();       // 자동 셔플 1회 + (타이머 켜짐 시) 타이머 시작
     setup.style.display="none";
   }

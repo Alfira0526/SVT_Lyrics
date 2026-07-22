@@ -1,5 +1,5 @@
 {
-  "rev": 1784746004762,
+  "rev": 1784749003806,
   "songs": [
     {
       "id": "s2",
@@ -629,6 +629,9 @@
       "팀 2"
     ],
     "mc": true,
-    "teamBlind": true
+    "teamBlind": true,
+    "autoHost": false,
+    "autoHideControls": false,
+    "autoInterval": 7
   }
 }

@@ -180,6 +180,15 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* ---- 저장 슬롯 잠금 ---- */
+  #slot-card.locked #slot-body{display:none}
+  #slot-card:not(.locked) #slot-lock{display:none}
+  .slot-lock{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .slot-lock .sl-emoji{font-size:18px;flex:none}
+  .slot-lock input{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:15px;letter-spacing:3px;font-family:inherit}
+  .slot-lock input:focus{outline:0;border-color:var(--rose)}
+  .slot-lock .sl-err{flex-basis:100%;color:var(--red);font-size:12px;font-weight:700;margin-top:2px}
+
   /* ---- 4지선다 ---- */
   .mc-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
   .mc-opt{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:15px;font-weight:700;color:var(--txt);cursor:pointer;text-align:left;display:flex;gap:10px;align-items:center;transition:.12s;font-family:inherit}
@@ -403,20 +412,28 @@
       <p class="hint">팀전 모드에서는 정답 공개 후 맞힌 팀 버튼을 눌러 점수를 부여합니다. 타이머를 함께 켜면 남은 시간에 비례한 <b>시간 보너스</b>가 가산됩니다.</p>
     </div>
 
-    <!-- 저장 슬롯 -->
-    <div class="card">
+    <!-- 저장 슬롯 (비밀번호 잠금) -->
+    <div class="card locked" id="slot-card">
       <div class="set-head">
         <div>
-          <h2>저장 슬롯 <span style="font-size:12px;color:var(--muted);font-weight:600">여러 벌 저장</span></h2>
+          <h2>저장 슬롯 <span style="font-size:12px;color:var(--muted);font-weight:600">여러 벌 저장 · 🔒 비밀번호</span></h2>
           <div class="fill-count">저장된 구성 <b id="slot-count">0</b>개</div>
         </div>
       </div>
-      <div class="slot-save-row">
-        <input id="slot-name" placeholder="저장 이름 (예: 1차 모임용)" maxlength="40" />
-        <button class="btn btn-reveal btn-sm" id="slot-save">+ 현재 상태 저장</button>
+      <div class="slot-lock" id="slot-lock">
+        <span class="sl-emoji">🔒</span>
+        <input type="password" id="slot-pw" inputmode="numeric" placeholder="비밀번호 입력" autocomplete="off" />
+        <button class="btn btn-reveal btn-sm" id="slot-ok">잠금 해제</button>
+        <div class="sl-err" id="slot-err"></div>
       </div>
-      <div id="slot-list"></div>
-      <p class="hint" style="margin-bottom:0">현재 설정(곡·가사·MV·팀·타이머)을 이름 붙여 <b>여러 벌</b> 저장하고 언제든 불러올 수 있습니다. 저장 슬롯은 이 기기에 보관됩니다. <b>파일</b> 버튼으로 개별 슬롯을 내려받아 커밋할 수도 있습니다.</p>
+      <div id="slot-body">
+        <div class="slot-save-row">
+          <input id="slot-name" placeholder="저장 이름 (예: 1차 모임용)" maxlength="40" />
+          <button class="btn btn-reveal btn-sm" id="slot-save">+ 현재 상태 저장</button>
+        </div>
+        <div id="slot-list"></div>
+        <p class="hint" style="margin-bottom:0">현재 설정(곡·가사·MV·팀·타이머)을 이름 붙여 <b>여러 벌</b> 저장하고 언제든 불러올 수 있습니다. 저장 슬롯은 이 기기에 보관됩니다. <b>파일</b> 버튼으로 개별 슬롯을 내려받아 커밋할 수도 있습니다.</p>
+      </div>
     </div>
 
     <div class="card">
@@ -612,6 +629,25 @@ const DEFAULT_CONTENT = {
 
 const DEFAULT_CONFIG = {
   timerOn:false, timerSec:15, teamMode:false, teamNames:["팀 1","팀 2"], mc:false
+};
+
+/* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
+const ALBUM_INFO = {
+  s2:{year:2017,type:"정규"}, s3:{year:2017,type:"정규"}, s4:{year:2017,type:"미니"},
+  s6:{year:2017,type:"미니"}, s7:{year:2019,type:"미니"}, s8:{year:2020,type:"미니"},
+  s11:{year:2022,type:"정규"}, s12:{year:2019,type:"정규"}, s13:{year:2022,type:"정규"},
+  s44:{year:2020,type:"스페셜"}, s45:{year:2019,type:"미니"}, s47:{year:2023,type:"미니"},
+  s48:{year:2019,type:"정규"},
+  s14:{year:2015,type:"미니"}, s15:{year:2015,type:"미니"}, s16:{year:2016,type:"정규"},
+  s17:{year:2016,type:"정규"}, s18:{year:2016,type:"미니"}, s20:{year:2017,type:"미니"},
+  s22:{year:2016,type:"정규"}, s23:{year:2019,type:"미니"}, s24:{year:2019,type:"정규"},
+  s25:{year:2022,type:"정규"}, s26:{year:2021,type:"미니"}, s27:{year:2021,type:"미니"},
+  s28:{year:2023,type:"미니"}, s29:{year:2023,type:"미니"}, s30:{year:2023,type:"미니"},
+  s32:{year:2023,type:"싱글"}, s41:{year:2018,type:"미니"}, s42:{year:2020,type:"미니"},
+  s43:{year:2018,type:"스페셜"}, s46:{year:2016,type:"정규"},
+  s33:{year:2024,type:"베스트"}, s34:{year:2024,type:"베스트"}, s36:{year:2024,type:"싱글"},
+  s37:{year:2025,type:"싱글"}, s39:{year:2025,type:"정규"}, s40:{year:2024,type:"베스트"},
+  s49:{year:2024,type:"디지털 싱글"}
 };
 
 /* 4지선다 오답 보기용 세븐틴 곡명 풀 (웹서치로 확보한 실제 곡 · 정답 40곡과 함께 사용) */
@@ -826,15 +862,22 @@ function maskTitle(t){
   let shown=false;
   return [...t].map(ch=>{ if(/\s/.test(ch)) return " "; if(!shown){ shown=true; return ch; } return "○"; }).join("");
 }
+/* 6개 카테고리 중 랜덤 3개 힌트 생성 */
 function buildHints(song){
   const t=primaryTitle(song.name);
-  return [
-    {k:"1단계", v:"파트 · "+escapeHtml(song.part)},
-    {k:"2단계", v:"제목 초성 <b>"+escapeHtml(toChoseong(t))+"</b>"},
-    {k:"3단계", v:"첫 글자 <b>"+escapeHtml(maskTitle(t))+"</b>"},
-  ];
+  const info=ALBUM_INFO[song.id];
+  const cands=[];
+  cands.push({k:"구성", v: isUnitSong(song)? "<b>유닛곡</b>" : "<b>단체곡</b> (완전체)"});
+  cands.push({k:"제목 초성", v:"<b>"+escapeHtml(toChoseong(t))+"</b>"});
+  cands.push({k:"파트", v:escapeHtml(song.part)});
+  cands.push({k:"첫 글자", v:"<b>"+escapeHtml(maskTitle(t))+"</b>"});
+  if(info && info.year) cands.push({k:"발매 연도", v:"<b>"+info.year+"</b>년"});
+  if(info && info.type) cands.push({k:"앨범 종류", v:"<b>"+escapeHtml(info.type)+"</b>"});
+  shuffleArr(cands);
+  return cands.slice(0,3);
 }
-let hintLevel=0;
+let hintLevel=0, currentHints=[];
+function prepareHints(){ currentHints = order.length? buildHints(songById(order[pos])) : []; }
 function renderHints(){
   const box=document.getElementById("g-hints");
   const nEl=document.getElementById("g-hint-n");
@@ -842,17 +885,16 @@ function renderHints(){
   if(!box) return;
   box.innerHTML="";
   if(order.length===0){ nEl.textContent="(0/3)"; btn.disabled=true; return; }
-  const hints=buildHints(songById(order[pos]));
-  for(let i=0;i<hintLevel && i<hints.length;i++){
+  for(let i=0;i<hintLevel && i<currentHints.length;i++){
     const d=document.createElement("div"); d.className="hint-chip";
-    d.innerHTML='<span class="hk">'+hints[i].k+'</span><span class="hv">'+hints[i].v+'</span>';
+    d.innerHTML='<span class="hk">'+currentHints[i].k+'</span><span class="hv">'+currentHints[i].v+'</span>';
     box.appendChild(d);
   }
   nEl.textContent="("+hintLevel+"/3)";
-  btn.disabled = hintLevel>=3;
+  btn.disabled = hintLevel>=currentHints.length;
 }
-function revealHint(){ if(order.length===0) return; if(hintLevel<3){ hintLevel++; renderHints(); } }
-function resetHints(){ hintLevel=0; renderHints(); }
+function revealHint(){ if(order.length===0) return; if(hintLevel<currentHints.length){ hintLevel++; renderHints(); } }
+function resetHints(){ hintLevel=0; prepareHints(); renderHints(); }
 
 /* ---- 4지선다 (객관식) ---- */
 let mcOptions=[];
@@ -1326,6 +1368,20 @@ document.getElementById("r-restart").addEventListener("click",()=>{
   }
   document.getElementById("intro-start").addEventListener("click",start);
   document.addEventListener("keydown",e=>{ if(!intro.classList.contains("hide") && e.key==="Enter" && e.target.tagName!=="INPUT"){ e.preventDefault(); start(); } });
+})();
+
+// 저장 슬롯 잠금 (비밀번호로 슬롯 수정 보호)
+const SLOT_PW="19950719";
+(function(){
+  const card=document.getElementById("slot-card");
+  const pw=document.getElementById("slot-pw");
+  const err=document.getElementById("slot-err");
+  function tryUnlock(){
+    if(pw.value===SLOT_PW){ card.classList.remove("locked"); err.textContent=""; pw.value=""; }
+    else{ err.textContent="비밀번호가 올바르지 않습니다."; pw.value=""; pw.focus(); }
+  }
+  document.getElementById("slot-ok").addEventListener("click",tryUnlock);
+  pw.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); tryUnlock(); } });
 })();
 
 document.getElementById("s-savefile").addEventListener("click",downloadDataFile);

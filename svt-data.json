@@ -1,5 +1,5 @@
 {
-  "rev": 1784741924860,
+  "rev": 1784743162892,
   "songs": [
     {
       "id": "s2",
@@ -282,6 +282,24 @@
       "name": "동갑내기 (96ers)",
       "part": "1절 벌스 · 호시X우지",
       "diff": "신곡"
+    },
+    {
+      "id": "s57",
+      "name": "Ruby",
+      "part": "벌스 · 우지 솔로 (영어)",
+      "diff": "상"
+    },
+    {
+      "id": "s58",
+      "name": "Black Eye",
+      "part": "벌스 · 버논 솔로 (영어)",
+      "diff": "상"
+    },
+    {
+      "id": "s59",
+      "name": "5, 4, 3 (Pretty woman)",
+      "part": "1절 벌스 · 쿱스X민규 (영어)",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -518,6 +536,21 @@
     "s56": {
       "lyrics": "첫 만남은 코찔찔이 중2",
       "mv": "https://youtu.be/rEBHjYQ8HoI",
+      "time": "0:12"
+    },
+    "s57": {
+      "lyrics": "Where am I running to now, blinded by shining lights pulling me close",
+      "mv": "https://youtu.be/oV_2853N4n4",
+      "time": "0:08"
+    },
+    "s58": {
+      "lyrics": "Running round the whole city for someone to look me in my eyes",
+      "mv": "https://youtu.be/vPQasPdd6fI",
+      "time": "0:05"
+    },
+    "s59": {
+      "lyrics": "You make me heat up, trip up, act up, what'd you do?",
+      "mv": "https://youtu.be/u89aNeJlyg0",
       "time": "0:12"
     }
   },

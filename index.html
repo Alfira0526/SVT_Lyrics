@@ -462,7 +462,7 @@
           <button class="btn btn-ghost btn-sm" id="s-savefile">💾 배포본 저장(커밋용)</button>
         </div>
         <div id="slot-list"></div>
-        <p class="hint" style="margin-bottom:0">현재 설정(곡·가사·MV·팀·타이머)을 이름 붙여 <b>여러 벌</b> 저장·불러오기 할 수 있습니다(이 기기 보관). <b>파일</b>로 개별 슬롯을 내려받고, <b>💾 배포본 저장</b>으로 받은 <code>svt-data.json</code>을 커밋하면 다른 기기에도 동일하게 반영됩니다.</p>
+        <p class="hint" style="margin-bottom:0">🔒 <b>비밀번호를 아는 관리자</b>만 저장 슬롯을 관리할 수 있습니다. <b>+ 현재 상태 저장</b>을 누르면 슬롯 보관과 함께 <code>svt-data.json</code>이 바로 <b>커밋용으로 내려받아져</b>, 저장소에 커밋하면 즉시 배포본에 반영됩니다. 각 슬롯의 <b>💾 배포본</b> 버튼으로 지난 구성도 언제든 커밋용 파일로 받을 수 있습니다.</p>
       </div>
     </div>
 
@@ -606,6 +606,9 @@ const DEFAULT_SONGS = [
   {id:"s54", name:"나란히 (Side By Side)", part:"1절 벌스 · 디에잇 솔로", diff:"상"},
   {id:"s55", name:"You're My Christmas", part:"1절 벌스 · 도겸 솔로", diff:"중"},
   {id:"s56", name:"동갑내기 (96ers)", part:"1절 벌스 · 호시X우지", diff:"신곡"},
+  {id:"s57", name:"Ruby", part:"벌스 · 우지 솔로 (영어)", diff:"상"},
+  {id:"s58", name:"Black Eye", part:"벌스 · 버논 솔로 (영어)", diff:"상"},
+  {id:"s59", name:"5, 4, 3 (Pretty woman)", part:"1절 벌스 · 쿱스X민규 (영어)", diff:"신곡"},
 ];
 
 /* ---- 기본 콘텐츠 ----
@@ -660,6 +663,9 @@ const DEFAULT_CONTENT = {
   s54: {lyrics:"나의 마음을 너에게 다 주고 싶지만 나는 왜 네 앞에 서면 말을 못 할까", mv:"https://youtu.be/e5bqgvfz84E", time:"0:18"},
   s55: {lyrics:"하얀 눈이 쌓인 고요한 밤 별빛마저 우릴 비추죠", mv:"https://youtu.be/mHJNduifECM", time:"0:08"},
   s56: {lyrics:"첫 만남은 코찔찔이 중2", mv:"https://youtu.be/rEBHjYQ8HoI", time:"0:12"},
+  s57: {lyrics:"Where am I running to now, blinded by shining lights pulling me close", mv:"https://youtu.be/oV_2853N4n4", time:"0:08"},
+  s58: {lyrics:"Running round the whole city for someone to look me in my eyes", mv:"https://youtu.be/vPQasPdd6fI", time:"0:05"},
+  s59: {lyrics:"You make me heat up, trip up, act up, what'd you do?", mv:"https://youtu.be/u89aNeJlyg0", time:"0:12"},
 };
 
 const DEFAULT_CONFIG = {
@@ -684,7 +690,8 @@ const ALBUM_INFO = {
   s37:{year:2025,type:"싱글"}, s39:{year:2025,type:"정규"}, s40:{year:2024,type:"베스트"},
   s50:{year:2018,type:"싱글"}, s51:{year:2022,type:"정규"}, s52:{year:2021,type:"디지털 싱글"},
   s53:{year:2021,type:"디지털 싱글"}, s54:{year:2021,type:"디지털 싱글"}, s55:{year:2021,type:"디지털 싱글"},
-  s56:{year:2025,type:"싱글"}
+  s56:{year:2025,type:"싱글"}, s57:{year:2022,type:"디지털 싱글"}, s58:{year:2022,type:"디지털 싱글"},
+  s59:{year:2025,type:"미니"}
 };
 
 /* 4지선다 오답 보기용 세븐틴 곡명 풀 (웹서치로 확보한 실제 곡 · 정답 40곡과 함께 사용) */
@@ -742,16 +749,21 @@ async function loadState(){
   resetToDefault(false);
 }
 /* 현재 설정을 커밋용 파일로 저장(다운로드) · 새 rev를 부여해 커밋 시 다른 기기에 전파 */
-function downloadDataFile(){
+/* 배포본(svt-data.json) 내려받기 — 어떤 구성이든 rev를 새로 찍어 커밋 가능한 파일로 저장 */
+function downloadDeploy(data){
   const rev=Date.now();
-  saveState(rev);
-  const text=JSON.stringify({rev, songs, content, config},null,2);
-  const blob=new Blob([text],{type:"application/json"});
+  const payload={rev, songs:data.songs, content:data.content, config:data.config};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   a.href=url; a.download="svt-data.json";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
+  return rev;
+}
+function downloadDataFile(){
+  const rev=downloadDeploy({songs, content, config});
+  saveState(rev);
   toast("svt-data.json 저장됨 · 저장소에 커밋하면 배포본에 반영");
 }
 
@@ -768,8 +780,11 @@ function addSlot(){
   let name=(inp.value||"").trim();
   const slots=loadSlots();
   if(!name) name="저장 "+(slots.length+1);
-  slots.unshift({id:slotId(), name, savedAt:nowStamp(), data:snapshotState()});
-  persistSlots(slots); inp.value=""; renderSlots(); toast(`'${name}' 저장됨`);
+  const snap=snapshotState();
+  slots.unshift({id:slotId(), name, savedAt:nowStamp(), data:snap});
+  persistSlots(slots); inp.value=""; renderSlots();
+  downloadDeploy(snap);   // 저장과 동시에 커밋용 svt-data.json 내려받기 → 바로 커밋 가능
+  toast(`'${name}' 저장 · svt-data.json 내려받음(커밋하면 배포 반영)`);
 }
 function loadSlot(id){
   const s=loadSlots().find(x=>x.id===id); if(!s) return;
@@ -786,12 +801,8 @@ function delSlot(id){
 }
 function fileSlot(id){
   const s=loadSlots().find(x=>x.id===id); if(!s) return;
-  const blob=new Blob([JSON.stringify(s.data,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download=(s.name.replace(/[^\w가-힣\- ]/g,"").trim()||"svt-data")+".json";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000); toast("파일로 저장됨");
+  downloadDeploy(s.data);   // 해당 슬롯을 커밋용 svt-data.json으로 내려받기
+  toast(`'${s.name}' → svt-data.json 내려받음 · 커밋하면 배포본에 반영`);
 }
 function renderSlots(){
   const slots=loadSlots();
@@ -807,7 +818,7 @@ function renderSlots(){
       <div class="si-time">${escapeHtml(s.savedAt||"")} · 곡 ${n} · 가사 ${f}</div></div>
       <div class="si-btns">
         <button class="si-load" data-load="${s.id}">불러오기</button>
-        <button class="si-file" data-file="${s.id}">파일</button>
+        <button class="si-file" data-file="${s.id}">💾 배포본</button>
         <button class="si-del" data-del="${s.id}">삭제</button>
       </div>`;
     list.appendChild(el);

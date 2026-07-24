@@ -334,6 +334,11 @@
     <div class="setup-card">
       <div class="rhb-code" style="text-align:center;font-size:16px">방 코드 <b id="rl-code" style="font-size:26px;letter-spacing:4px;color:var(--rose)">----</b></div>
       <div class="rl-conn" id="rl-conn" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">연결 확인 중…</div>
+      <div style="text-align:center;margin-top:12px">
+        <img id="rl-qr" alt="방 참가 QR" style="width:180px;height:180px;display:none;border-radius:12px;background:#fff;padding:8px" />
+        <div id="rl-qr-cap" style="font-size:12px;color:var(--muted);margin-top:6px;display:none">📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요</div>
+        <div id="rl-link" style="font-size:11px;color:var(--serene);word-break:break-all;margin-top:4px"></div>
+      </div>
       <div class="setup-label" style="margin-top:16px">참가 팀 (<b id="rl-count">0</b>)</div>
       <div id="rl-teams" style="font-size:14px;line-height:1.9">아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.</div>
       <div class="video-wrap" id="rl-video" style="margin-top:14px"></div>
@@ -380,6 +385,7 @@
       </div>
       <div class="team-editor" id="c-team-editor"></div>
       <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+      <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px">🎲 랜덤 이름</button>
       <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 빨리 맞힐수록 <b>남은 시간이 보너스 점수</b>로 쌓여요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
     </div>
 
@@ -825,6 +831,15 @@ const EXTRA_TITLES = [
   "Trauma","Space (끝이 안보여)","Shhh","박수 (CLAP)","어쩌나 (Oh My!)","거침없이 (Just do it)","Spell","Bad Influence",
   "Shining Diamond","Fast Pace","Healing","Change Up (체인지업)","HIGHLIGHT","Rocket","Campfire","Good to Me",
   "20","Home;Run","2 MINUS 1","Circles","Ash","_WORLD","HIT","Anyone","Darl+ing","24H","Fallin' Flower","Dream"
+];
+
+/* 팀명 랜덤 풀 — 세븐틴 멤버 케미 조합명·라인·유닛 (namu.wiki 세븐틴/멤버 간 케미 참조) */
+const TEAM_NAME_POOL = [
+  "호우주의보","달빛즈","투캡틴즈","날쏘가즈","댕냥즈","최씨즈","원정대",
+  "부석순","힙합팀","보컬팀","퍼포먼스팀",
+  "95즈","96즈","97즈","막내라인","07즈",
+  "캐럿","샤이닝 다이아몬드","다이아몬드 엣지","붐붐","아주 나이스","만세","예쁘다","손오공",
+  "음악의 신","하이라이트","열세즈","세봉이","호랭이","붕어즈"
 ];
 
 /* ---- 상태 ---- */
@@ -1596,6 +1611,11 @@ function renderTeamEditor(){
   }));
 }
 document.getElementById("c-team-add").addEventListener("click",()=>{ config.teamNames.push("팀 "+(config.teamNames.length+1)); saveState(); renderTeamEditor(); });
+document.getElementById("c-team-random").addEventListener("click",()=>{
+  const pool=TEAM_NAME_POOL.slice(); shuffleArr(pool);
+  config.teamNames = config.teamNames.map((_,i)=> pool[i] || ("팀 "+(i+1)));
+  saveState(); renderTeamEditor(); toast("🎲 팀 이름을 랜덤으로 지었어요");
+});
 document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
@@ -1783,6 +1803,14 @@ const Room = (function(){
     });
     document.getElementById("rl-code").textContent=host.code;
     document.getElementById("rhb-code").textContent=host.code;
+    // 참가 QR — 폰 카메라로 스캔하면 방 코드가 채워진 참가 화면으로 바로 이동
+    const joinUrl=location.origin+location.pathname+"#room="+host.code;
+    if(location.protocol==="http:"||location.protocol==="https:"){
+      const qr=document.getElementById("rl-qr");
+      qr.src="https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=8&data="+encodeURIComponent(joinUrl);
+      qr.style.display="inline-block"; document.getElementById("rl-qr-cap").style.display="block";
+    }
+    document.getElementById("rl-link").textContent=joinUrl;
     document.getElementById("rl-video").innerHTML=randomMvEmbed();   // 대기 화면 랜덤 MV
     lobbyConn(); lobbyTeams();
   }

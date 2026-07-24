@@ -277,6 +277,8 @@
   .intro-counts button{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:10px 18px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;min-width:58px;transition:.12s}
   .intro-counts button:hover{border-color:var(--serene)}
   .intro-counts button.on{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  .intro-counts .ic-step{min-width:46px;font-size:20px;line-height:1}
+  .intro-counts .ic-num{min-width:72px}
   .intro-unit{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
   .intro-unit input{width:16px;height:16px;accent-color:var(--rose)}
 </style>
@@ -365,13 +367,13 @@
     <div class="setup-card">
       <div class="setup-label">문제 수</div>
       <div class="intro-counts" id="intro-counts">
-        <button type="button" data-n="10">10</button>
-        <button type="button" data-n="20">20</button>
-        <button type="button" data-n="30">30</button>
-        <button type="button" data-n="0" class="on">전체</button>
+        <button type="button" class="ic-step" id="ic-minus" aria-label="5개 줄이기">−</button>
+        <button type="button" class="ic-num" id="ic-num" data-n="15">15</button>
+        <button type="button" class="ic-step" id="ic-plus" aria-label="5개 늘리기">+</button>
+        <button type="button" class="ic-all on" id="ic-all" data-n="0">전체</button>
       </div>
       <label class="intro-unit" style="margin-top:14px"><input type="checkbox" id="intro-unit" checked /><span>유닛곡 비중 높이기</span></label>
-      <div class="setup-tip">처음 모이는 자리라면 <b>10문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
+      <div class="setup-tip">문제 수는 <b>5문제 단위</b>로 −/+ 조절할 수 있어요. 처음 모이는 자리라면 <b>10~15문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
     </div>
 
     <div class="setup-card">
@@ -389,8 +391,8 @@
         <label class="switch"><input type="checkbox" id="c-team" /><span class="slider"></span></label>
         <span style="font-size:14px">팀전 모드 <span style="color:var(--muted)">(타이머 시 시간 보너스)</span></span>
       </div>
-      <div class="team-editor" id="c-team-editor"></div>
       <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+      <div class="team-editor" id="c-team-editor"></div>
       <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px">🎲 랜덤 이름</button>
       <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 빨리 맞힐수록 <b>남은 시간이 보너스 점수</b>로 쌓여요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
     </div>
@@ -1236,7 +1238,7 @@ function startNextRound(){
   buildOrder(activeFilter, true, playedIds);
   if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(activeFilter, true); }
   marks={}; pos=0;
-  if(Room.host.active){ Room.host.answers={}; Room.host.phase="playing"; }
+  if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
   renderGame();
   document.querySelector('nav.tabs button[data-view="game"]').click();
 }
@@ -1376,6 +1378,7 @@ if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pi
 function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
 function scheduleAutoTTS(){
   clearAutoTTS();
+  if(config.quizOnly) return;                   // 문제만 맞추기: 자동 낭독 없음
   if(!gameActive) return;                       // 게임 시작 전에는 예약 안 함
   const gv=document.getElementById("view-game");
   if(!gv || !gv.classList.contains("active")) return;   // 게임 화면일 때만
@@ -1473,7 +1476,7 @@ function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드�
 function autoAdvance(){
   autoStopTimers();
   if(pos<order.length-1){ next(); }   // next→renderGame→autoStartQuestion 로 순환
-  else { autoRun=false; if(Room.host.active) Room.hostEnd(); document.querySelector('nav.tabs button[data-view="result"]').click(); }
+  else { autoRun=false; if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }   // 온라인 방은 닫지 않고 대기 → 새 라운드로 이어감
 }
 function autoPause(){ autoRun=false; autoStopTimers(); stopTimer(); stopTTS(); updateAutoBar(); }
 function autoResume(){ autoRun=true; if(answerShown()) autoAfterReveal(); else autoStartQuestion(); updateAutoBar(); }
@@ -1747,6 +1750,10 @@ function grade(rate,answered){
 document.getElementById("r-restart").addEventListener("click",()=>{
   gameActive=true;
   startNewGame(true);
+  if(Room.host.active){   // 온라인 방: 점수 초기화 + 라운드↑ → 참가자도 새 판으로 동반 이동
+    Object.keys(Room.host.roster).forEach(k=>Room.host.roster[k].score=0);
+    autoRun=true; Room.hostNextRound();
+  }
   document.querySelector('nav.tabs button[data-view="game"]').click();
   toast("다시 시작합니다");
 });
@@ -1828,17 +1835,17 @@ const Room = (function(){
   function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
 
   /* ---- 호스트 ---- */
-  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{} };
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0 };
   async function hostOpen(){
     if(!config.fbUrl) await loadMqtt();
-    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false;
+    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0;
     host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
     host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
     host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
     host.tx.onmsg(m=>{
       if(m.type==="hello"){ hostPushSlots(); hostSyncGuest(); }
       else if(m.type==="claim"){ hostClaim(m.dev, m.name); }
-      else if(m.type==="answer" && host.claims[m.name]){ (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
+      else if(m.type==="answer" && host.claims[m.name]){ if((m.round||0)!==(host.round||0)) return; (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
     });
     document.getElementById("rl-code").textContent=host.code;
     document.getElementById("rhb-code").textContent=host.code;
@@ -1880,10 +1887,11 @@ const Room = (function(){
   function hostState(){
     if(order.length===0) return null;
     const c=getC(order[pos]);
-    return { type:"state", qid:pos, index:pos+1, total:order.length,
+    return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
       lyric:(c.lyrics||"").trim(),
       options:mcOptions.map(o=>o.name),
       sec:(config.timerOn?config.timerSec:0),
+      quizOnly:!!config.quizOnly,
       phase:"answer" };   // 힌트는 진행에 따라 별도(type:"hint")로 하나씩 공개
   }
   function hintTexts(n){ return (currentHints||[]).slice(0,n).map(h=>h.k+" · "+String(h.v).replace(/<[^>]+>/g,"")); }
@@ -1899,7 +1907,7 @@ const Room = (function(){
     marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
     updateCounters();
     const song=songById(order[pos]); const c=getC(order[pos]);
-    host.tx.send({type:"reveal", qid:pos, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
+    host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
     hostBar();
   }
   function hostBar(){
@@ -1908,6 +1916,15 @@ const Room = (function(){
     const conn=host.relay?"🌐":"💻";
     const top=n?" · "+rosterArr().sort((a,b)=>b.score-a.score).slice(0,3).map(t=>escapeHtml(t.name)+" "+t.score).join(" · "):"";
     document.getElementById("rhb-info").textContent=`${conn} 참가 ${n} · 제출 ${sub}/${n}`+top;
+  }
+  function hostIntermission(){   // 라운드 종료 — 방은 열어둔 채 참가자에게 대기 안내(다음 라운드로 이어감)
+    if(!host.active) return;
+    host.phase="intermission";
+    host.tx.send({type:"intermission", roster:rosterArr()}, true);
+  }
+  function hostNextRound(){   // 새 라운드 시작: 라운드 번호 증가·답안 초기화 → renderGame이 새 상태 전송
+    if(!host.active) return;
+    host.round=(host.round||0)+1; host.answers={}; host.phase="playing";
   }
   function hostEnd(){ if(host.active){ try{ host.tx.send({type:"ended", roster:rosterArr()}, true); }catch(e){} } hostClose(); }
   function hostClose(){ if(host.tx){ try{ host.tx.clear(); }catch(e){} host.tx.close(); } host.active=false; host.phase="lobby"; document.getElementById("room-host-bar").style.display="none"; document.getElementById("rl-video").innerHTML=""; }
@@ -1930,6 +1947,7 @@ const Room = (function(){
       else if(m.type==="roster") guestRoster(m);
       else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
+      else if(m.type==="intermission"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 라운드 종료 · 방장이 다음 라운드를 준비 중이에요"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-timer").textContent=""; }
       else if(m.type==="ended"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 게임이 종료되었습니다 · 최종 순위"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-video").innerHTML=""; document.getElementById("rg-timer").textContent=""; }
     });
     guestHello();
@@ -1974,13 +1992,15 @@ const Room = (function(){
     guest.cdI=setInterval(()=>{ guest.cdLeft--; if(el) el.textContent="⏱️ "+Math.max(0,guest.cdLeft)+"초"; if(guest.cdLeft<=0) guestCdStop(); },1000);
   }
   function guestState(m){
+    if((m.round||0)!==(guest.round||0)){ guest.round=m.round||0; guest.revealedQid=null; guest.qid=null; }   // 새 라운드: 문항 가드 초기화
     if(guest.revealedQid===m.qid) return;   // 이미 공개된 문항이면 재렌더 금지(중복 state 방지)
     const isNew = m.qid!==guest.qid;
     if(isNew){ guest.qid=m.qid; guest.answered=false; document.getElementById("rg-video").innerHTML=""; }
     guest.lyric=m.lyric||"";
     document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
     document.getElementById("rg-lyric").textContent=m.lyric||"";
-    if(isNew){ guestCountdown(m.sec||0); guestSpeak(); document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독+카운트다운, 힌트 초기화(하나씩 공개됨)
+    document.getElementById("rg-mc").style.display="grid";
+    if(isNew){ guestCountdown(m.sec||0); if(!m.quizOnly) guestSpeak(); document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독(문제만 맞추기 제외)+카운트다운, 힌트 초기화
     const box=document.getElementById("rg-mc"); box.style.display="grid"; box.innerHTML="";
     const keys=["A","B","C","D"];
     (m.options||[]).forEach((nm,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(nm)}</span>`; b.disabled=guest.answered; b.addEventListener("click",()=>guestAnswer(i)); box.appendChild(b); });
@@ -1988,11 +2008,14 @@ const Room = (function(){
   function guestAnswer(i){
     if(guest.answered) return; guest.answered=true;
     [...document.querySelectorAll("#rg-mc .mc-opt")].forEach((b,idx)=>{ b.disabled=true; if(idx===i) b.classList.add("picked"); });
-    const send=()=>guest.tx.send({type:"answer", qid:guest.qid, name:guest.team, pick:i});
+    const qid=guest.qid, rnd=guest.round||0;   // 스냅샷 — 재전송이 다음 라운드(같은 qid)로 새지 않도록
+    const send=()=>guest.tx.send({type:"answer", qid:qid, round:rnd, name:guest.team, pick:i});
     send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 1200);
     document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
   }
   function guestReveal(m){
+    if((m.round||0)<(guest.round||0)) return;   // 이전 라운드의 잔여(retained) 공개는 무시
+    if((m.round||0)>(guest.round||0)){ guest.round=m.round||0; }
     if(m.qid!==guest.qid){ guest.qid=m.qid; }
     guest.revealedQid=m.qid;   // 이 문항은 공개됨 → 중복 state 무시
     guestCdStop(); document.getElementById("rg-timer").textContent="";
@@ -2009,17 +2032,21 @@ const Room = (function(){
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
   }
 
-  return { hostOpen, hostClose, hostEnd, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
+  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
 })();
 
 (function(){
   const intro=document.getElementById("intro");
   const setup=document.getElementById("setup");
   const counts=document.getElementById("intro-counts");
-  counts.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
-    counts.querySelectorAll("button").forEach(x=>x.classList.remove("on"));
-    b.classList.add("on");
-  }));
+  const icNum=document.getElementById("ic-num");
+  const icAll=document.getElementById("ic-all");
+  function countMax(){ return Math.max(5, Math.floor(((songs&&songs.length)||60)/5)*5); }   // 5단위 상한(곡 수 기준)
+  function setCount(n){ n=Math.max(5, Math.min(countMax(), n)); icNum.dataset.n=n; icNum.textContent=n; icNum.classList.add("on"); icAll.classList.remove("on"); }
+  document.getElementById("ic-minus").addEventListener("click",()=>setCount((parseInt(icNum.dataset.n,10)||5)-5));
+  document.getElementById("ic-plus").addEventListener("click",()=>setCount((parseInt(icNum.dataset.n,10)||5)+5));
+  icNum.addEventListener("click",()=>setCount(parseInt(icNum.dataset.n,10)||5));
+  icAll.addEventListener("click",()=>{ icAll.classList.add("on"); icNum.classList.remove("on"); });
   function showSetup(){ renderSetup(); intro.classList.add("hide"); setup.style.display="flex"; setup.scrollTop=0; }
   function backToIntro(){ setup.style.display="none"; intro.classList.remove("hide"); }
   function startGame(){

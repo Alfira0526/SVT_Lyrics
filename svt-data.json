@@ -1,5 +1,5 @@
 {
-  "rev": 1784852031027,
+  "rev": 1784853918332,
   "songs": [
     {
       "id": "s2",
@@ -633,6 +633,7 @@
     "autoHost": false,
     "autoHideControls": false,
     "autoInterval": 7,
-    "onlineRoom": false
+    "onlineRoom": false,
+    "fbUrl": ""
   }
 }

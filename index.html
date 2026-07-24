@@ -154,7 +154,8 @@
   .stat .k{font-size:12px;color:var(--muted);margin-top:2px}
   .rank{display:flex;flex-direction:column;gap:8px;margin:16px 0}
   .rank .r{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-  .rank .r .medal{font-size:20px}
+  .rank .r .rank-no{font-weight:900;color:var(--serene);min-width:40px}
+  .rank .r .medal{font-size:20px;min-width:24px}
   .rank .r .rn{flex:1;font-weight:800}
   .rank .r .rs{font-weight:900;font-size:18px}
 
@@ -491,7 +492,7 @@
         <span class="lyric-text" id="g-lyric"></span>
       </div>
 
-      <div class="speed-row">
+      <div class="speed-row" id="g-speed-row">
         <span>🐢 속도</span>
         <input type="range" id="g-speed" min="0.5" max="1.2" step="0.1" value="1.0" />
         <span class="speed-val" id="g-speedval">1.0×</span>
@@ -1266,6 +1267,11 @@ function renderGame(){
   if(c.lyrics && c.lyrics.trim()) els.lyric.textContent=c.lyrics.trim();
   else els.lyric.innerHTML='<span class="placeholder">이 문항의 가사가 아직 입력되지 않았습니다.<br>설정 탭에서 입력하세요.</span>';
 
+  // 문제만 맞추기: 낭독(TTS) 관련 컨트롤 숨김 — 속도/가사 낭독/정지
+  const qo=!!config.quizOnly;
+  document.getElementById("g-speed-row").style.display=qo?"none":"";
+  document.getElementById("g-play").style.display=qo?"none":"";
+  document.getElementById("g-stopread").style.display=qo?"none":"";
   applyHide(); hideAnswer(); updateCounters();
   resetTimer(); if(config.timerOn && gameActive) startTimer();   // 게임 시작·문항 전환 시 타이머 시작
   resetHints(); buildMcOptions(); resetTeamRound(); renderMc();
@@ -1324,10 +1330,11 @@ function showAnswer(){
   if(order.length===0) return;
   const id=order[pos]; const song=songById(id);
   els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
-  if(config.quizOnly){   // 문제만 맞추기: 영상 생략(빠른 진행)
-    document.getElementById("g-video").innerHTML="";
+  if(config.quizOnly){   // 문제만 맞추기: 영상 영역 완전 숨김(빈 검은 박스도 제거)·낭독 없음
+    const gv=document.getElementById("g-video"); gv.innerHTML=""; gv.style.display="none";
     document.getElementById("g-video-reload").style.display="none";
   } else {
+    document.getElementById("g-video").style.display="";
     document.getElementById("g-video-reload").style.display="";
     renderVideo();
   }
@@ -1705,6 +1712,15 @@ document.getElementById("dlg-bulk-ok").addEventListener("click",()=>{
 });
 
 /* =====================  RESULT  ===================== */
+// 결과 순위 행 — 동점은 같은 등수(1,2,2,4), 등수 숫자 + 메달 함께 표기
+function renderRankRows(rank){
+  const medals=["🥇","🥈","🥉"];
+  let prevScore=null, rn=0;
+  return rank.map((r,i)=>{
+    if(prevScore===null || r.score!==prevScore){ rn=i+1; prevScore=r.score; }   // 동점이면 등수 유지
+    return `<div class="r"><span class="rank-no">${rn}위</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`;
+  }).join("");
+}
 function renderResult(){
   let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
   const answered=c+w, rate=answered?Math.round(c/answered*100):0;
@@ -1728,20 +1744,16 @@ function renderResult(){
   if(config.onlineRoom && roomRoster){
     tb.style.display="block";
     const rank=roomRoster.map(t=>({nm:t.name,score:t.score})).sort((a,b)=>b.score-a.score);
-    const medals=["🥇","🥈","🥉"];
-    document.getElementById("r-rank").innerHTML=rank.map((r,i)=>
-      `<div class="r"><span class="medal">${medals[i]||"·"}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`).join("");
+    document.getElementById("r-rank").innerHTML=renderRankRows(rank);
   } else if(config.teamMode){
     tb.style.display="block";
     const rank=(config.teamNames||[]).map((nm,i)=>({nm,score:teamScores[i]||0})).sort((a,b)=>b.score-a.score);
-    const medals=["🥇","🥈","🥉"];
-    document.getElementById("r-rank").innerHTML=rank.map((r,i)=>
-      `<div class="r"><span class="medal">${medals[i]||"·"}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`).join("");
+    document.getElementById("r-rank").innerHTML=renderRankRows(rank);
   }else tb.style.display="none";
 }
 function grade(rate,answered){
   if(answered===0) return {emoji:"🎬",title:"아직 시작 전",desc:"게임 탭에서 채점을 시작해 보세요"};
-  if(rate>=95) return {emoji:"🏆",title:"칼럿 인증",desc:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬"};
+  if(rate>=95) return {emoji:"🏆",title:"캐럿 인증",desc:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬"};
   if(rate>=80) return {emoji:"💎",title:"코어 팬",desc:"수록곡까지 꿰뚫은 진성 캐럿"};
   if(rate>=60) return {emoji:"⭐",title:"찐팬",desc:"웬만한 곡은 다 아는 실력"};
   if(rate>=40) return {emoji:"🌱",title:"라이트 팬",desc:"조금만 더 들으면 코어 팬까지 금방!"};

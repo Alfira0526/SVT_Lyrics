@@ -404,7 +404,11 @@
         <label class="switch"><input type="checkbox" id="c-teamblind" /><span class="slider"></span></label>
         <span style="font-size:14px">팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span></span>
       </div>
-      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요 — 온라인·동시 진행에서 먼저 고른 팀 선택이 드러나지 않아요.</div>
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-quizonly" /><span class="slider"></span></label>
+        <span style="font-size:14px">문제만 맞추기 <span style="color:var(--muted)">(정답 공개 시 영상 없이 · 빠른 진행)</span></span>
+      </div>
+      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
     </div>
 
     <div class="setup-card">
@@ -634,9 +638,11 @@
         <div class="stat"><div class="v" id="r-total">40</div><div class="k">전체 문항</div></div>
       </div>
       <div class="controls">
+        <button class="btn btn-ghost" id="r-next-round" style="flex:1">🆕 새 문제로 이어가기</button>
         <button class="btn btn-reveal" id="r-restart" style="flex:1">↻ 다시 시작</button>
       </div>
       <p class="hint" id="r-breakdown"></p>
+      <p class="hint" id="r-next-note" style="margin-top:2px">🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).</p>
     </div>
   </section>
 </div>
@@ -805,7 +811,7 @@ const DEFAULT_CONTENT = {
 
 const DEFAULT_CONFIG = {
   timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
-  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:""
+  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:"", quizOnly:false
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -1202,8 +1208,10 @@ function finalizeTeamRound(){
 }
 
 function isUnitSong(s){ return /팀|부석순|유닛|정한|LEADERS|솔로|[가-힣]X[가-힣]/.test((s&&s.part)||""); }
-function buildOrder(filter, shuffle){
+let playedIds=new Set();   // 지금까지 출제된 문항(라운드 이어가기용)
+function buildOrder(filter, shuffle, exclude){
   let list=songs.map(s=>s.id);
+  if(exclude && exclude.size) list=list.filter(id=>!exclude.has(id));
   if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
   const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
   if(doShuffle){
@@ -1219,8 +1227,18 @@ function buildOrder(filter, shuffle){
   order=list; pos=0;
 }
 function startNewGame(shuffle){
-  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0;
+  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set();
   buildOrder(activeFilter, !!shuffle);
+}
+/* 새 문제로 이어가기 — 지금까지 출제된 문항 제외하고 새로 뽑기(점수는 유지) */
+function startNextRound(){
+  order.forEach(id=>playedIds.add(id));
+  buildOrder(activeFilter, true, playedIds);
+  if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(activeFilter, true); }
+  marks={}; pos=0;
+  if(Room.host.active){ Room.host.answers={}; Room.host.phase="playing"; }
+  renderGame();
+  document.querySelector('nav.tabs button[data-view="game"]').click();
 }
 
 function renderGame(){
@@ -1304,7 +1322,13 @@ function showAnswer(){
   if(order.length===0) return;
   const id=order[pos]; const song=songById(id);
   els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
-  renderVideo();
+  if(config.quizOnly){   // 문제만 맞추기: 영상 생략(빠른 진행)
+    document.getElementById("g-video").innerHTML="";
+    document.getElementById("g-video-reload").style.display="none";
+  } else {
+    document.getElementById("g-video-reload").style.display="";
+    renderVideo();
+  }
   // scoring UI
   document.getElementById("g-solo-score").style.display=config.teamMode?"none":"flex";
   document.getElementById("g-team-score").style.display=config.teamMode?"block":"none";
@@ -1632,6 +1656,7 @@ document.getElementById("c-autohide").addEventListener("change",e=>{ config.auto
 document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||7)); saveState(); });
 document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); });
 document.getElementById("c-fburl").addEventListener("input",e=>{ config.fbUrl=(e.target.value||"").trim(); saveState(); });
+document.getElementById("c-quizonly").addEventListener("change",e=>{ config.quizOnly=e.target.checked; saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");
@@ -1725,6 +1750,11 @@ document.getElementById("r-restart").addEventListener("click",()=>{
   document.querySelector('nav.tabs button[data-view="game"]').click();
   toast("다시 시작합니다");
 });
+document.getElementById("r-next-round").addEventListener("click",()=>{
+  gameActive=true; autoRun=!!(config.autoHost||config.onlineRoom);
+  startNextRound();
+  toast("🆕 새 문제로 이어갑니다");
+});
 
 /* =====================  INIT  ===================== */
 // 시작 화면 → 기본 설정(게임 옵션) → 게임 시작
@@ -1740,6 +1770,7 @@ function renderSetup(){
   document.getElementById("c-autointerval").value=config.autoInterval||7;
   document.getElementById("c-online").checked=!!config.onlineRoom;
   document.getElementById("c-fburl").value=config.fbUrl||"";
+  document.getElementById("c-quizonly").checked=!!config.quizOnly;
   renderTeamEditor();
 }
 /* =====================  온라인 방(Room)  =====================
@@ -1868,7 +1899,7 @@ const Room = (function(){
     marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
     updateCounters();
     const song=songById(order[pos]); const c=getC(order[pos]);
-    host.tx.send({type:"reveal", qid:pos, correctIdx:ci, answer:song.name, part:song.part, mv:c.mv||"", time:c.time||"", roster:rosterArr()}, true);
+    host.tx.send({type:"reveal", qid:pos, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
     hostBar();
   }
   function hostBar(){

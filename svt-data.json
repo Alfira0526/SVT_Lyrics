@@ -1,5 +1,5 @@
 {
-  "rev": 1784884071219,
+  "rev": 1784900569605,
   "songs": [
     {
       "id": "s2",
@@ -634,6 +634,7 @@
     "autoHideControls": false,
     "autoInterval": 7,
     "onlineRoom": false,
-    "fbUrl": ""
+    "fbUrl": "",
+    "quizOnly": false
   }
 }

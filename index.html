@@ -303,12 +303,18 @@
   <div class="intro-inner" style="max-width:420px">
     <h1 class="intro-title" style="font-size:24px">방 참가</h1>
     <div id="rg-join">
-      <p class="intro-desc">사회자 화면의 <b>방 코드</b>와 <b>팀 이름</b>을 입력하세요.</p>
-      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase;margin-bottom:10px" />
-      <input class="num-input" id="rg-name" placeholder="팀 이름" maxlength="20" />
-      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%">참가하기</button>
+      <p class="intro-desc">사회자 화면의 <b>방 코드</b>를 입력하세요.</p>
+      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase" />
+      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%">입장</button>
       <div class="sl-err" id="rg-err"></div>
       <button class="btn btn-ghost btn-sm" id="rg-back" style="margin-top:14px">← 뒤로</button>
+    </div>
+    <div id="rg-pick" style="display:none">
+      <p class="intro-desc"><b>참가할 팀</b>을 선택하세요. <span style="color:var(--muted)">(한 팀당 한 명)</span></p>
+      <select class="num-input" id="rg-team" style="text-transform:none"><option value="">팀 목록 불러오는 중…</option></select>
+      <button class="intro-start" id="rg-claim" style="margin-top:14px;width:100%">이 팀으로 참가</button>
+      <div class="sl-err" id="rg-pick-err"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-pick-back" style="margin-top:14px">← 방 코드 다시</button>
     </div>
     <div id="rg-play" style="display:none">
       <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
@@ -1791,15 +1797,17 @@ const Room = (function(){
   function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
 
   /* ---- 호스트 ---- */
-  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false };
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{} };
   async function hostOpen(){
     if(!config.fbUrl) await loadMqtt();
     host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false;
-    host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); });
+    host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
+    host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
     host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
     host.tx.onmsg(m=>{
-      if(m.type==="join"){ ensureTeam(m.teamId,m.name); hostSyncGuest(); lobbyTeams(); hostBar(); }
-      else if(m.type==="answer"){ ensureTeam(m.teamId,m.name); (host.answers[m.qid]=host.answers[m.qid]||{})[m.teamId]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
+      if(m.type==="hello"){ hostPushSlots(); hostSyncGuest(); }
+      else if(m.type==="claim"){ hostClaim(m.dev, m.name); }
+      else if(m.type==="answer" && host.claims[m.name]){ (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
     });
     document.getElementById("rl-code").textContent=host.code;
     document.getElementById("rhb-code").textContent=host.code;
@@ -1812,10 +1820,20 @@ const Room = (function(){
     }
     document.getElementById("rl-link").textContent=joinUrl;
     document.getElementById("rl-video").innerHTML=randomMvEmbed();   // 대기 화면 랜덤 MV
+    hostPushSlots();
     lobbyConn(); lobbyTeams();
   }
-  function ensureTeam(id,name){ if(!host.roster[id]) host.roster[id]={name:name||"팀",score:0}; if(name) host.roster[id].name=name; }
-  function rosterArr(){ return Object.entries(host.roster).map(([id,t])=>({id,name:t.name,score:t.score})); }
+  function hostPushSlots(){ if(!host.active) return; host.tx.send({type:"slots", teams:host.slots.map(n=>({name:n, taken:!!host.claims[n]}))}, true); }
+  function hostClaim(dev,name){
+    if(!host.active || host.slots.indexOf(name)<0) return;
+    if(host.claims[name] && host.claims[name]!==dev){ host.tx.send({type:"claimno", dev:dev, name:name}); hostPushSlots(); return; }   // 이미 다른 사람이 선택
+    // 같은 기기가 다른 팀을 다시 고르면 이전 선택 해제
+    Object.keys(host.claims).forEach(nm=>{ if(host.claims[nm]===dev && nm!==name){ delete host.claims[nm]; delete host.roster[nm]; } });
+    host.claims[name]=dev; host.roster[name]=host.roster[name]||{name:name,dev:dev,score:0}; host.roster[name].dev=dev;
+    host.tx.send({type:"claimok", dev:dev, name:name});
+    hostPushSlots(); hostSyncGuest(); lobbyTeams(); hostBar();
+  }
+  function rosterArr(){ return Object.keys(host.roster).map(n=>({id:n,name:host.roster[n].name,score:host.roster[n].score})); }
   function teamsJoined(){ return Object.keys(host.roster).length; }
   function lobbyConn(){ const e=document.getElementById("rl-conn"); if(e) e.textContent = host.relay ? "🌐 릴레이 연결됨 · 다른 기기에서 참가 가능" : "💻 같은 브라우저(멀티탭)만 연결 · 다른 기기 릴레이 대기 중…"; }
   function lobbyTeams(){
@@ -1864,31 +1882,55 @@ const Room = (function(){
   function hostClose(){ if(host.tx){ try{ host.tx.clear(); }catch(e){} host.tx.close(); } host.active=false; host.phase="lobby"; document.getElementById("room-host-bar").style.display="none"; document.getElementById("rl-video").innerHTML=""; }
 
   /* ---- 참가자 ---- */
-  const guest={ active:false, code:null, tx:null, teamId:null, name:null, qid:null, answered:false };
-  async function guestJoin(code,name){
+  const guest={ active:false, code:null, tx:null, teamId:null, team:null, qid:null, answered:false };
+  async function guestConnect(code){
     if(guest.tx){ try{ guest.tx.close(); }catch(e){} guest.tx=null; }   // 이전 방 연결 정리(새로고침 없이 재입장 대비)
     if(!config.fbUrl) await loadMqtt();
-    guest.active=true; guest.code=code; guest.name=name; guest.qid=null; guest.answered=false; guest.revealedQid=null;
+    guest.active=true; guest.code=code; guest.team=null; guest.qid=null; guest.answered=false; guest.revealedQid=null;
     guest.teamId=localStorage.getItem("svtq_teamid")||("t"+Math.random().toString(36).slice(2,8));
     localStorage.setItem("svtq_teamid",guest.teamId);
-    guest.tx=makeTransport(code,(c)=>{ if(c) guestSendJoin(); });
+    guest.tx=makeTransport(code,(c)=>{ if(c) guestHello(); });
     guest.tx.onmsg(m=>{
-      if(m.type==="state") guestState(m);
-      else if(m.type==="reveal") guestReveal(m);
+      if(m.type==="slots"){ guestSlots(m.teams||[]); }
+      else if(m.type==="claimok"){ if(m.dev===guest.teamId){ guest.team=m.name; guestEnterPlay(); } }
+      else if(m.type==="claimno"){ if(m.dev===guest.teamId){ const e=document.getElementById("rg-pick-err"); if(e) e.textContent="이미 선택된 팀이에요. 다른 팀을 골라주세요."; } }
+      else if(m.type==="state"){ if(guest.team) guestState(m); }
+      else if(m.type==="reveal"){ if(guest.team) guestReveal(m); }
       else if(m.type==="roster") guestRoster(m);
-      else if(m.type==="lobby"){ if(guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
+      else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
       else if(m.type==="ended"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 게임이 종료되었습니다 · 최종 순위"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-video").innerHTML=""; document.getElementById("rg-timer").textContent=""; }
     });
-    guestSendJoin();
-    let tries=0; const iv=setInterval(()=>{ if(!guest.active||tries++>=5){ clearInterval(iv); return; } guestSendJoin(); }, 1500);
+    guestHello();
+    let tries=0; const iv=setInterval(()=>{ if(!guest.active||guest.team||tries++>=6){ clearInterval(iv); return; } guestHello(); }, 1200);
     document.getElementById("rg-join").style.display="none";
-    document.getElementById("rg-play").style.display="block";
-    document.getElementById("rg-status").textContent="입장 완료 · 방장을 기다리는 중…";
-    document.getElementById("rg-video").innerHTML=randomMvEmbed();   // 대기 중 랜덤 MV(문항 시작 시 교체)
+    document.getElementById("rg-pick").style.display="block";
+    document.getElementById("rg-pick-err").textContent="";
   }
-  function guestSendJoin(){ if(guest.tx) guest.tx.send({type:"join", teamId:guest.teamId, name:guest.name}); }
-  function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; }
+  function guestHello(){ if(guest.tx) guest.tx.send({type:"hello", dev:guest.teamId}); }
+  function guestSlots(teams){
+    const sel=document.getElementById("rg-team"); if(!sel) return;
+    const prev=sel.value;
+    if(!teams.length){ sel.innerHTML='<option value="">방장이 팀을 아직 설정하지 않았어요</option>'; return; }
+    sel.innerHTML="";
+    teams.forEach(t=>{ const o=document.createElement("option"); o.value=t.name; o.textContent=t.taken?(t.name+" (선택됨)"):t.name; o.disabled=!!t.taken; sel.appendChild(o); });
+    const keep=teams.find(t=>t.name===prev && !t.taken);
+    const firstFree=teams.find(t=>!t.taken);
+    sel.value = keep?prev:(firstFree?firstFree.name:"");
+  }
+  function guestClaim(){
+    const sel=document.getElementById("rg-team"); const name=sel?sel.value:""; const e=document.getElementById("rg-pick-err");
+    if(!name){ if(e) e.textContent="참가할 팀을 선택하세요."; return; }
+    if(e) e.textContent="확인 중…";
+    if(guest.tx) guest.tx.send({type:"claim", dev:guest.teamId, name:name});
+  }
+  function guestEnterPlay(){
+    document.getElementById("rg-pick").style.display="none";
+    document.getElementById("rg-play").style.display="block";
+    document.getElementById("rg-status").textContent="입장 완료 ("+escapeHtml(guest.team)+") · 방장을 기다리는 중…";
+    document.getElementById("rg-video").innerHTML=randomMvEmbed();
+  }
+  function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
   function guestSpeak(){
     if(!("speechSynthesis" in window) || !guest.lyric) return;
     try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(guest.lyric); u.lang="ko-KR"; if(typeof koVoice!=="undefined"&&koVoice) u.voice=koVoice; speechSynthesis.speak(u); }catch(e){}
@@ -1915,7 +1957,7 @@ const Room = (function(){
   function guestAnswer(i){
     if(guest.answered) return; guest.answered=true;
     [...document.querySelectorAll("#rg-mc .mc-opt")].forEach((b,idx)=>{ b.disabled=true; if(idx===i) b.classList.add("picked"); });
-    const send=()=>guest.tx.send({type:"answer", qid:guest.qid, teamId:guest.teamId, name:guest.name, pick:i});
+    const send=()=>guest.tx.send({type:"answer", qid:guest.qid, name:guest.team, pick:i});
     send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 1200);
     document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
   }
@@ -1931,12 +1973,12 @@ const Room = (function(){
   }
   function guestRoster(m){
     if(!m.roster) return;
-    const me=m.roster.find(t=>t.id===guest.teamId);
+    const me=m.roster.find(t=>t.name===guest.team);
     const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
   }
 
-  return { hostOpen, hostClose, hostEnd, hostStartPlaying, hostPushState, hostPushHint, hostReveal, host, guestJoin, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
+  return { hostOpen, hostClose, hostEnd, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
 })();
 
 (function(){
@@ -1983,16 +2025,21 @@ const Room = (function(){
   document.getElementById("rg-back").addEventListener("click",()=>{ guestView.style.display="none"; intro.classList.remove("hide"); });
   document.getElementById("rg-enter").addEventListener("click",()=>{
     const code=(document.getElementById("rg-code").value||"").trim().toUpperCase();
-    const name=(document.getElementById("rg-name").value||"").trim();
     const err=document.getElementById("rg-err");
     if(code.length<4){ err.textContent="방 코드를 확인하세요."; return; }
-    if(!name){ err.textContent="팀 이름을 입력하세요."; return; }
-    err.textContent=""; Room.guestJoin(code,name);
+    err.textContent=""; Room.guestConnect(code);
+  });
+  document.getElementById("rg-claim").addEventListener("click",()=>Room.guestClaim());
+  document.getElementById("rg-pick-back").addEventListener("click",()=>{
+    Room.guestLeave();
+    document.getElementById("rg-pick").style.display="none";
+    document.getElementById("rg-join").style.display="block";
   });
   document.getElementById("rg-speak").addEventListener("click",()=>Room.guestSpeak());
   document.getElementById("rg-leave").addEventListener("click",()=>{
     Room.guestLeave();
     document.getElementById("rg-play").style.display="none";
+    document.getElementById("rg-pick").style.display="none";
     document.getElementById("rg-join").style.display="block";
     guestView.style.display="none"; intro.classList.remove("hide");
   });

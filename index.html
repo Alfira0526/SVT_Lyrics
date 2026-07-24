@@ -1172,8 +1172,11 @@ function renderMc(){
 function pickMc(i){
   const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
   btns.forEach(b=>{ b.disabled=true; });
-  btns[i].classList.add(mcOptions[i].correct?"correct":"wrong");
-  toast(mcOptions[i].correct?"✔ 정답!":"✘ 오답");
+  const ok=!!mcOptions[i].correct;
+  btns[i].classList.add(ok?"correct":"wrong");
+  marks[order[pos]]=ok?"correct":"wrong";   // 혼자 플레이: 고른 즉시 정답/오답 자동 집계
+  updateCounters();
+  toast(ok?"✔ 정답!":"✘ 오답");
   showAnswer();
 }
 /* --- 팀전: 팀별 순차 선택 --- */
@@ -1258,6 +1261,8 @@ function startNextRound(){
 }
 
 function renderGame(){
+  const gvv=document.getElementById("view-game");
+  if(gvv && gvv.classList.contains("active")) window.scrollTo({top:0, behavior:"smooth"});   // 문항 전환 시 맨 위로
   const total=order.length;
   els.total.textContent=total;
   // team card
@@ -1351,8 +1356,8 @@ function showAnswer(){
     document.getElementById("g-video-reload").style.display="";
     renderVideo();
   }
-  // scoring UI
-  document.getElementById("g-solo-score").style.display=config.teamMode?"none":"flex";
+  // scoring UI — 솔로+4지선다는 고른 즉시 자동 채점되므로 수동 버튼 숨김(4지선다 끈 솔로만 수동)
+  document.getElementById("g-solo-score").style.display=(config.teamMode||config.mc)?"none":"flex";
   document.getElementById("g-team-score").style.display=config.teamMode?"block":"none";
   if(config.teamMode){
     if(config.mc){   // 4지선다 팀전은 팀별 선택으로 이미 자동 채점 → 수동 버튼 숨김
@@ -1392,9 +1397,22 @@ function awardTeam(i,pts){
 }
 
 /* ---- TTS ---- */
-let koVoice=null;
-function pickVoice(){ const vs=speechSynthesis.getVoices(); koVoice=vs.find(v=>v.lang==="ko-KR")||vs.find(v=>v.lang&&v.lang.startsWith("ko"))||null; }
+let koVoice=null, enVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  koVoice=vs.find(v=>v.lang==="ko-KR")||vs.find(v=>v.lang&&v.lang.startsWith("ko"))||null;
+  enVoice=vs.find(v=>v.lang==="en-US")||vs.find(v=>v.lang&&v.lang.startsWith("en"))||null;   // 영어 가사용 영어 성우
+}
 if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+// 가사가 (거의) 영어면 영어 성우로 — 한글 음절이 없거나 라틴 문자가 압도적일 때
+function isEnglishText(s){ const ko=(s.match(/[가-힣]/g)||[]).length, en=(s.match(/[A-Za-z]/g)||[]).length; return en>0 && (ko===0 || ko/(ko+en)<0.2); }
+function makeUtterance(text){
+  const en=isEnglishText(text);
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=en?"en-US":"ko-KR";
+  const v=en?enVoice:koVoice; if(v) u.voice=v;
+  return u;
+}
 function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
 function scheduleAutoTTS(){
   clearAutoTTS();
@@ -1413,8 +1431,8 @@ function speak(){
   const c=getC(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
   stopTTS();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="ko-KR"; if(koVoice) u.voice=koVoice; u.rate=parseFloat(els.speed.value); u.pitch=1;
+  const u=makeUtterance(text);
+  u.rate=parseFloat(els.speed.value); u.pitch=1;
   speechSynthesis.speak(u);
 }
 
@@ -2007,7 +2025,7 @@ const Room = (function(){
   function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
   function guestSpeak(){
     if(!("speechSynthesis" in window) || !guest.lyric) return;
-    try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(guest.lyric); u.lang="ko-KR"; if(typeof koVoice!=="undefined"&&koVoice) u.voice=koVoice; speechSynthesis.speak(u); }catch(e){}
+    try{ speechSynthesis.cancel(); speechSynthesis.speak(makeUtterance(guest.lyric)); }catch(e){}
   }
   function guestCdStop(){ if(guest.cdI){ clearInterval(guest.cdI); guest.cdI=null; } }
   function guestCountdown(sec){

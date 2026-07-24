@@ -9,15 +9,17 @@
     /* 중립 — 인디고-플럼 다크 베이스에 Mocha Mousse(팬톤 2025) 웜기를 미세 주입해 그라운딩 */
     --bg:#100b1c; --bg2:#181334; --panel:#201a44; --panel2:#2b2358; --line:#3b3168;
     --txt:#efeaff; --muted:#ada2d6;
-    /* 세븐틴 시그니처 듀오 — Rose Quartz × Serenity(팬톤 2016), 다크 배경용으로 채도 조정 */
-    --rose:#f0609b; --rose-deep:#cf4f8f;
-    --serene:#8aa2f2; --serene-deep:#6376de;
-    /* 웜 하이라이트 — Peach Fuzz(팬톤 2024) */
-    --gold:#ffbe98; --gold-deep:#f2a273;
-    /* 성공 = 민트 · 위험 = 코랄(웜 트렌드) */
-    --green:#41d6a1; --green-deep:var(--green-deep);
-    --red:#ff6f7d; --red-deep:#e0555f;
-    /* 그라운딩 웜 뉴트럴 — Mocha Mousse(팬톤 2025) */
+    /* ── 분류 계열(브랜드·난이도·정보) : 로즈 → 라일락 → 세레니티 스펙트럼 ── */
+    /* 세븐틴 시그니처 듀오 — Rose Quartz × Serenity(팬톤 2016), 다크 배경용 채도 조정 */
+    --rose:#f0609b; --rose-deep:#cf4f8f;      /* 브랜드 · 난이도 '상' */
+    --lilac:#b892e6; --lilac-deep:#9a6fd0;    /* 난이도 '중' · 힌트 — Very Peri(팬톤 2022) */
+    --serene:#8aa2f2; --serene-deep:#6376de;  /* 브랜드 · 난이도 '신곡' */
+    /* ── 상태 계열(판정·시간) : 신호등 민트 → 앰버 → 코랄 ── */
+    --green:#41d6a1; --green-deep:#2bb37a;    /* 정답 · 타이머 안전 */
+    --amber:#ffcf5c;                          /* 타이머 경고 */
+    --red:#ff6f7d; --red-deep:#e0555f;        /* 오답 · 타이머 위험 */
+    /* ── 웜 액센트 : Peach Fuzz(팬톤 2024)='선택됨' · Mocha Mousse(팬톤 2025)=중립 그라운딩 ── */
+    --gold:#ffbe98; --gold-deep:#f2a273;      /* MC 선택됨(picked) · 보조 웜 */
     --mocha:#c69c86;
     --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.38);
   }
@@ -51,9 +53,9 @@
   .counter{font-size:13px;color:var(--muted)}
   .counter b{color:var(--txt);font-size:15px}
   .badge{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:800}
-  .b-상{background:rgba(255,111,125,.16);color:#ffb0a6;border:1px solid rgba(255,111,125,.4)}
-  .b-중{background:rgba(138,162,242,.16);color:#b4c3f8;border:1px solid rgba(138,162,242,.4)}
-  .b-신곡{background:rgba(255,190,152,.16);color:#ffd8bf;border:1px solid rgba(255,190,152,.4)}
+  .b-상{background:rgba(240,96,155,.16);color:#f9a9c8;border:1px solid rgba(240,96,155,.42)}
+  .b-중{background:rgba(184,146,230,.16);color:#d3bcf2;border:1px solid rgba(184,146,230,.42)}
+  .b-신곡{background:rgba(138,162,242,.16);color:#b4c3f8;border:1px solid rgba(138,162,242,.42)}
 
   .progress{height:8px;background:var(--bg2);border-radius:999px;overflow:hidden;margin-bottom:16px}
   .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--serene));width:0;transition:width .3s}
@@ -62,7 +64,7 @@
   .timer.on{display:block}
   .timer-bar{height:6px;background:var(--bg2);border-radius:999px;overflow:hidden}
   .timer-bar i{display:block;height:100%;background:var(--green);width:100%;transition:width 1s linear}
-  .timer-bar i.warn{background:var(--gold)}
+  .timer-bar i.warn{background:var(--amber)}
   .timer-bar i.danger{background:var(--red)}
   .timer-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:6px}
   .timer-top b{color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
@@ -208,7 +210,8 @@
   .mc-opt:disabled{cursor:default}
   .mc-opt.correct{background:rgba(65,214,161,.18);border-color:var(--green)}
   .mc-opt.correct .mc-key{background:var(--green);color:#06281c}
-  .mc-opt.picked{background:rgba(138,162,242,.2);border-color:var(--serene)}
+  .mc-opt.picked{background:rgba(255,190,152,.2);border-color:var(--gold)}
+  .mc-opt.picked .mc-key{background:var(--gold);color:#4a2f1c}
   .mc-opt.wrong{background:rgba(255,111,125,.16);border-color:var(--red)}
   .mc-opt.wrong .mc-key{background:var(--red);color:#3a0d0d}
   .mc-opt .mc-name{flex:1}
@@ -234,8 +237,8 @@
   .hint-area{display:flex;align-items:flex-start;gap:10px;margin-top:14px;flex-wrap:wrap}
   .hint-area > button{flex:none}
   .hints{display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
-  .hint-chip{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:8px 12px;font-size:14px;animation:fade .25s ease;display:flex;gap:8px;align-items:baseline}
-  .hint-chip .hk{font-size:11px;font-weight:800;color:var(--gold);flex:none}
+  .hint-chip{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--lilac);border-radius:10px;padding:8px 12px;font-size:14px;animation:fade .25s ease;display:flex;gap:8px;align-items:baseline}
+  .hint-chip .hk{font-size:11px;font-weight:800;color:var(--lilac);flex:none}
   .hint-chip .hv{color:var(--txt)}
   .hint-chip .hv b{letter-spacing:2px;font-size:16px}
 

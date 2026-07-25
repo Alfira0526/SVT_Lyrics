@@ -24,6 +24,8 @@
     --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.38);
   }
   *{box-sizing:border-box}
+  /* 접근성: 키보드 포커스 가시화(마우스 클릭엔 안 뜸) */
+  :focus-visible{outline:2px solid var(--serene);outline-offset:2px;border-radius:6px}
   html,body{margin:0;padding:0}
   body{
     background:radial-gradient(1200px 600px at 50% -10%, #2f2262 0%, var(--bg) 55%) fixed;
@@ -214,6 +216,9 @@
   .mc-opt.picked .mc-key{background:var(--gold);color:#4a2f1c}
   .mc-opt.wrong{background:rgba(255,111,125,.16);border-color:var(--red)}
   .mc-opt.wrong .mc-key{background:var(--red);color:#3a0d0d}
+  /* 접근성: 색 외에 글리프로도 정답/오답 구분(색맹·원거리 프로젝터 대응) */
+  .mc-opt.correct::after{content:"✓";font-weight:900;font-size:18px;color:var(--green);margin-left:4px}
+  .mc-opt.wrong::after{content:"✗";font-weight:900;font-size:18px;color:var(--red);margin-left:4px}
   .mc-opt .mc-name{flex:1}
   .mc-opt .mc-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
   .mc-badge{font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;white-space:nowrap}
@@ -379,6 +384,14 @@
     <p class="setup-sub">옵션을 정하고 게임을 시작하세요</p>
 
     <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-hide" checked /><span class="slider"></span></label>
+        <span style="font-size:14px">🎧 듣기 전용 (가사 가리기) <span style="color:var(--muted)">· 권장</span></span>
+      </div>
+      <div class="setup-tip">이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).</div>
+    </div>
+
+    <div class="setup-card">
       <div class="setup-label">문제 수</div>
       <div class="intro-counts" id="intro-counts">
         <button type="button" class="ic-step" id="ic-minus" aria-label="5개 줄이기">−</button>
@@ -414,7 +427,7 @@
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
-        <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기</span>
+        <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기 <span style="color:var(--muted)">· 변별력↓</span></span>
       </div>
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-teamblind" /><span class="slider"></span></label>
@@ -422,7 +435,7 @@
       </div>
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-quizonly" /><span class="slider"></span></label>
-        <span style="font-size:14px">문제만 맞추기 <span style="color:var(--muted)">(정답 공개 시 영상 없이 · 빠른 진행)</span></span>
+        <span style="font-size:14px">문제만 맞추기 <span style="color:var(--muted)">(영상·자동낭독 없이 · 빠른 진행 · 변별력↓)</span></span>
       </div>
       <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
     </div>
@@ -827,7 +840,8 @@ const DEFAULT_CONTENT = {
 
 const DEFAULT_CONFIG = {
   timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
-  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:"", quizOnly:false
+  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:"", quizOnly:false,
+  hideLyrics:true   // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -896,7 +910,11 @@ async function loadState(){
   // 호스팅(http/https) 시: 커밋된 svt-data.json의 rev가 더 최신이면 모든 기기에 동일 반영
   if(location.protocol==="http:"||location.protocol==="https:"){
     try{
-      const r=await fetch("svt-data.json",{cache:"no-store"});
+      // 타임아웃(4s) — 현장 와이파이가 느리거나 응답이 없어도 부팅이 멈추지 않도록
+      const ac=("AbortController" in window)?new AbortController():null;
+      const to=ac?setTimeout(()=>ac.abort(),4000):null;
+      const r=await fetch("svt-data.json",{cache:"no-store", signal:ac?ac.signal:undefined});
+      if(to) clearTimeout(to);
       if(r.ok){
         const j=await r.json();
         if(j && Array.isArray(j.songs) && j.content){
@@ -939,7 +957,7 @@ function downloadDataFile(){
 /* ---- 저장 슬롯 (여러 벌 저장) ---- */
 const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
 function loadSlots(){ try{ return JSON.parse(localStorage.getItem(SLOTS_KEY))||[]; }catch(e){ return []; } }
-function persistSlots(s){ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }
+function persistSlots(s){ try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 슬롯을 저장하지 못했어요"); } }
 function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config})); }
 function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
@@ -957,10 +975,13 @@ function addSlot(){
 }
 function loadSlot(id){
   const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  if(!s.data || !Array.isArray(s.data.songs) || !s.data.content){ toast("이 슬롯 데이터가 손상되어 불러올 수 없어요"); return; }
   if(!confirm(`'${s.name}' 구성을 불러올까요? 현재 편집 내용은 대체됩니다.`)) return;
-  songs=JSON.parse(JSON.stringify(s.data.songs));
-  content=JSON.parse(JSON.stringify(s.data.content));
-  config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
+  try{
+    songs=JSON.parse(JSON.stringify(s.data.songs));
+    content=JSON.parse(JSON.stringify(s.data.content));
+    config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
+  }catch(e){ toast("슬롯을 불러오는 중 오류가 발생했어요"); return; }
   saveState(); renderSettings(); startNewGame(); toast(`'${s.name}' 불러옴`);
 }
 function delSlot(id){
@@ -999,7 +1020,8 @@ function renderSlots(){
 let currentRev=0;
 function saveState(rev){
   if(rev!=null) currentRev=rev;
-  localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config}));
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config})); }
+  catch(e){ if(typeof toast==="function") toast("저장 공간이 부족하거나 사용할 수 없어요(설정 유지 실패)"); }
 }
 function resetToDefault(doSave){
   songs = DEFAULT_SONGS.map(s=>Object.assign({},s));
@@ -1247,6 +1269,7 @@ function buildOrder(filter, shuffle, exclude){
 }
 function startNewGame(shuffle){
   marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set();
+  if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
   buildOrder(activeFilter, !!shuffle);
 }
 /* 새 문제로 이어가기 — 지금까지 출제된 문항 제외하고 새로 뽑기(점수는 유지) */
@@ -1479,7 +1502,7 @@ function autoScheduleHints(){   // 자동 호스트: 제한시간 비율로 힌�
   }
 }
 function answerShown(){ return els.answer.classList.contains("show"); }
-function autoBarVisible(){ return config.autoHost && !config.autoHideControls; }
+function autoBarVisible(){ return (config.autoHost||config.onlineRoom) && !config.autoHideControls; }
 function updateAutoBar(){
   const bar=document.getElementById("g-auto-bar");
   if(!bar) return;
@@ -1499,11 +1522,15 @@ function autoStartQuestion(){   // 문항 표시 직후: 응답창 후 자동 �
 }
 function autoReveal(){
   if(answerShown()) return;
-  if(config.mc && config.teamMode && !teamRoundDone && order.length) finalizeTeamRound();
+  if(config.mc && config.teamMode && !teamRoundDone && order.length){
+    // 자동 진행+팀전: 아무도 안 골랐으면 전부 오답 처리하지 말고 정답만 공개(오프라인 단일화면엔 팀 입력이 없음)
+    if(teamPicks.some(p=>p!=null)) finalizeTeamRound();
+    else showAnswer();
+  }
   else showAnswer();   // 두 경로 모두 끝에서 autoAfterReveal() 호출
 }
-function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드면 다음 예약
-  if(!(config.autoHost && autoRun && gameActive)) { updateAutoBar(); return; }
+function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드(오토호스트/온라인 방)면 다음 예약
+  if(!((config.autoHost||config.onlineRoom) && autoRun && gameActive)) { updateAutoBar(); return; }
   autoStopTimers();
   const sec=Math.max(2, config.autoInterval||7);
   autoCdLeft=sec;
@@ -1532,7 +1559,7 @@ function next(){ stopTTS(); stopTimer(); if(pos<order.length-1){ pos++; renderGa
 function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
 
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
-els.hide.addEventListener("change",applyHide);
+els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
 document.getElementById("g-reveal").addEventListener("click",()=>{
@@ -1688,6 +1715,7 @@ document.getElementById("c-team-random").addEventListener("click",()=>{
   config.teamNames = config.teamNames.map((_,i)=> pool[i] || ("팀 "+(i+1)));
   saveState(); renderTeamEditor(); toast("🎲 팀 이름을 랜덤으로 지었어요");
 });
+document.getElementById("c-hide").addEventListener("change",e=>{ config.hideLyrics=e.target.checked; saveState(); });
 document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
@@ -1811,6 +1839,7 @@ document.getElementById("r-next-round").addEventListener("click",()=>{
 // 시작 화면 → 기본 설정(게임 옵션) → 게임 시작
 let gameActive=false;
 function renderSetup(){
+  document.getElementById("c-hide").checked=config.hideLyrics!==false;
   document.getElementById("c-timer").checked=!!config.timerOn;
   document.getElementById("c-timersec").value=config.timerSec;
   document.getElementById("c-team").checked=!!config.teamMode;
@@ -1844,9 +1873,14 @@ const Room = (function(){
   }
   function makeTransport(code,onConn){
     const outs=[]; let cb=null;
-    const bc=new BroadcastChannel("svtq-"+code);
-    bc.onmessage=e=>{ if(cb) cb(e.data); };
-    outs.push({send:m=>bc.postMessage(m), close:()=>bc.close()});
+    // BroadcastChannel 미지원(구형 사파리/웹뷰)에서도 릴레이(MQTT/Firebase)만으로 동작하도록 방어
+    if("BroadcastChannel" in window){
+      try{
+        const bc=new BroadcastChannel("svtq-"+code);
+        bc.onmessage=e=>{ if(cb) cb(e.data); };
+        outs.push({send:m=>bc.postMessage(m), close:()=>bc.close()});
+      }catch(e){}
+    }
     if(config.fbUrl){
       // Firebase Realtime DB REST — 이벤트 로그에 POST, EventSource로 스트리밍(원격 안정)
       const base=config.fbUrl.replace(/\/+$/,"")+"/svtq/"+code+"/events";

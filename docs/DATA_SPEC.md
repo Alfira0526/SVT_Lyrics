@@ -17,18 +17,25 @@
     "s2": { "lyrics": "…", "mv": "https://youtu.be/…", "time": "2:05" }
     // ...
   },
-  "config": {                     // 게임 방식 설정
-    "timerOn": false,
-    "timerSec": 15,
+  "config": {                     // 게임 방식 설정 (아래는 실제 기본값)
+    "timerOn": true,
+    "timerSec": 20,
     "teamMode": false,
     "teamNames": ["팀 1", "팀 2"],
-    "mc": false                   // 4지선다(객관식) 모드
+    "mc": true,                   // 4지선다(객관식) 모드
+    "teamBlind": true,            // 팀 선택 가리기(모든 팀 제출 전 비공개)
+    "autoHost": false,            // 자동 진행(오토 호스트)
+    "autoHideControls": false,    // 진행 컨트롤 숨기기(키오스크)
+    "autoInterval": 7,            // 자동 진행 문항 간격(초)
+    "onlineRoom": false,          // 온라인 방(폰 참가)
+    "fbUrl": "",                  // (선택) Firebase Realtime DB 주소
+    "quizOnly": false             // 문제만 맞추기(영상·자동낭독 생략)
   }
 }
 ```
 
 - `content`는 배열 인덱스가 아니라 **곡 `id`로 키잉**되어, 곡을 추가·삭제·재정렬해도 가사가 어긋나지 않습니다.
-- 곡을 추가하면 `u1001` 형태의 새 id가 부여됩니다(내장 곡은 `s1`~).
+- 곡을 추가하면 `u1001` 형태의 새 id가 부여됩니다(내장 곡은 `s2`~ — 초기 편집으로 일부 번호가 비어 있어 `s1`은 없음).
 
 ### 로드 우선순위
 앱 시작 시 다음 순서로 데이터를 불러옵니다.
@@ -150,9 +157,9 @@
 | 6 | 청춘찬가 (Cheers to Youth) | 1절 벌스 · 보컬팀 |
 | 7 | 동갑내기 (96ers) | 1절 벌스 · 호시X우지 |
 | 8 | 5, 4, 3 (Pretty woman) | 1절 벌스 · 쿱스X민규 (영어) |
-| 9 | singasong | 1절 벌스 · V8 (버논X디에잇) |
+| 9 | singasong | 1절 벌스 · V8 · 버논X디에잇 (영어) |
 | 10 | 미아 (mia) | 벌스 · 버논 솔로 · V8 |
-| 11 | girlsnboys | 벌스 · V8 (영어) |
+| 11 | girlsnboys | 벌스 · V8 · 버논X디에잇 (영어) |
 | 12 | Blue | 1절 벌스 · 도겸X승관 (D&S) |
 | 13 | For you | 벌스 · 쿱스X민규 (영어) |
 | 14 | STUPID IDIOT | 벌스 · 호시X우지 |

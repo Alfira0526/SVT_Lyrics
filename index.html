@@ -451,11 +451,10 @@
       <div class="scope-dims" id="scope-dims">
         <span class="chip active" data-dim="all">전체</span>
         <span class="chip" data-dim="diff">난이도</span>
-        <span class="chip" data-dim="era">시대(연도)</span>
         <span class="chip" data-dim="unit">구성</span>
       </div>
       <div class="scope-vals" id="scope-vals"></div>
-      <div class="setup-tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>시대</b>(데뷔초기~최신), <b>구성</b>(완전체·유닛곡).<br>예: 신입 캐럿과는 <b>전성기·최신</b>으로, 고인물끼리는 <b>데뷔초기·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
+      <div class="setup-tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>구성</b>(완전체·유닛곡).<br>예: 가볍게 즐길 땐 <b>중·신곡</b>, 고인물끼리는 <b>상·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
     </div>
 
     <div class="setup-card">
@@ -931,7 +930,7 @@ const DEFAULT_CONFIG = {
   hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
   sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
   stage:false,      // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
-  scope:{by:"all", val:""}   // 문제 범위(그룹): all | diff(난이도) | era(시대) | unit(구성)
+  scope:{by:"all", val:""}   // 문제 범위(그룹): all | diff(난이도) | unit(구성)
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -977,7 +976,8 @@ const TEAM_NAME_POOL = [
 
 /* ---- 상태 ---- */
 const STORE_KEY = "svt_lyrics_quiz_v1";
-let songs, content, config;
+let songs, content, config, album=null;   // album: 데이터에 포함된 발매연도/앨범종류 맵({id:{year,type}}). 없으면 인라인 ALBUM_INFO 폴백
+function albumOf(id){ return (album && album[id]) || ALBUM_INFO[id] || null; }
 let uidCounter = 1000;
 
 /* runtime (비저장) */
@@ -1010,7 +1010,7 @@ async function loadState(){
         if(j && Array.isArray(j.songs) && j.content){
           const committedRev = j.rev||0;
           if(!localValid || committedRev>appliedRev){
-            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{});
+            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{}); album=j.album||null;
             saveState(committedRev);   // 이 커밋 버전을 적용 완료로 기록
             return;
           }
@@ -1020,7 +1020,7 @@ async function loadState(){
   }
   if(localValid){   // 커밋본이 더 최신이 아니면 이 기기 편집본 유지
     currentRev=appliedRev;
-    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{});
+    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{}); album=saved.album||null;
     return;
   }
   resetToDefault(false);
@@ -1029,7 +1029,7 @@ async function loadState(){
 /* 배포본(svt-data.json) 내려받기 — 어떤 구성이든 rev를 새로 찍어 커밋 가능한 파일로 저장 */
 function downloadDeploy(data){
   const rev=Date.now();
-  const payload={rev, songs:data.songs, content:data.content, config:data.config};
+  const payload={rev, songs:data.songs, content:data.content, album:data.album||album||undefined, config:data.config};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
@@ -1057,7 +1057,7 @@ function downloadBlob(filename, text, type){
 const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
 function loadSlots(){ try{ return JSON.parse(localStorage.getItem(SLOTS_KEY))||[]; }catch(e){ return []; } }
 function persistSlots(s){ try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 슬롯을 저장하지 못했어요"); } }
-function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config})); }
+function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config, album})); }
 function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
 
@@ -1174,6 +1174,7 @@ function loadSlot(id){
     songs=JSON.parse(JSON.stringify(s.data.songs));
     content=JSON.parse(JSON.stringify(s.data.content));
     config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
+    album=s.data.album?JSON.parse(JSON.stringify(s.data.album)):null;
   }catch(e){ toast("슬롯을 불러오는 중 오류가 발생했어요"); return; }
   saveState(); renderSettings(); startNewGame(); toast(`'${s.name}' 불러옴`);
 }
@@ -1253,7 +1254,7 @@ function statsClear(){ if(!confirm("이 기기의 모든 분석 통계를 삭제
 let currentRev=0;
 function saveState(rev){
   if(rev!=null) currentRev=rev;
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config})); }
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config, album})); }
   catch(e){ if(typeof toast==="function") toast("저장 공간이 부족하거나 사용할 수 없어요(설정 유지 실패)"); }
 }
 function resetToDefault(doSave){
@@ -1353,7 +1354,7 @@ function maskTitle(t){
 /* 6개 카테고리 중 랜덤 3개 힌트 생성 */
 function buildHints(song){
   const t=primaryTitle(song.name);
-  const info=ALBUM_INFO[song.id];
+  const info=albumOf(song.id);
   const cands=[];
   cands.push({k:"구성", v: isUnitSong(song)? "<b>유닛곡</b>" : "<b>단체곡</b> (완전체)"});
   cands.push({k:"제목 초성", v:"<b>"+escapeHtml(toChoseong(t))+"</b>"});
@@ -1487,17 +1488,14 @@ function isUnitSong(s){ return /팀|부석순|유닛|정한|LEADERS|솔로|[가-
 let playedIds=new Set();   // 지금까지 출제된 문항(라운드 이어가기용)
 
 /* ---- 문제 범위(그룹) — 난이도/시대/구성으로 출제 범위 좁히기 ---- */
-function eraBucket(y){ if(y==null) return null; if(y<=2017) return "2015-2017"; if(y<=2020) return "2018-2020"; if(y<=2023) return "2021-2023"; return "2024-2026"; }
 const SCOPE_DEFS = {
   diff:{ label:"난이도", vals:[{v:"상",label:"상"},{v:"중",label:"중"},{v:"신곡",label:"신곡"}] },
-  era:{  label:"시대",   vals:[{v:"2015-2017",label:"데뷔초기 ’15–17"},{v:"2018-2020",label:"성장기 ’18–20"},{v:"2021-2023",label:"전성기 ’21–23"},{v:"2024-2026",label:"최신 ’24–26"}] },
   unit:{ label:"구성",   vals:[{v:"full",label:"완전체(단체곡)"},{v:"unit",label:"유닛곡"}] }
 };
 function songMatchesScope(id, by, val){
   if(by==="all"||!val) return true;
   const s=songById(id); if(!s) return false;
   if(by==="diff") return s.diff===val;
-  if(by==="era")  return eraBucket((ALBUM_INFO[id]||{}).year)===val;
   if(by==="unit") return (val==="unit")===isUnitSong(s);
   return true;
 }
@@ -2031,7 +2029,7 @@ document.getElementById("dlg-json-ok").addEventListener("click",()=>{
   try{
     const obj=JSON.parse(ta.value);
     if(!obj||!Array.isArray(obj.songs)||!obj.content) throw 0;
-    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{});
+    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{}); album=obj.album||null;
     saveState(); renderSettings(); startNewGame();
     toast("불러오기 완료"); dlgJson.close();
   }catch(e){ toast("올바른 형식의 JSON이 아닙니다"); }

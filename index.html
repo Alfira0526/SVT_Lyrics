@@ -152,6 +152,11 @@
   .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
   .chip{padding:7px 13px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
   .chip.active{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene)}
+  .scope-dims{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .scope-vals{display:flex;gap:8px;flex-wrap:wrap}
+  .scope-vals:empty{display:none}
+  body.stage .scope-line{font-size:15px}
 
   .slot{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
   .slot-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -442,6 +447,18 @@
     </div>
 
     <div class="setup-card">
+      <div class="setup-label">🎯 문제 범위 (그룹 선택)</div>
+      <div class="scope-dims" id="scope-dims">
+        <span class="chip active" data-dim="all">전체</span>
+        <span class="chip" data-dim="diff">난이도</span>
+        <span class="chip" data-dim="era">시대(연도)</span>
+        <span class="chip" data-dim="unit">구성</span>
+      </div>
+      <div class="scope-vals" id="scope-vals"></div>
+      <div class="setup-tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>시대</b>(데뷔초기~최신), <b>구성</b>(완전체·유닛곡).<br>예: 신입 캐럿과는 <b>전성기·최신</b>으로, 고인물끼리는 <b>데뷔초기·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
+    </div>
+
+    <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-timer" /><span class="slider"></span></label>
         <span style="font-size:14px">타이머 사용 <span style="color:var(--muted)">(시작 시 카운트다운)</span></span>
@@ -633,6 +650,7 @@
         <span class="chip" id="g-shuffle">🔀 셔플</span>
         <span class="chip" id="g-restart">↻ 처음부터</span>
       </div>
+      <div class="scope-line" id="g-scope">🎯 범위: 전체</div>
       <div class="filter-bar" style="margin:12px 0 0">
         <span class="chip" id="g-end">⏹ 게임 종료(결과)</span>
         <span style="flex:1"></span>
@@ -912,7 +930,8 @@ const DEFAULT_CONFIG = {
   autoHost:false, autoHideControls:false, autoInterval:20, onlineRoom:false, fbUrl:"", quizOnly:false,
   hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
   sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
-  stage:false       // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
+  stage:false,      // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
+  scope:{by:"all", val:""}   // 문제 범위(그룹): all | diff(난이도) | era(시대) | unit(구성)
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -967,7 +986,6 @@ let pos = 0;
 let marks = {};            // {songId: "correct"|"wrong"}
 let teamScores = [];
 let turn = 0;
-let activeFilter = "all";
 let timerHandle = null, timerLeft = 0;
 let autoTTSHandle = null;   // 카드 전환 후 자동 낭독 예약 핸들
 let quizCount = null;        // 출제 문제 수 (null = 전체)
@@ -1467,10 +1485,38 @@ function finalizeTeamRound(){
 
 function isUnitSong(s){ return /팀|부석순|유닛|정한|LEADERS|솔로|[가-힣]X[가-힣]/.test((s&&s.part)||""); }
 let playedIds=new Set();   // 지금까지 출제된 문항(라운드 이어가기용)
-function buildOrder(filter, shuffle, exclude){
+
+/* ---- 문제 범위(그룹) — 난이도/시대/구성으로 출제 범위 좁히기 ---- */
+function eraBucket(y){ if(y==null) return null; if(y<=2017) return "2015-2017"; if(y<=2020) return "2018-2020"; if(y<=2023) return "2021-2023"; return "2024-2026"; }
+const SCOPE_DEFS = {
+  diff:{ label:"난이도", vals:[{v:"상",label:"상"},{v:"중",label:"중"},{v:"신곡",label:"신곡"}] },
+  era:{  label:"시대",   vals:[{v:"2015-2017",label:"데뷔초기 ’15–17"},{v:"2018-2020",label:"성장기 ’18–20"},{v:"2021-2023",label:"전성기 ’21–23"},{v:"2024-2026",label:"최신 ’24–26"}] },
+  unit:{ label:"구성",   vals:[{v:"full",label:"완전체(단체곡)"},{v:"unit",label:"유닛곡"}] }
+};
+function songMatchesScope(id, by, val){
+  if(by==="all"||!val) return true;
+  const s=songById(id); if(!s) return false;
+  if(by==="diff") return s.diff===val;
+  if(by==="era")  return eraBucket((ALBUM_INFO[id]||{}).year)===val;
+  if(by==="unit") return (val==="unit")===isUnitSong(s);
+  return true;
+}
+function currentScope(){ const sc=config.scope||{by:"all",val:""}; return {by:sc.by||"all", val:sc.val||""}; }
+function songInScope(id){ const sc=currentScope(); return songMatchesScope(id, sc.by, sc.val); }
+function scopeCount(by, val){ return songs.reduce((n,s)=>n+(songMatchesScope(s.id, by, val)?1:0), 0); }
+function scopeSummary(){
+  const sc=currentScope();
+  if(sc.by==="all"||!sc.val) return "전체 "+songs.length+"곡";
+  let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
+  if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
+  return vlabel+" · "+scopeCount(sc.by, sc.val)+"곡";
+}
+
+function buildOrder(shuffle, exclude){
   let list=songs.map(s=>s.id);
   if(exclude && exclude.size) list=list.filter(id=>!exclude.has(id));
-  if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
+  list=list.filter(songInScope);
+  if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).filter(id=>!(exclude&&exclude.has(id))); }   // 범위가 비면 전체로 폴백
   const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
   if(doShuffle){
     if(quizUnitBoost){
@@ -1487,13 +1533,13 @@ function buildOrder(filter, shuffle, exclude){
 function startNewGame(shuffle){
   marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
   if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
-  buildOrder(activeFilter, !!shuffle);
+  buildOrder(!!shuffle);
 }
 /* 새 문제로 이어가기 — 지금까지 출제된 문항 제외하고 새로 뽑기(점수는 유지) */
 function startNextRound(){
   order.forEach(id=>playedIds.add(id));
-  buildOrder(activeFilter, true, playedIds);
-  if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(activeFilter, true); }
+  buildOrder(true, playedIds);
+  if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(true); }
   marks={}; pos=0; gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
   if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
   renderGame();
@@ -1504,6 +1550,7 @@ function renderGame(){
   const gvv=document.getElementById("view-game");
   if(gvv && gvv.classList.contains("active")) window.scrollTo({top:0, behavior:"smooth"});   // 문항 전환 시 맨 위로
   applyStage();   // 무대 모드 상태 반영
+  syncGameScopeChips();   // 문제 범위 칩·표시 동기화
   const total=order.length;
   els.total.textContent=total;
   // team card
@@ -1799,14 +1846,23 @@ document.getElementById("g-noone").addEventListener("click",()=>{ if(order.lengt
 document.getElementById("g-next").addEventListener("click",next);
 document.getElementById("g-prev").addEventListener("click",prev);
 
+function syncGameScopeChips(){
+  const sc=currentScope();
+  document.querySelectorAll('#view-game .chip[data-filter]').forEach(x=>{
+    const v=x.dataset.filter;
+    const on = (v==="all") ? (sc.by==="all") : (sc.by==="diff" && sc.val===v);
+    x.classList.toggle("active", on);
+  });
+  const ind=document.getElementById("g-scope"); if(ind) ind.textContent="🎯 범위: "+scopeSummary();
+}
 document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
   c.addEventListener("click",()=>{
-    document.querySelectorAll('#view-game .chip[data-filter]').forEach(x=>x.classList.remove("active"));
-    c.classList.add("active"); activeFilter=c.dataset.filter;
-    buildOrder(activeFilter,false); renderGame();
+    const v=c.dataset.filter;
+    config.scope = (v==="all") ? {by:"all",val:""} : {by:"diff",val:v};   // 인게임 난이도 칩 = 난이도 범위 빠른 전환
+    saveState(); syncGameScopeChips(); buildOrder(false); renderGame();
   });
 });
-document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(activeFilter,true); renderGame(); toast("🔀 순서를 섞었습니다"); });
+document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast("🔀 순서를 섞었습니다"); });
 document.getElementById("g-restart").addEventListener("click",()=>{
   if(!confirm("채점 기록·팀 점수를 지우고 처음부터 다시 시작할까요?")) return;
   startNewGame(true); renderGame(); toast("처음부터 다시 시작");
@@ -2097,7 +2153,27 @@ function renderSetup(){
   document.getElementById("c-fburl").value=config.fbUrl||"";
   document.getElementById("c-quizonly").checked=!!config.quizOnly;
   renderTeamEditor();
+  renderScopeSetup();
 }
+function renderScopeSetup(){
+  const sc=currentScope();
+  const dims=document.getElementById("scope-dims"); if(!dims) return;
+  dims.querySelectorAll("[data-dim]").forEach(x=>x.classList.toggle("active", x.dataset.dim===(sc.by==="all"?"all":sc.by)));
+  const vwrap=document.getElementById("scope-vals"); if(!vwrap) return; vwrap.innerHTML="";
+  const def=SCOPE_DEFS[sc.by]; if(!def) return;
+  def.vals.forEach(o=>{
+    const c=document.createElement("span");
+    c.className="chip"+(sc.val===o.v?" active":"");
+    c.textContent=o.label+" "+scopeCount(sc.by,o.v);
+    c.addEventListener("click",()=>{ config.scope={by:sc.by,val:o.v}; saveState(); renderScopeSetup(); });
+    vwrap.appendChild(c);
+  });
+}
+document.querySelectorAll('#scope-dims [data-dim]').forEach(btn=>btn.addEventListener("click",()=>{
+  const d=btn.dataset.dim;
+  config.scope = (d==="all") ? {by:"all",val:""} : {by:d, val:SCOPE_DEFS[d].vals[0].v};   // 축 전환 시 첫 값 자동 선택
+  saveState(); renderScopeSetup();
+}));
 /* =====================  온라인 방(Room)  =====================
    기획: 호스트 PC로 방을 열면 같은 공간의 참가자들이 모바일로 참가 → 각자 폰에서 답 선택 → 결과 취합.
    전송: 같은 브라우저는 BroadcastChannel(검증됨), 다른 기기는 공개 MQTT 릴레이(베스트에포트, 지연 로드·폴백).

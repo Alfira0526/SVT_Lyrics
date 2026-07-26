@@ -290,6 +290,18 @@
   .setup-tip b{color:var(--rose);font-weight:800}
   .setup-actions{display:flex;gap:10px;margin-top:8px}
   .slot-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .stats-block{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .stats-sum{font-size:14px;color:var(--txt);margin:4px 0 12px}
+  .stats-sum b{color:var(--rose);font-weight:900}
+  .stats-tbl{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 14px}
+  .stats-tbl caption{text-align:left;font-size:12px;font-weight:800;color:var(--muted);padding:6px 0}
+  .stats-tbl th,.stats-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  .stats-tbl th:first-child,.stats-tbl td:first-child{text-align:left}
+  .stats-tbl th{color:var(--muted);font-weight:700;font-size:12px}
+  .stats-tbl tbody tr:last-child td{border-bottom:none}
+  .stats-rate{font-weight:900}
+  .stats-empty{font-size:13px;color:var(--muted);padding:10px 0}
+  .stats-scroll{overflow-x:auto}
   .intro-setup{margin:2px 0 26px}
   .intro-setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:9px;letter-spacing:.3px}
   .intro-counts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
@@ -618,6 +630,20 @@
         </div>
         <div id="slot-list"></div>
         <p class="hint" style="margin-bottom:0">🔒 <b>비밀번호를 아는 관리자</b>만 저장 슬롯을 관리할 수 있습니다. <b>+ 현재 상태 저장</b>을 누르면 슬롯 보관과 함께 <code>svt-data.json</code>이 바로 <b>커밋용으로 내려받아져</b>, 저장소에 커밋하면 즉시 배포본에 반영됩니다. 각 슬롯의 <b>💾 배포본</b> 버튼으로 지난 구성도 언제든 커밋용 파일로 받을 수 있습니다.</p>
+
+        <div class="stats-block">
+          <div class="set-head" style="margin-top:6px">
+            <h2 style="font-size:16px">📊 분석 리포트 <span style="font-size:12px;color:var(--muted);font-weight:600">모드별 이용율 · 곡별 정답률 (이 기기 로컬)</span></h2>
+          </div>
+          <div class="slot-actions">
+            <button class="btn btn-ghost btn-sm" id="stats-refresh">↻ 새로고침</button>
+            <button class="btn btn-ghost btn-sm" id="stats-json">⬇ JSON</button>
+            <button class="btn btn-ghost btn-sm" id="stats-csv">⬇ CSV(곡별)</button>
+            <button class="btn btn-ghost btn-sm" id="stats-clear">🗑 초기화</button>
+          </div>
+          <div id="stats-report"></div>
+          <p class="hint" style="margin-bottom:0">게임을 끝까지 진행(결과 화면 도달)할 때마다 <b>모드·정답/오답·곡별 정답</b>이 이 기기에만 기록됩니다(최근 <b>200판</b>). 서버 전송·개인정보 수집은 없습니다.</p>
+        </div>
       </div>
     </div>
 
@@ -953,6 +979,15 @@ function downloadDataFile(){
   saveState(rev);
   toast("svt-data.json 저장됨 · 저장소에 커밋하면 배포본에 반영");
 }
+/* 임의 텍스트를 파일로 내려받기(리포트 JSON/CSV 등) — downloadDeploy의 범용 형제 */
+function downloadBlob(filename, text, type){
+  const blob=new Blob([text],{type:type||"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 
 /* ---- 저장 슬롯 (여러 벌 저장) ---- */
 const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
@@ -961,6 +996,39 @@ function persistSlots(s){ try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)
 function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config})); }
 function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
+
+/* ---- 통계(telemetry) — 모드별 이용율·곡별 정답률 (로컬 전용, 관리자 리포트용) ---- */
+const STATS_KEY="svt_lyrics_quiz_stats_v1";
+const STATS_MAX=200;   // 세션 상한(오래된 것부터 폐기)
+function loadStats(){
+  try{ const o=JSON.parse(localStorage.getItem(STATS_KEY)); if(o&&o.v===1&&Array.isArray(o.sessions)&&o.modeCounts&&o.songStats) return o; }catch(e){}
+  return {v:1, sessions:[], modeCounts:{}, songStats:{}, best:{rate:0, streak:0}};
+}
+function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 통계를 저장하지 못했어요"); } }
+function statsModeLabel(cfg){
+  if(cfg.onlineRoom) return "온라인 방";
+  let s = cfg.teamMode ? "팀전" : "솔로";
+  if(cfg.autoHost) s+="·자동";
+  if(cfg.quizOnly) s+="·문제만";
+  s += cfg.mc ? "·4지선다" : "·주관식";
+  return s;
+}
+let gameRecorded=false;   // 판당 1회 적재 가드(결과탭 재진입·재시작 중복 방지)
+function recordStats(){
+  try{
+    let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
+    const answered=c+w; if(answered<=0) return false;
+    const st=loadStats();
+    const mode=statsModeLabel(config), rate=Math.round(c/answered*100);
+    st.sessions.unshift({ts:nowStamp(), mode, served:answered, correct:c, wrong:w, rate});
+    if(st.sessions.length>STATS_MAX) st.sessions.length=STATS_MAX;
+    const mc=st.modeCounts[mode]||(st.modeCounts[mode]={games:0,served:0,correct:0,wrong:0});
+    mc.games++; mc.served+=answered; mc.correct+=c; mc.wrong+=w;
+    for(const k in marks){ const v=marks[k]; if(v!=="correct"&&v!=="wrong") continue; const ss=st.songStats[k]||(st.songStats[k]={served:0,correct:0}); ss.served++; if(v==="correct") ss.correct++; }
+    saveStats(st);
+    return true;
+  }catch(e){ return false; }   // 통계 실패는 결과 화면을 막지 않음
+}
 
 function addSlot(){
   const inp=document.getElementById("slot-name");
@@ -1017,6 +1085,46 @@ function renderSlots(){
   list.querySelectorAll("[data-file]").forEach(b=>b.addEventListener("click",()=>fileSlot(b.dataset.file)));
   list.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>delSlot(b.dataset.del)));
 }
+
+/* ---- 분석 리포트 렌더/내보내기(W2) ---- */
+function renderStats(){
+  const box=document.getElementById("stats-report"); if(!box) return;
+  const st=loadStats();
+  const totGames=st.sessions.length;
+  let tc=0,ts=0; for(const m in st.modeCounts){ tc+=st.modeCounts[m].correct; ts+=st.modeCounts[m].served; }
+  const tRate=ts?Math.round(tc/ts*100):0;
+  if(!totGames){ box.innerHTML='<p class="stats-empty">아직 기록된 게임이 없어요. 게임을 끝까지 진행하면 이곳에 통계가 쌓입니다.</p>'; return; }
+  // 모드별
+  const modeRows=Object.keys(st.modeCounts).sort((a,b)=>st.modeCounts[b].games-st.modeCounts[a].games).map(m=>{
+    const d=st.modeCounts[m], r=d.served?Math.round(d.correct/d.served*100):0;
+    const share=totGames?Math.round(d.games/totGames*100):0;
+    return `<tr><td>${escapeHtml(m)}</td><td>${d.games} (${share}%)</td><td>${d.served}</td><td class="stats-rate" style="color:${rateColor(r)}">${r}%</td></tr>`;
+  }).join("");
+  // 곡별(정답률 낮은 순, 응답 1회 이상)
+  const songRows=Object.keys(st.songStats).map(id=>{
+    const d=st.songStats[id], s=songById(id), r=d.served?Math.round(d.correct/d.served*100):0;
+    return {id, name:(s?s.name:id), diff:(s?s.diff:"–"), served:d.served, correct:d.correct, r};
+  }).filter(x=>x.served>0).sort((a,b)=>a.r-b.r || b.served-a.served);
+  const songBody=songRows.map(x=>`<tr><td>${escapeHtml(x.name)} <span style="color:var(--muted)">${escapeHtml(x.diff)}</span></td><td>${x.served}</td><td>${x.correct}</td><td class="stats-rate" style="color:${rateColor(x.r)}">${x.r}%</td></tr>`).join("");
+  box.innerHTML=`
+    <p class="stats-sum">총 <b>${totGames}</b>판 · 누적 응답 <b>${ts}</b> · 전체 정답률 <b>${tRate}%</b></p>
+    <div class="stats-scroll"><table class="stats-tbl"><caption>모드별 이용율 · 정답률</caption>
+      <thead><tr><th>모드</th><th>판수(비중)</th><th>응답</th><th>정답률</th></tr></thead><tbody>${modeRows}</tbody></table></div>
+    <div class="stats-scroll"><table class="stats-tbl"><caption>곡별 정답률 (낮은 순 · 가장 어려운 곡부터)</caption>
+      <thead><tr><th>곡 (난이도)</th><th>응답</th><th>정답</th><th>정답률</th></tr></thead><tbody>${songBody}</tbody></table></div>`;
+}
+function rateColor(r){ return r>=70?"var(--green)":(r>=40?"var(--amber)":"var(--red)"); }
+function statsExportJSON(){ downloadBlob("svt-quiz-stats.json", JSON.stringify(loadStats(),null,2), "application/json"); toast("통계 JSON 내려받음"); }
+function statsExportCSV(){
+  const st=loadStats();
+  const esc=v=>{ const s=String(v==null?"":v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const rows=[["songId","name","diff","served","correct","rate"]];
+  Object.keys(st.songStats).forEach(id=>{ const d=st.songStats[id], s=songById(id), r=d.served?Math.round(d.correct/d.served*100):0; if(d.served>0) rows.push([id,(s?s.name:id),(s?s.diff:""),d.served,d.correct,r]); });
+  const csv="﻿"+rows.map(r=>r.map(esc).join(",")).join("\n");   // BOM: 엑셀 한글 대응
+  downloadBlob("svt-quiz-song-stats.csv", csv, "text/csv;charset=utf-8");
+  toast("곡별 정답률 CSV 내려받음");
+}
+function statsClear(){ if(!confirm("이 기기의 모든 분석 통계를 삭제할까요? 되돌릴 수 없습니다.")) return; try{ localStorage.removeItem(STATS_KEY); }catch(e){} renderStats(); toast("통계를 초기화했어요"); }
 let currentRev=0;
 function saveState(rev){
   if(rev!=null) currentRev=rev;
@@ -1268,7 +1376,7 @@ function buildOrder(filter, shuffle, exclude){
   order=list; pos=0;
 }
 function startNewGame(shuffle){
-  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set();
+  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false;
   if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
   buildOrder(activeFilter, !!shuffle);
 }
@@ -1277,7 +1385,7 @@ function startNextRound(){
   order.forEach(id=>playedIds.add(id));
   buildOrder(activeFilter, true, playedIds);
   if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(activeFilter, true); }
-  marks={}; pos=0;
+  marks={}; pos=0; gameRecorded=false;
   if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
   renderGame();
   document.querySelector('nav.tabs button[data-view="game"]').click();
@@ -1647,7 +1755,7 @@ function renderSettings(){
       </div>`;
     list.appendChild(slot);
   });
-  bindSlotInputs(); updateFilled(); renderSlots();
+  bindSlotInputs(); updateFilled(); renderSlots(); renderStats();
 }
 function bindSlotInputs(){
   document.querySelectorAll("#s-list [data-f]").forEach(inp=>{
@@ -1784,6 +1892,7 @@ function renderRankRows(rank){
 function renderResult(){
   let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
   const answered=c+w, rate=answered?Math.round(c/answered*100):0;
+  if(!gameRecorded && recordStats()) gameRecorded=true;   // 판당 1회 통계 적재(W2)
   document.getElementById("r-correct").textContent=c;
   document.getElementById("r-answered").textContent=answered;
   document.getElementById("r-rate").textContent=rate+"%";
@@ -2197,12 +2306,16 @@ const SLOT_PW="19950719";
   const pw=document.getElementById("slot-pw");
   const err=document.getElementById("slot-err");
   function tryUnlock(){
-    if(pw.value===SLOT_PW){ card.classList.remove("locked"); err.textContent=""; pw.value=""; }
+    if(pw.value===SLOT_PW){ card.classList.remove("locked"); err.textContent=""; pw.value=""; renderStats(); }
     else{ err.textContent="비밀번호가 올바르지 않습니다."; pw.value=""; pw.focus(); }
   }
   document.getElementById("slot-ok").addEventListener("click",tryUnlock);
   pw.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); tryUnlock(); } });
 })();
+document.getElementById("stats-refresh").addEventListener("click",renderStats);
+document.getElementById("stats-json").addEventListener("click",statsExportJSON);
+document.getElementById("stats-csv").addEventListener("click",statsExportCSV);
+document.getElementById("stats-clear").addEventListener("click",statsClear);
 
 document.getElementById("s-savefile").addEventListener("click",downloadDataFile);
 document.getElementById("slot-save").addEventListener("click",addSlot);

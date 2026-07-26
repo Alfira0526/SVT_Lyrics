@@ -152,6 +152,9 @@
   .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
   .chip{padding:7px 13px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
   .chip.active{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  #staging-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:repeating-linear-gradient(45deg,#3a2a00,#3a2a00 12px,#4a3600 12px,#4a3600 24px);color:#ffcf5c;font-size:13px;font-weight:800;text-align:center;padding:8px 12px;border-bottom:1px solid var(--amber)}
+  #staging-banner a{color:#fff;text-decoration:underline}
+  body.staging{padding-top:38px}
   .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene)}
   .scope-dims{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .scope-vals{display:flex;gap:8px;flex-wrap:wrap}
@@ -974,8 +977,14 @@ const TEAM_NAME_POOL = [
   "음악의 신","하이라이트","열세즈","세봉이","호랭이","붕어즈"
 ];
 
+/* ---- 스테이징(검수) 모드 ---- */
+// ?staging (또는 ?staging=1)로 접속하면 검수용 데이터(svt-data.staging.json)를 로드.
+// 실서비스 로컬 상태를 오염시키지 않도록 저장키를 분리하고, 상단에 배너를 띄운다.
+const STAGING = (function(){ try{ const sp=new URLSearchParams(location.search); return sp.has("staging") && sp.get("staging")!=="0" && sp.get("staging")!=="false"; }catch(e){ return false; } })();
+const DATA_FILE = STAGING ? "svt-data.staging.json" : "svt-data.json";
+
 /* ---- 상태 ---- */
-const STORE_KEY = "svt_lyrics_quiz_v1";
+const STORE_KEY = "svt_lyrics_quiz_v1" + (STAGING ? "__staging" : "");
 let songs, content, config, album=null;   // album: 데이터에 포함된 발매연도/앨범종류 맵({id:{year,type}}). 없으면 인라인 ALBUM_INFO 폴백
 function albumOf(id){ return (album && album[id]) || ALBUM_INFO[id] || null; }
 let uidCounter = 1000;
@@ -1003,7 +1012,7 @@ async function loadState(){
       // 타임아웃(4s) — 현장 와이파이가 느리거나 응답이 없어도 부팅이 멈추지 않도록
       const ac=("AbortController" in window)?new AbortController():null;
       const to=ac?setTimeout(()=>ac.abort(),4000):null;
-      const r=await fetch("svt-data.json",{cache:"no-store", signal:ac?ac.signal:undefined});
+      const r=await fetch(DATA_FILE,{cache:"no-store", signal:ac?ac.signal:undefined});
       if(to) clearTimeout(to);
       if(r.ok){
         const j=await r.json();
@@ -2547,6 +2556,10 @@ document.getElementById("slot-name").addEventListener("keydown",e=>{ if(e.key===
 
 els.speedval.textContent="1.0×";
 (async ()=>{
+  if(STAGING){
+    document.body.classList.add("staging");
+    document.body.insertAdjacentHTML("afterbegin", '<div id="staging-banner">🧪 스테이징(검수용) 모드 · 실제 게임 데이터가 아닙니다 · <a href="?">실서비스로</a></div>');
+  }
   await loadState();
   startNewGame();
   renderGame();

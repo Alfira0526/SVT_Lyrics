@@ -862,5 +862,23 @@
     "onlineRoom": false,
     "fbUrl": "",
     "quizOnly": false
+  },
+  "_review": {
+    "s63": {
+      "reason": "현재 \"Blue\" = 2026 미니로 저장 — 2025~26 최신이라 자동검증 불가, 오너 확인 필요",
+      "fields": [
+        "year",
+        "type",
+        "존재여부"
+      ]
+    },
+    "s64": {
+      "reason": "현재 \"For you\" = 2025 미니로 저장 — 한국 발매 여부/정보 미확인",
+      "fields": [
+        "year",
+        "type",
+        "존재여부"
+      ]
+    }
   }
 }

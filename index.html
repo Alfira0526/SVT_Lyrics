@@ -60,9 +60,9 @@
   .card + .card{margin-top:14px}
 
   .status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-  .counter{font-size:13px;color:var(--muted)}
+  .counter{font-size:14px;color:var(--muted)}
   .counter b{color:var(--txt);font-size:15px}
-  .badge{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:800}
+  .badge{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:800}
   .b-상{background:rgba(240,96,155,.16);color:#f9a9c8;border:1px solid rgba(240,96,155,.42)}
   .b-중{background:rgba(184,146,230,.16);color:#d3bcf2;border:1px solid rgba(184,146,230,.42)}
   .b-신곡{background:rgba(138,162,242,.16);color:#b4c3f8;border:1px solid rgba(138,162,242,.42)}
@@ -76,13 +76,25 @@
   .timer-bar i{display:block;height:100%;background:var(--green);width:100%;transition:width 1s linear}
   .timer-bar i.warn{background:var(--amber)}
   .timer-bar i.danger{background:var(--red)}
-  .timer-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:6px}
-  .timer-top b{color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
+  .timer-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .timer-top b{color:var(--txt);font-variant-numeric:tabular-nums;font-size:16px}
 
-  .lyric-box{background:linear-gradient(180deg,var(--panel2),var(--bg2));border:1px solid var(--line);border-radius:14px;padding:26px 20px;min-height:132px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;line-height:1.7;font-weight:600;position:relative}
+  .lyric-box{background:linear-gradient(180deg,var(--panel2),var(--bg2));border:1px solid var(--line);border-radius:14px;padding:28px 20px;min-height:148px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(23px,3.4vw,34px);line-height:1.6;font-weight:600;position:relative}
   .lyric-box.hidden-mode .lyric-text{filter:blur(11px);user-select:none;opacity:.55}
   .lyric-box .placeholder{color:var(--muted);font-size:15px;font-weight:500;line-height:1.7}
-  .hide-note{position:absolute;top:10px;right:14px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .hide-note{position:absolute;top:10px;right:14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .status-right{display:flex;align-items:center;gap:8px}
+  .stage-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:12px;font-weight:800;padding:5px 10px;border-radius:999px;cursor:pointer}
+  .stage-btn[aria-pressed="true"]{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  /* 무대(Stage) 모드 — 프로젝터/원거리 가독성 우선: 가사·카운터·타이머 대형화, 보조 컨트롤 숨김 */
+  body.stage .lyric-box{font-size:clamp(30px,5vw,52px);min-height:200px;line-height:1.5;font-weight:700}
+  body.stage .counter{font-size:18px}
+  body.stage .counter b{font-size:22px}
+  body.stage .badge{font-size:15px;padding:5px 14px}
+  body.stage .timer-top{font-size:15px}
+  body.stage .timer-top b{font-size:22px}
+  body.stage .answer .song-name{font-size:clamp(30px,4.4vw,44px)}
+  body.stage #g-speed-row, body.stage #g-hide-row, body.stage .hint-area{display:none !important}
 
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
   button.btn{border:0;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s;color:#fff;display:inline-flex;align-items:center;gap:8px;justify-content:center}
@@ -127,7 +139,7 @@
   .team .turn-tag{position:absolute;top:6px;right:8px;font-size:10px;color:var(--rose);font-weight:800;display:none}
   .team.active .turn-tag{display:block}
   .team-btns{display:flex;gap:6px;justify-content:center;margin-top:8px}
-  .team-btns button{border:0;border-radius:8px;width:30px;height:28px;font-weight:900;cursor:pointer;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .team-btns button{border:0;border-radius:9px;width:40px;height:36px;font-size:18px;font-weight:900;cursor:pointer;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
   .award-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .award-row button{flex:1;min-width:110px;border:0;border-radius:10px;padding:11px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--green),var(--green-deep))}
 
@@ -195,13 +207,19 @@
   .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 
   @media(max-width:560px){
-    .lyric-box{font-size:19px}
+    .lyric-box{font-size:21px}
     .result-score{font-size:42px}
     .stat .v{font-size:18px}
     .cfg-grid{grid-template-columns:1fr}
     .row3{flex-wrap:wrap}
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
+  }
+  /* 태블릿(가로 태블릿·작은 노트북) — 561~1024px: 보기·가사 중간 크기로 확대 */
+  @media(min-width:561px) and (max-width:1024px){
+    .mc-options{grid-template-columns:1fr 1fr}
+    .mc-opt{font-size:16px}
+    .team-btns button{width:44px;height:40px}
   }
   /* ---- 저장 슬롯 잠금 ---- */
   #slot-card.locked #slot-body{display:none}
@@ -533,7 +551,10 @@
           &nbsp;·&nbsp; 정답 <b id="g-correct">0</b> · 오답 <b id="g-wrong">0</b>
           <span class="streak-badge" id="g-streak" style="display:none">🔥2</span>
         </div>
-        <span class="badge b-중" id="g-badge">중</span>
+        <div class="status-right">
+          <button class="stage-btn" id="g-stage-btn" title="무대 모드 — 프로젝터/원거리용 크게 보기" aria-pressed="false">🎦 무대</button>
+          <span class="badge b-중" id="g-badge">중</span>
+        </div>
       </div>
       <div class="progress"><i id="g-bar"></i></div>
 
@@ -553,7 +574,7 @@
         <span class="speed-val" id="g-speedval">1.0×</span>
       </div>
 
-      <div class="toggle-row">
+      <div class="toggle-row" id="g-hide-row">
         <label class="switch"><input type="checkbox" id="g-hide" /><span class="slider"></span></label>
         <span style="font-size:14px">가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span></span>
       </div>
@@ -887,7 +908,8 @@ const DEFAULT_CONFIG = {
   timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
   autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:"", quizOnly:false,
   hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
-  sfx:true          // 효과음(정답·오답·카운트다운) 기본 ON
+  sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
+  stage:false       // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
 };
 
 /* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
@@ -1103,6 +1125,12 @@ function bumpStreak(correct){
 function updateStreakBadge(){
   const el=document.getElementById("g-streak"); if(!el) return;
   if(streak>=2){ el.textContent="🔥"+streak; el.style.display=""; } else el.style.display="none";
+}
+/* 무대 모드(프로젝터 대형) 적용/토글 (W4) */
+function applyStage(){
+  document.body.classList.toggle("stage", !!config.stage);
+  const btn=document.getElementById("g-stage-btn");
+  if(btn) btn.setAttribute("aria-pressed", config.stage?"true":"false");
 }
 
 function addSlot(){
@@ -1471,6 +1499,7 @@ function startNextRound(){
 function renderGame(){
   const gvv=document.getElementById("view-game");
   if(gvv && gvv.classList.contains("active")) window.scrollTo({top:0, behavior:"smooth"});   // 문항 전환 시 맨 위로
+  applyStage();   // 무대 모드 상태 반영
   const total=order.length;
   els.total.textContent=total;
   // team card
@@ -1748,6 +1777,7 @@ function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
 
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
 els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });
+document.getElementById("g-stage-btn").addEventListener("click",()=>{ config.stage=!config.stage; saveState(); applyStage(); toast(config.stage?"🎦 무대 모드 켜짐(크게 보기)":"무대 모드 꺼짐"); });
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
 document.getElementById("g-reveal").addEventListener("click",()=>{
@@ -2221,7 +2251,8 @@ const Room = (function(){
     guest.active=true; guest.code=code; guest.team=null; guest.qid=null; guest.answered=false; guest.revealedQid=null;
     guest.teamId=localStorage.getItem("svtq_teamid")||("t"+Math.random().toString(36).slice(2,8));
     localStorage.setItem("svtq_teamid",guest.teamId);
-    guest.tx=makeTransport(code,(c)=>{ if(c) guestHello(); });
+    guest.gotSlots=false;
+    guest.tx=makeTransport(code,(c)=>{ if(c){ guestHello(); const e=document.getElementById("rg-pick-err"); if(e && !guest.gotSlots) e.textContent="🌐 연결됨 · 팀 목록을 받는 중…"; } });
     guest.tx.onmsg(m=>{
       if(m.type==="slots"){ guestSlots(m.teams||[]); }
       else if(m.type==="claimok"){ if(m.dev===guest.teamId){ guest.team=m.name; guestEnterPlay(); } }
@@ -2235,14 +2266,27 @@ const Room = (function(){
       else if(m.type==="ended"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 게임이 종료되었습니다 · 최종 순위"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-video").innerHTML=""; document.getElementById("rg-timer").textContent=""; }
     });
     guestHello();
-    let tries=0; const iv=setInterval(()=>{ if(!guest.active||guest.team||tries++>=6){ clearInterval(iv); return; } guestHello(); }, 1200);
+    // 팀 목록을 받을 때까지 hello 재전송(최대 ~8s). 그래도 응답 없으면 실패 안내 + 다시 시도 노출.
+    let tries=0; const iv=setInterval(()=>{
+      if(!guest.active||guest.team||guest.gotSlots){ clearInterval(iv); return; }
+      if(tries++>=6){ clearInterval(iv); guestConnFailed(code); return; }
+      guestHello();
+    }, 1200);
     document.getElementById("rg-join").style.display="none";
     document.getElementById("rg-pick").style.display="block";
-    document.getElementById("rg-pick-err").textContent="";
+    document.getElementById("rg-pick-err").textContent="🔌 사회자 방에 연결 중…";
+  }
+  function guestConnFailed(code){
+    if(guest.team||guest.gotSlots) return;
+    const e=document.getElementById("rg-pick-err"); if(!e) return;
+    e.innerHTML='⚠️ 사회자 방에서 응답이 없어요. <b>방 코드</b>를 확인하거나 다시 시도해 주세요. <button class="btn btn-ghost btn-sm" id="rg-retry" style="margin-top:8px">🔄 다시 시도</button>';
+    const rb=document.getElementById("rg-retry"); if(rb) rb.addEventListener("click",()=>{ e.textContent="🔌 다시 연결 중…"; guestConnect(code); });
   }
   function guestHello(){ if(guest.tx) guest.tx.send({type:"hello", dev:guest.teamId}); }
   function guestSlots(teams){
+    const first=!guest.gotSlots; guest.gotSlots=true;
     const sel=document.getElementById("rg-team"); if(!sel) return;
+    if(first){ const e=document.getElementById("rg-pick-err"); if(e) e.textContent=""; }   // 연결/실패 안내 해제
     const prev=sel.value;
     if(!teams.length){ sel.innerHTML='<option value="">방장이 팀을 아직 설정하지 않았어요</option>'; return; }
     sel.innerHTML="";

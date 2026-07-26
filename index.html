@@ -492,7 +492,7 @@
         <span style="font-size:14px">자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span></span>
       </div>
       <label class="hint" style="display:block;margin:10px 0 4px">정답 공개 후 다음까지(초)</label>
-      <input class="num-input" type="number" id="c-autointerval" min="2" max="60" value="7" />
+      <input class="num-input" type="number" id="c-autointerval" min="2" max="60" value="20" />
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-autohide" /><span class="slider"></span></label>
         <span style="font-size:14px">진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span></span>
@@ -734,6 +734,9 @@
         <button class="btn btn-ghost" id="r-next-round" style="flex:1">🆕 새 문제로 이어가기</button>
         <button class="btn btn-reveal" id="r-restart" style="flex:1">↻ 다시 시작</button>
       </div>
+      <div class="controls" style="margin-top:10px">
+        <button class="btn btn-ghost" id="r-home" style="flex:1">🏠 처음으로</button>
+      </div>
       <p class="hint" id="r-breakdown"></p>
       <p class="hint" id="r-recap" style="margin-top:2px;display:none"></p>
       <p class="hint" id="r-best" style="margin-top:2px;display:none"></p>
@@ -906,7 +909,7 @@ const DEFAULT_CONTENT = {
 
 const DEFAULT_CONFIG = {
   timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
-  autoHost:false, autoHideControls:false, autoInterval:7, onlineRoom:false, fbUrl:"", quizOnly:false,
+  autoHost:false, autoHideControls:false, autoInterval:20, onlineRoom:false, fbUrl:"", quizOnly:false,
   hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
   sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
   stage:false       // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
@@ -1747,7 +1750,7 @@ function autoReveal(){
 function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드(오토호스트/온라인 방)면 다음 예약
   if(!((config.autoHost||config.onlineRoom) && autoRun && gameActive)) { updateAutoBar(); return; }
   autoStopTimers();
-  const sec=Math.max(2, config.autoInterval||7);
+  const sec=Math.max(2, config.autoInterval||20);
   autoCdLeft=sec;
   autoCdI=setInterval(()=>{ autoCdLeft--; updateAutoBar(); if(autoCdLeft<=0){ clearInterval(autoCdI); autoCdI=null; } },1000);
   autoNextT=setTimeout(()=>{ autoNextT=null; autoAdvance(); }, sec*1000);
@@ -1814,13 +1817,18 @@ document.getElementById("g-end").addEventListener("click",()=>{
   if(Room.host.active) Room.hostEnd();   // 온라인 방: 참가자에게 종료 알림 후 방 닫기
   document.querySelector('nav.tabs button[data-view="result"]').click();
 });
-document.getElementById("g-home").addEventListener("click",()=>{
-  if(gameActive && !confirm("처음 화면으로 돌아갈까요? (진행 중인 게임은 중단됩니다)")) return;
+function goHome(){
   stopEverything(); gameActive=false;
   if(Room.host.active) Room.hostEnd();
   document.getElementById("room-lobby").style.display="none";
   document.getElementById("intro").classList.remove("hide");
+  window.scrollTo({top:0});
+}
+document.getElementById("g-home").addEventListener("click",()=>{
+  if(gameActive && !confirm("처음 화면으로 돌아갈까요? (진행 중인 게임은 중단됩니다)")) return;
+  goHome();
 });
+document.getElementById("r-home").addEventListener("click",goHome);   // 결과 화면 → 처음으로(게임 이미 종료 상태라 확인 없이 이동)
 
 /* =====================  SETTINGS  ===================== */
 let sFilter="all";
@@ -1942,7 +1950,7 @@ document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.targe
 document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
 document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
 document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });
-document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||7)); saveState(); });
+document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||20)); saveState(); });
 document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); });
 document.getElementById("c-fburl").addEventListener("input",e=>{ config.fbUrl=(e.target.value||"").trim(); saveState(); });
 document.getElementById("c-quizonly").addEventListener("change",e=>{ config.quizOnly=e.target.checked; saveState(); });
@@ -2083,7 +2091,7 @@ function renderSetup(){
   document.getElementById("c-teamblind").checked=config.teamBlind!==false;
   document.getElementById("c-autohost").checked=!!config.autoHost;
   document.getElementById("c-autohide").checked=!!config.autoHideControls;
-  document.getElementById("c-autointerval").value=config.autoInterval||7;
+  document.getElementById("c-autointerval").value=config.autoInterval||20;
   document.getElementById("c-online").checked=!!config.onlineRoom;
   document.getElementById("c-fburl").value=config.fbUrl||"";
   document.getElementById("c-quizonly").checked=!!config.quizOnly;

@@ -20,7 +20,7 @@ P(d1.rev>baseRev, `rev 증가: ${baseRev} -> ${d1.rev}`);
 P(Array.isArray(d1._test)&&d1._test.includes('tX1'), '_test에 새 id 등록');
 P(d1.songs.some(s=>s.id==='tX1'), 'songs에 곡 추가');
 P(!!d1._review&&!!d1._review['tX1'], '_review 검수요청 등록');
-P(/경고/.test(r1.stderr)&&/mv|유튜브/.test(r1.stderr)&&/time|추천/.test(r1.stderr), 'mv·time 미입력 시 경고 출력');
+P(/경고/.test(r1.stderr)&&/가사|lyrics/.test(r1.stderr)&&/mv|유튜브/.test(r1.stderr)&&/time|추천 시작/.test(r1.stderr), '가사·mv·time 미입력 시 경고 출력');
 
 // 2) mv/time 채워서 추가 → 경고 없음 + rev 또 증가(엄격)
 const rev1=d1.rev;

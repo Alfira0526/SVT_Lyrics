@@ -1,5 +1,5 @@
 {
-  "rev": 1785175155215,
+  "rev": 1785176007147,
   "songs": [
     {
       "id": "s2",
@@ -655,7 +655,7 @@
       "time": "0:45"
     },
     "s67": {
-      "lyrics": "",
+      "lyrics": "I bring the FX, you bring the beat / I just wanna put you on repeat",
       "mv": "https://youtu.be/iOJsBt2alcU",
       "time": "0:30"
     },
@@ -947,7 +947,7 @@
   ],
   "_review": {
     "s66": {
-      "reason": "Friend: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
+      "reason": "Friend: 가사 원문 미확보(가사사이트 접근차단) — 검수 시 입력 필요 · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
       "fields": [
         "lyrics",
         "mv_check",
@@ -955,33 +955,32 @@
       ]
     },
     "s67": {
-      "reason": "BEAT: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
+      "reason": "BEAT: 가사=영어 후렴 자동발췌(정확성 확인 필요) · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
       "fields": [
-        "lyrics",
+        "lyrics_check",
         "mv_check",
         "time_est"
       ]
     },
     "s68": {
-      "reason": "컬러링: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
+      "reason": "컬러링: 가사 발췌 원문대조 필요 · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
       "fields": [
+        "lyrics_check",
         "mv_check",
         "time_est"
       ]
     },
     "s69": {
-      "reason": "8DM (THE8 공식영상): 공식영상 연결됨 · 추천구간(time) 추정값 · 가사 확인 필요",
+      "reason": "8DM: 가사 원문 미확보 — 검수 시 입력 필요 · MV=THE8 공식영상 · 추천구간 추정",
       "fields": [
         "lyrics",
-        "mv_check",
         "time_est"
       ]
     },
     "s70": {
-      "reason": "rat race (MBC 뮤직코어 공식무대): 공식영상 연결됨 · 추천구간(time) 추정값 · 가사 확인 필요",
+      "reason": "rat race: 가사 원문 미확보 — 검수 시 입력 필요 · MV=MBC 뮤직코어 공식무대 · 추천구간 추정",
       "fields": [
         "lyrics",
-        "mv_check",
         "time_est"
       ]
     }

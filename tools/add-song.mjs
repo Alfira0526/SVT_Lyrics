@@ -40,7 +40,11 @@ if (!a["no-review"]) {
   data._review[a.id] = { reason: "신규 추가 곡 — 검수 필요", fields: need.length ? need : ["confirm"] };
 }
 
+// rev 증가: 캐시된 ?staging=1 브라우저에 추가분이 전파되도록(안 올리면 옛 캐시가 유지돼 신곡·_test 미반영).
+// promote.mjs와 동일한 안전 증가(과거 rev·시계역전 방지 → 항상 엄격 증가).
+data.rev = Math.max(data.rev || 0, Date.now()) + 1;
+
 writeFileSync(FILE, JSON.stringify(data, null, 2) + "\n");
-console.log(`✅ 추가: [${a.id}] ${a.name} (${diff}) → ${FILE}`);
+console.log(`✅ 추가: [${a.id}] ${a.name} (${diff}) → ${FILE} (rev ${data.rev})`);
 console.log(`   테스트용 목록(_test) ${data._test.length}곡, 검수요청 ${Object.keys(data._review || {}).length}건`);
 console.log(`   다음: ?staging=1 화면 또는 설정 편집기에서 가사/MV/시간을 채우고 → node tools/validate.mjs ${FILE}`);

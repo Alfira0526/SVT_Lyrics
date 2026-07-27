@@ -1,5 +1,5 @@
 {
-  "rev": 1785174080148,
+  "rev": 1785175155215,
   "songs": [
     {
       "id": "s2",
@@ -651,28 +651,28 @@
     },
     "s66": {
       "lyrics": "",
-      "mv": "",
-      "time": ""
+      "mv": "https://youtu.be/ecVL81Jmqdk",
+      "time": "0:45"
     },
     "s67": {
       "lyrics": "",
-      "mv": "",
-      "time": ""
+      "mv": "https://youtu.be/iOJsBt2alcU",
+      "time": "0:30"
     },
     "s68": {
       "lyrics": "Sorry, can we make up again 어제같이 / 123456, 다시 015B",
-      "mv": "",
-      "time": ""
+      "mv": "https://youtu.be/SimiV3tJJOU",
+      "time": "0:50"
     },
     "s69": {
       "lyrics": "",
-      "mv": "",
-      "time": ""
+      "mv": "https://youtu.be/dNimGCqZOI0",
+      "time": "0:40"
     },
     "s70": {
       "lyrics": "",
-      "mv": "",
-      "time": ""
+      "mv": "https://youtu.be/4dDKFQwRKmw",
+      "time": "0:35"
     }
   },
   "album": {
@@ -947,38 +947,42 @@
   ],
   "_review": {
     "s66": {
-      "reason": "신규 추가 곡 — 검수 필요",
+      "reason": "Friend: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
       "fields": [
         "lyrics",
-        "time"
+        "mv_check",
+        "time_est"
       ]
     },
     "s67": {
-      "reason": "신규 추가 곡 — 검수 필요",
+      "reason": "BEAT: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
       "fields": [
         "lyrics",
-        "time"
+        "mv_check",
+        "time_est"
       ]
     },
     "s68": {
-      "reason": "가사 발췌는 검색 요약 인용(원문 페이지 접근 차단으로 직접 대조 못함) — 정확성 확인 필요",
+      "reason": "컬러링: MV=비공식 팬 가사영상(공식 비주얼라이저 공개 시 교체 권장) · 추천구간(time) 추정값 · 가사 확인 필요",
       "fields": [
-        "lyrics",
-        "time"
+        "mv_check",
+        "time_est"
       ]
     },
     "s69": {
-      "reason": "신규 추가 곡 — 검수 필요",
+      "reason": "8DM (THE8 공식영상): 공식영상 연결됨 · 추천구간(time) 추정값 · 가사 확인 필요",
       "fields": [
         "lyrics",
-        "time"
+        "mv_check",
+        "time_est"
       ]
     },
     "s70": {
-      "reason": "신규 추가 곡 — 검수 필요",
+      "reason": "rat race (MBC 뮤직코어 공식무대): 공식영상 연결됨 · 추천구간(time) 추정값 · 가사 확인 필요",
       "fields": [
         "lyrics",
-        "time"
+        "mv_check",
+        "time_est"
       ]
     }
   }

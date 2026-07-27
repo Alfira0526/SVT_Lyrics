@@ -1,5 +1,5 @@
 {
-  "rev": 1785177070198,
+  "rev": 1785195764829,
   "songs": [
     {
       "id": "s2",
@@ -652,27 +652,28 @@
     "s66": {
       "lyrics": "내가 헛스윙해도 / You make me feel like I hit it home",
       "mv": "https://youtu.be/ecVL81Jmqdk",
-      "time": "0:45"
+      "time": "1:30"
     },
     "s67": {
       "lyrics": "I bring the FX, you bring the beat / I just wanna put you on repeat",
       "mv": "https://youtu.be/iOJsBt2alcU",
-      "time": "0:30"
+      "time": "0:28"
     },
     "s68": {
       "lyrics": "Sorry, can we make up again 어제같이 / 123456, 다시 015B",
       "mv": "https://youtu.be/SimiV3tJJOU",
-      "time": "0:50"
+      "time": "1:14"
     },
     "s69": {
       "lyrics": "我没有时间试探 / 我没有兴趣计算",
       "mv": "https://youtu.be/dNimGCqZOI0",
-      "time": "0:40"
+      "time": "1:00",
+      "lang": "zh"
     },
     "s70": {
       "lyrics": "Tryna make a smash hit / ‘Til I’m in the casket",
       "mv": "https://youtu.be/4dDKFQwRKmw",
-      "time": "0:35"
+      "time": "0:42"
     }
   },
   "album": {
@@ -936,7 +937,14 @@
     "autoInterval": 20,
     "onlineRoom": false,
     "fbUrl": "",
-    "quizOnly": false
+    "quizOnly": false,
+    "hideLyrics": false,
+    "sfx": true,
+    "stage": false,
+    "scope": {
+      "by": "test",
+      "val": "1"
+    }
   },
   "_test": [
     "s66",
@@ -944,42 +952,5 @@
     "s68",
     "s69",
     "s70"
-  ],
-  "_review": {
-    "s66": {
-      "reason": "Friend: 가사 확보(벅스) · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
-      "fields": [
-        "mv_check",
-        "time_est"
-      ]
-    },
-    "s67": {
-      "reason": "BEAT: 가사=영어 후렴 자동발췌(정확성 확인 필요) · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
-      "fields": [
-        "lyrics_check",
-        "mv_check",
-        "time_est"
-      ]
-    },
-    "s68": {
-      "reason": "컬러링: 가사 발췌 원문대조 필요 · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
-      "fields": [
-        "lyrics_check",
-        "mv_check",
-        "time_est"
-      ]
-    },
-    "s69": {
-      "reason": "8DM: 가사 확보(벅스) · MV=THE8 공식영상 · 추천구간 추정",
-      "fields": [
-        "time_est"
-      ]
-    },
-    "s70": {
-      "reason": "rat race: 가사 확보(벅스) · MV=MBC 뮤직코어 공식무대 · 추천구간 추정",
-      "fields": [
-        "time_est"
-      ]
-    }
-  }
+  ]
 }

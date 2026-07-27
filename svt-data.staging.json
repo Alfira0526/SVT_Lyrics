@@ -336,6 +336,36 @@
       "name": "STUPID IDIOT",
       "part": "벌스 · 호시X우지",
       "diff": "신곡"
+    },
+    {
+      "id": "s66",
+      "name": "Friend",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s67",
+      "name": "BEAT",
+      "part": "벌스 · V8 · 버논X디에잇 (영어) 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s68",
+      "name": "컬러링 (Coloring)",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s69",
+      "name": "8DM",
+      "part": "벌스 · 디에잇 솔로 · V8 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s70",
+      "name": "rat race",
+      "part": "벌스 · V8 · 버논X디에잇 (디지털 보너스) 신곡",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -618,6 +648,31 @@
       "lyrics": "오늘은 밤새 노세 가득 채우고 건배 건배",
       "mv": "https://youtu.be/hbZZmSb2I-s",
       "time": "0:10"
+    },
+    "s66": {
+      "lyrics": "",
+      "mv": "",
+      "time": ""
+    },
+    "s67": {
+      "lyrics": "",
+      "mv": "",
+      "time": ""
+    },
+    "s68": {
+      "lyrics": "Sorry, can we make up again 어제같이 / 123456, 다시 015B",
+      "mv": "",
+      "time": ""
+    },
+    "s69": {
+      "lyrics": "",
+      "mv": "",
+      "time": ""
+    },
+    "s70": {
+      "lyrics": "",
+      "mv": "",
+      "time": ""
     }
   },
   "album": {
@@ -844,6 +899,26 @@
     "s65": {
       "year": 2025,
       "type": "싱글"
+    },
+    "s66": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s67": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s68": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s69": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s70": {
+      "year": 2026,
+      "type": "미니"
     }
   },
   "config": {
@@ -862,5 +937,49 @@
     "onlineRoom": false,
     "fbUrl": "",
     "quizOnly": false
+  },
+  "_test": [
+    "s66",
+    "s67",
+    "s68",
+    "s69",
+    "s70"
+  ],
+  "_review": {
+    "s66": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
+    },
+    "s67": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
+    },
+    "s68": {
+      "reason": "가사 발췌는 검색 요약 인용(원문 페이지 접근 차단으로 직접 대조 못함) — 정확성 확인 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
+    },
+    "s69": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
+    },
+    "s70": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
+    }
   }
 }

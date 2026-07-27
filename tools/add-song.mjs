@@ -44,6 +44,12 @@ if (!a["no-review"]) {
 // promote.mjs와 동일한 안전 증가(과거 rev·시계역전 방지 → 항상 엄격 증가).
 data.rev = Math.max(data.rev || 0, Date.now()) + 1;
 
+// 유튜브 영상·추천 시작구간은 기본으로 연결되어 있어야 함(퀴즈 정답 재생용). 비었으면 눈에 띄게 경고.
+if (!a.mv || !a.time) {
+  const miss = [!a.mv ? "--mv(유튜브 링크)" : null, !a.time ? "--time(추천 시작구간)" : null].filter(Boolean).join(" · ");
+  console.warn(`⚠️  경고: [${a.id}] ${miss} 미입력 — 곡 추가 시 유튜브 영상과 추천구간은 기본으로 연결해 주세요(공식 MV/비주얼라이저/공식오디오/방송무대 우선). 채운 뒤 재실행 권장.`);
+}
+
 writeFileSync(FILE, JSON.stringify(data, null, 2) + "\n");
 console.log(`✅ 추가: [${a.id}] ${a.name} (${diff}) → ${FILE} (rev ${data.rev})`);
 console.log(`   테스트용 목록(_test) ${data._test.length}곡, 검수요청 ${Object.keys(data._review || {}).length}건`);

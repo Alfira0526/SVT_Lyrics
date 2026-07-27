@@ -32,6 +32,19 @@ for(const [txt,ov,exp,label] of bcp){
   P(got===exp, `makeUtterance ${label}: ${got}===${exp}`);
 }
 
+// segmentByLang: 혼합 가사를 언어 구간으로 분할(각 구간 다른 TTS로 낭독됨)
+const segCases=[
+  ['내가 헛스윙해도 / You make me feel like I hit it home', ['ko','en'], '한→영 2구간'],
+  ['우린 정신을 좀 차려야 해', ['ko'], '한국어 단일'],
+  ['我没有时间试探 / 我没有兴趣计算', ['zh'], '중국어 단일'],
+  ['You bring the beat 어제같이 다시', ['en','ko'], '영→한'],
+];
+for(const [txt,exp,label] of segCases){
+  const r=await pg.evaluate(t=>{ const s=segmentByLang(t); return {langs:s.map(x=>x.lang), join:s.map(x=>x.text).join('')}; }, txt);
+  P(JSON.stringify(r.langs)===JSON.stringify(exp), `segmentByLang ${label}: [${r.langs}]==[${exp}]`);
+  P(r.join===txt, `segmentByLang ${label}: 원문 보존(손실 없음)`);
+}
+
 // 실제 스테이징 데이터: s69 8DM은 lang=zh → zh-CN 로 낭독
 await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });

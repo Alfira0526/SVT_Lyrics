@@ -1731,6 +1731,44 @@ function makeUtterance(text, override){
   const v=voiceForLang(lang); if(v) u.voice=v;
   return u;
 }
+// 한 글자의 스크립트 분류(공백·숫자·문장부호는 null=중립).
+function charLang(ch){
+  if(/[぀-ヿ]/.test(ch)) return "ja";
+  if(/[가-힣]/.test(ch)) return "ko";
+  if(/[一-鿿]/.test(ch)) return "zh";
+  if(/[A-Za-z]/.test(ch)) return "en";
+  return null;
+}
+// 가사를 언어 구간으로 분할. 중립 문자는 직전 언어에 붙이고, 인접 동일 언어는 병합.
+function segmentByLang(text){
+  const segs=[]; let cur=null, buf="";
+  for(const ch of text){
+    const c=charLang(ch);
+    if(c===null){ buf+=ch; continue; }          // 중립 → 현재 구간에 붙임
+    if(cur===null){ cur=c; buf+=ch; }            // 첫 언어
+    else if(c===cur){ buf+=ch; }
+    else { segs.push({lang:cur, text:buf}); cur=c; buf=ch; }   // 언어 전환
+  }
+  if(buf) segs.push({lang:cur||detectLang(buf), text:buf});
+  const out=[];
+  for(const s of segs){
+    if(!s.text.trim()){ if(out.length) out[out.length-1].text+=s.text; continue; }   // 공백뿐이면 앞에 흡수
+    if(out.length && out[out.length-1].lang===s.lang) out[out.length-1].text+=s.text; // 같은 언어 병합
+    else out.push(s);
+  }
+  return out;
+}
+// 가사 낭독: 명시 lang이 있으면 통째로, 없으면 언어 구간별로 각 음성으로 순차 재생(큐).
+function speakLyric(text, override, rate){
+  if(!("speechSynthesis" in window)) return;
+  const segs=(override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text);
+  if(!segs.length) return;
+  for(const s of segs){
+    const u=makeUtterance(s.text, s.lang);
+    if(rate) u.rate=rate; u.pitch=1;
+    speechSynthesis.speak(u);   // 여러 개면 순차 재생됨
+  }
+}
 function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
 function scheduleAutoTTS(){
   clearAutoTTS();
@@ -1749,9 +1787,7 @@ function speak(){
   const c=getC(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
   stopTTS();
-  const u=makeUtterance(text, c.lang);
-  u.rate=parseFloat(els.speed.value); u.pitch=1;
-  speechSynthesis.speak(u);
+  speakLyric(text, c.lang, parseFloat(els.speed.value));   // 한+영 등 혼합 가사는 구간별로 각 언어 음성으로 낭독
 }
 
 /* ---- Timer ---- */
@@ -2438,7 +2474,7 @@ const Room = (function(){
   function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
   function guestSpeak(){
     if(!("speechSynthesis" in window) || !guest.lyric) return;
-    try{ speechSynthesis.cancel(); speechSynthesis.speak(makeUtterance(guest.lyric, guest.lang)); }catch(e){}
+    try{ speechSynthesis.cancel(); speakLyric(guest.lyric, guest.lang, 1); }catch(e){}
   }
   function guestCdStop(){ if(guest.cdI){ clearInterval(guest.cdI); guest.cdI=null; } }
   function guestCountdown(sec){

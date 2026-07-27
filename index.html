@@ -6,15 +6,29 @@
 <title>세븐틴 가사 퀴즈 · SVT Lyrics Quiz</title>
 <style>
   :root{
-    --bg:#0d0b1a; --bg2:#151230; --panel:#1c1840; --panel2:#252055; --line:#332c66;
-    --txt:#eae7ff; --muted:#a49dd6;
-    --rose:#f04f8a; --serene:#7c9bff; --gold:#ffcf5c; --green:#3ddc97; --red:#ff6b6b;
-    --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+    /* 중립 — 인디고-플럼 다크 베이스에 Mocha Mousse(팬톤 2025) 웜기를 미세 주입해 그라운딩 */
+    --bg:#100b1c; --bg2:#181334; --panel:#201a44; --panel2:#2b2358; --line:#3b3168;
+    --txt:#efeaff; --muted:#ada2d6;
+    /* ── 분류 계열(브랜드·난이도·정보) : 로즈 → 라일락 → 세레니티 스펙트럼 ── */
+    /* 세븐틴 시그니처 듀오 — Rose Quartz × Serenity(팬톤 2016), 다크 배경용 채도 조정 */
+    --rose:#f0609b; --rose-deep:#cf4f8f;      /* 브랜드 · 난이도 '상' */
+    --lilac:#b892e6; --lilac-deep:#9a6fd0;    /* 난이도 '중' · 힌트 — Very Peri(팬톤 2022) */
+    --serene:#8aa2f2; --serene-deep:#6376de;  /* 브랜드 · 난이도 '신곡' */
+    /* ── 상태 계열(판정·시간) : 신호등 민트 → 앰버 → 코랄 ── */
+    --green:#41d6a1; --green-deep:#2bb37a;    /* 정답 · 타이머 안전 */
+    --amber:#ffcf5c;                          /* 타이머 경고 */
+    --red:#ff6f7d; --red-deep:#e0555f;        /* 오답 · 타이머 위험 */
+    /* ── 웜 액센트 : Peach Fuzz(팬톤 2024)='선택됨' · Mocha Mousse(팬톤 2025)=중립 그라운딩 ── */
+    --gold:#ffbe98; --gold-deep:#f2a273;      /* MC 선택됨(picked) · 보조 웜 */
+    --mocha:#c69c86;
+    --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.38);
   }
   *{box-sizing:border-box}
+  /* 접근성: 키보드 포커스 가시화(마우스 클릭엔 안 뜸) */
+  :focus-visible{outline:2px solid var(--serene);outline-offset:2px;border-radius:6px}
   html,body{margin:0;padding:0}
   body{
-    background:radial-gradient(1200px 600px at 50% -10%, #2a1f5e 0%, var(--bg) 55%) fixed;
+    background:radial-gradient(1200px 600px at 50% -10%, #2f2262 0%, var(--bg) 55%) fixed;
     color:var(--txt);
     font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
     -webkit-font-smoothing:antialiased; min-height:100vh;
@@ -22,7 +36,7 @@
   .wrap{max-width:860px;margin:0 auto;padding:16px 16px 96px}
   header.top{display:flex;align-items:center;justify-content:space-between;padding:14px 4px 18px}
   .brand{display:flex;align-items:center;gap:12px}
-  .diamond{width:34px;height:34px;flex:none;background:linear-gradient(135deg,var(--rose),var(--serene));transform:rotate(45deg);border-radius:8px;box-shadow:0 0 24px rgba(240,79,138,.5)}
+  .diamond{width:34px;height:34px;flex:none;background:linear-gradient(135deg,var(--rose),var(--serene));transform:rotate(45deg);border-radius:8px;box-shadow:0 0 24px rgba(240,96,155,.5)}
   .brand h1{font-size:19px;margin:0;letter-spacing:.2px}
   .brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
 
@@ -33,17 +47,25 @@
   .view{display:none;animation:fade .25s ease}
   .view.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* 재미(W3): 정답 축하 · 연속정답 배지 */
+  @keyframes pop{0%{transform:scale(.6);opacity:0}55%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+  @keyframes sparkle{0%{transform:translateY(8px) scale(.7);opacity:0}25%{opacity:1}100%{transform:translateY(-42px) scale(1.15);opacity:0}}
+  .celebrate{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+  .celebrate span{position:absolute;bottom:14px;font-size:22px;animation:sparkle .95s ease-out forwards}
+  .streak-badge{display:inline-block;margin-left:8px;font-size:12px;font-weight:900;color:#4a2f1c;background:linear-gradient(135deg,var(--gold),var(--amber));padding:2px 8px;border-radius:999px;vertical-align:middle;animation:pop .35s ease-out}
+  .answer.show .song-name{animation:pop .45s ease-out}
+  @media (prefers-reduced-motion: reduce){ .celebrate{display:none} .streak-badge,.answer.show .song-name{animation:none} }
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
   .card + .card{margin-top:14px}
 
   .status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-  .counter{font-size:13px;color:var(--muted)}
+  .counter{font-size:14px;color:var(--muted)}
   .counter b{color:var(--txt);font-size:15px}
-  .badge{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:800}
-  .b-상{background:rgba(255,107,107,.16);color:#ff9d9d;border:1px solid rgba(255,107,107,.4)}
-  .b-중{background:rgba(124,155,255,.16);color:#a9bcff;border:1px solid rgba(124,155,255,.4)}
-  .b-신곡{background:rgba(255,207,92,.16);color:#ffe0a0;border:1px solid rgba(255,207,92,.4)}
+  .badge{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:800}
+  .b-상{background:rgba(240,96,155,.16);color:#f9a9c8;border:1px solid rgba(240,96,155,.42)}
+  .b-중{background:rgba(184,146,230,.16);color:#d3bcf2;border:1px solid rgba(184,146,230,.42)}
+  .b-신곡{background:rgba(138,162,242,.16);color:#b4c3f8;border:1px solid rgba(138,162,242,.42)}
 
   .progress{height:8px;background:var(--bg2);border-radius:999px;overflow:hidden;margin-bottom:16px}
   .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--serene));width:0;transition:width .3s}
@@ -52,26 +74,38 @@
   .timer.on{display:block}
   .timer-bar{height:6px;background:var(--bg2);border-radius:999px;overflow:hidden}
   .timer-bar i{display:block;height:100%;background:var(--green);width:100%;transition:width 1s linear}
-  .timer-bar i.warn{background:var(--gold)}
+  .timer-bar i.warn{background:var(--amber)}
   .timer-bar i.danger{background:var(--red)}
-  .timer-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:6px}
-  .timer-top b{color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
+  .timer-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .timer-top b{color:var(--txt);font-variant-numeric:tabular-nums;font-size:16px}
 
-  .lyric-box{background:linear-gradient(180deg,var(--panel2),var(--bg2));border:1px solid var(--line);border-radius:14px;padding:26px 20px;min-height:132px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;line-height:1.7;font-weight:600;position:relative}
+  .lyric-box{background:linear-gradient(180deg,var(--panel2),var(--bg2));border:1px solid var(--line);border-radius:14px;padding:28px 20px;min-height:148px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(23px,3.4vw,34px);line-height:1.6;font-weight:600;position:relative}
   .lyric-box.hidden-mode .lyric-text{filter:blur(11px);user-select:none;opacity:.55}
   .lyric-box .placeholder{color:var(--muted);font-size:15px;font-weight:500;line-height:1.7}
-  .hide-note{position:absolute;top:10px;right:14px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .hide-note{position:absolute;top:10px;right:14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .status-right{display:flex;align-items:center;gap:8px}
+  .stage-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:12px;font-weight:800;padding:5px 10px;border-radius:999px;cursor:pointer}
+  .stage-btn[aria-pressed="true"]{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  /* 무대(Stage) 모드 — 프로젝터/원거리 가독성 우선: 가사·카운터·타이머 대형화, 보조 컨트롤 숨김 */
+  body.stage .lyric-box{font-size:clamp(30px,5vw,52px);min-height:200px;line-height:1.5;font-weight:700}
+  body.stage .counter{font-size:18px}
+  body.stage .counter b{font-size:22px}
+  body.stage .badge{font-size:15px;padding:5px 14px}
+  body.stage .timer-top{font-size:15px}
+  body.stage .timer-top b{font-size:22px}
+  body.stage .answer .song-name{font-size:clamp(30px,4.4vw,44px)}
+  body.stage #g-speed-row, body.stage #g-hide-row, body.stage .hint-area{display:none !important}
 
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
   button.btn{border:0;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s;color:#fff;display:inline-flex;align-items:center;gap:8px;justify-content:center}
   button.btn:active{transform:scale(.97)}
   button.btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn-play{background:linear-gradient(135deg,var(--rose),#c53c8f);flex:1;min-width:150px}
+  .btn-play{background:linear-gradient(135deg,var(--rose),var(--rose-deep));flex:1;min-width:150px}
   .btn-stop{background:var(--panel2);border:1px solid var(--line)!important}
-  .btn-reveal{background:linear-gradient(135deg,var(--serene),#5a6fd6);flex:1;min-width:150px}
+  .btn-reveal{background:linear-gradient(135deg,var(--serene),var(--serene-deep));flex:1;min-width:150px}
   .btn-ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)!important}
-  .btn-correct{background:linear-gradient(135deg,var(--green),#2bb37a);flex:1}
-  .btn-wrong{background:linear-gradient(135deg,var(--red),#d64545);flex:1}
+  .btn-correct{background:linear-gradient(135deg,var(--green),var(--green-deep));flex:1}
+  .btn-wrong{background:linear-gradient(135deg,var(--red),var(--red-deep));flex:1}
   .btn-sm{padding:8px 12px;font-size:13px}
 
   .speed-row{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:13px;color:var(--muted)}
@@ -99,15 +133,15 @@
   /* Teams */
   .teams{display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
   .team{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;position:relative;transition:.15s}
-  .team.active{border-color:var(--rose);box-shadow:0 0 0 2px rgba(240,79,138,.35)}
+  .team.active{border-color:var(--rose);box-shadow:0 0 0 2px rgba(240,96,155,.35)}
   .team .tn{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:4px}
   .team .ts{font-size:26px;font-weight:900}
   .team .turn-tag{position:absolute;top:6px;right:8px;font-size:10px;color:var(--rose);font-weight:800;display:none}
   .team.active .turn-tag{display:block}
   .team-btns{display:flex;gap:6px;justify-content:center;margin-top:8px}
-  .team-btns button{border:0;border-radius:8px;width:30px;height:28px;font-weight:900;cursor:pointer;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .team-btns button{border:0;border-radius:9px;width:40px;height:36px;font-size:18px;font-weight:900;cursor:pointer;background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
   .award-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-  .award-row button{flex:1;min-width:110px;border:0;border-radius:10px;padding:11px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--green),#2bb37a)}
+  .award-row button{flex:1;min-width:110px;border:0;border-radius:10px;padding:11px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--green),var(--green-deep))}
 
   /* Settings */
   .set-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -118,6 +152,16 @@
   .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
   .chip{padding:7px 13px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
   .chip.active{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  #staging-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:repeating-linear-gradient(45deg,#3a2a00,#3a2a00 12px,#4a3600 12px,#4a3600 24px);color:#ffcf5c;font-size:13px;font-weight:800;text-align:center;padding:8px 12px;border-bottom:1px solid var(--amber)}
+  #staging-banner a{color:#fff;text-decoration:underline}
+  body.staging{padding-top:38px}
+  .chip-test{background:rgba(255,207,92,.16);border-color:var(--amber);color:var(--amber)}
+  .chip-test.active{background:var(--amber);color:#3a2a00;border-color:transparent}
+  .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene)}
+  .scope-dims{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .scope-vals{display:flex;gap:8px;flex-wrap:wrap}
+  .scope-vals:empty{display:none}
+  body.stage .scope-line{font-size:15px}
 
   .slot{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
   .slot-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -154,7 +198,8 @@
   .stat .k{font-size:12px;color:var(--muted);margin-top:2px}
   .rank{display:flex;flex-direction:column;gap:8px;margin:16px 0}
   .rank .r{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-  .rank .r .medal{font-size:20px}
+  .rank .r .rank-no{font-weight:900;color:var(--serene);min-width:40px}
+  .rank .r .medal{font-size:20px;min-width:24px}
   .rank .r .rn{flex:1;font-weight:800}
   .rank .r .rs{font-weight:900;font-size:18px}
 
@@ -172,7 +217,7 @@
   .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 
   @media(max-width:560px){
-    .lyric-box{font-size:19px}
+    .lyric-box{font-size:21px}
     .result-score{font-size:42px}
     .stat .v{font-size:18px}
     .cfg-grid{grid-template-columns:1fr}
@@ -180,9 +225,319 @@
     .row3 .f-name,.row3 .f-part{flex:1 1 100%}
     .row3 .f-diff{width:100%}
   }
+  /* 태블릿(가로 태블릿·작은 노트북) — 561~1024px: 보기·가사 중간 크기로 확대 */
+  @media(min-width:561px) and (max-width:1024px){
+    .mc-options{grid-template-columns:1fr 1fr}
+    .mc-opt{font-size:16px}
+    .team-btns button{width:44px;height:40px}
+  }
+  /* ---- 저장 슬롯 잠금 ---- */
+  #slot-card.locked #slot-body{display:none}
+  #slot-card:not(.locked) #slot-lock{display:none}
+  .slot-lock{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .slot-lock .sl-emoji{font-size:18px;flex:none}
+  .slot-lock input{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:15px;letter-spacing:3px;font-family:inherit}
+  .slot-lock input:focus{outline:0;border-color:var(--rose)}
+  .slot-lock .sl-err{flex-basis:100%;color:var(--red);font-size:12px;font-weight:700;margin-top:2px}
+
+  /* ---- 4지선다 ---- */
+  .mc-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .mc-opt{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:15px;font-weight:700;color:var(--txt);cursor:pointer;text-align:left;display:flex;gap:10px;align-items:center;transition:.12s;font-family:inherit}
+  .mc-opt .mc-key{width:24px;height:24px;flex:none;border-radius:7px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--muted)}
+  .mc-opt:hover:not(:disabled){border-color:var(--serene);transform:translateY(-1px)}
+  .mc-opt:disabled{cursor:default}
+  .mc-opt.correct{background:rgba(65,214,161,.18);border-color:var(--green)}
+  .mc-opt.correct .mc-key{background:var(--green);color:#06281c}
+  .mc-opt.picked{background:rgba(255,190,152,.2);border-color:var(--gold)}
+  .mc-opt.picked .mc-key{background:var(--gold);color:#4a2f1c}
+  .mc-opt.wrong{background:rgba(255,111,125,.16);border-color:var(--red)}
+  .mc-opt.wrong .mc-key{background:var(--red);color:#3a0d0d}
+  /* 접근성: 색 외에 글리프로도 정답/오답 구분(색맹·원거리 프로젝터 대응) */
+  .mc-opt.correct::after{content:"✓";font-weight:900;font-size:18px;color:var(--green);margin-left:4px}
+  .mc-opt.wrong::after{content:"✗";font-weight:900;font-size:18px;color:var(--red);margin-left:4px}
+  .mc-opt .mc-name{flex:1}
+  .mc-opt .mc-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .mc-badge{font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;white-space:nowrap}
+  .mc-turn{margin-top:14px;font-size:14px;font-weight:700;text-align:center;color:var(--serene);background:rgba(138,162,242,.12);border-radius:11px;padding:11px}
+  .mc-turn b{color:var(--rose);font-weight:900}
+  .mc-turn.done{color:var(--txt);background:var(--panel2)}
+  .auto-bar{display:flex;gap:8px;align-items:center;margin-top:12px;background:rgba(138,162,242,.1);border:1px solid var(--line);border-radius:11px;padding:8px 10px}
+  .auto-btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 13px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+  .auto-btn:hover{border-color:var(--serene)}
+  .auto-status{margin-left:auto;font-size:13px;font-weight:700;color:var(--serene)}
+  .room-host-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .rhb-code{font-size:15px;font-weight:700}
+  .rhb-code b{font-size:22px;font-weight:900;letter-spacing:3px;color:var(--rose)}
+  .rhb-info{margin-left:auto;font-size:13px;font-weight:700;color:var(--serene)}
+  .rg-status{font-size:15px;font-weight:800;color:var(--serene);background:rgba(138,162,242,.12);border-radius:11px;padding:12px;margin-bottom:14px}
+  .rg-lyric{font-size:18px;font-weight:800;line-height:1.5;min-height:40px}
+  .rg-score{margin-top:14px;font-size:14px;font-weight:700;color:var(--muted)}
+  @media(max-width:560px){.mc-options{grid-template-columns:1fr}}
+
+  /* ---- 힌트 ---- */
+  .hint-area{display:flex;align-items:flex-start;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .hint-area > button{flex:none}
+  .hints{display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+  .hint-chip{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--lilac);border-radius:10px;padding:8px 12px;font-size:14px;animation:fade .25s ease;display:flex;gap:8px;align-items:baseline}
+  .hint-chip .hk{font-size:11px;font-weight:800;color:var(--lilac);flex:none}
+  .hint-chip .hv{color:var(--txt)}
+  .hint-chip .hv b{letter-spacing:2px;font-size:16px}
+
+  /* ---- 저장 슬롯 ---- */
+  .slot-save-row{display:flex;gap:8px;margin-bottom:12px}
+  .slot-save-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:14px}
+  .slot-save-row input:focus{outline:0;border-color:var(--rose)}
+  .slot-item{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px}
+  .slot-item .si-main{flex:1;min-width:0}
+  .slot-item .si-name{font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .slot-item .si-time{font-size:11px;color:var(--muted);margin-top:2px}
+  .slot-item .si-btns{display:flex;gap:6px;flex:none}
+  .slot-item .si-btns button{border:0;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer}
+  .si-load{background:linear-gradient(135deg,var(--serene),var(--serene-deep));color:#fff}
+  .si-file{background:var(--panel2);color:var(--txt);border:1px solid var(--line)!important}
+  .si-del{background:transparent;color:var(--muted);border:1px solid var(--line)!important}
+  .si-del:hover{color:var(--red);border-color:var(--red)!important}
+
+  /* ---- 시작(랜딩) 화면 ---- */
+  .intro{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(1000px 520px at 50% 0%, #2f2262 0%, var(--bg) 62%);
+    transition:opacity .45s ease, visibility .45s;}
+  .intro.hide{opacity:0;visibility:hidden}
+  .intro-inner{text-align:center;max-width:460px;animation:fade .5s ease}
+  .intro-diamond{width:76px;height:76px;margin:0 auto 24px;background:linear-gradient(135deg,var(--rose),var(--serene));transform:rotate(45deg);border-radius:18px;box-shadow:0 0 55px rgba(240,96,155,.6);animation:floaty 3.2s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-9px)}}
+  .intro-title{font-size:clamp(28px,7vw,36px);font-weight:900;margin:0;letter-spacing:.5px}
+  .intro-sub{color:var(--muted);letter-spacing:3px;margin:6px 0 20px;font-size:12px}
+  .intro-desc{color:var(--txt);font-size:16px;line-height:1.75;margin:0 0 22px}
+  .intro-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:30px}
+  .intro-chips span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--muted)}
+  .intro-start{border:0;border-radius:14px;padding:16px 44px;font-size:18px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--rose),var(--serene));box-shadow:0 10px 30px rgba(240,96,155,.4);transition:.15s}
+  .intro-start:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(240,96,155,.5)}
+  .intro-start:active{transform:scale(.97)}
+  .intro-note{color:var(--muted);font-size:12px;margin-top:20px}
+  /* 기본 설정(게임 옵션) 화면 */
+  #setup{align-items:flex-start;overflow-y:auto}
+  .setup-inner{width:100%;max-width:440px;margin:0 auto;padding:34px 4px 40px}
+  .setup-title{font-size:26px;font-weight:900;text-align:center;margin:0}
+  .setup-sub{color:var(--muted);text-align:center;font-size:14px;margin:6px 0 22px}
+  .setup-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;text-align:left}
+  .setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:10px}
+  .setup-tip{font-size:12.5px;line-height:1.55;color:var(--serene);background:rgba(138,162,242,.09);border-radius:9px;padding:8px 11px;margin-top:11px}
+  .setup-tip b{color:var(--rose);font-weight:800}
+  .setup-actions{display:flex;gap:10px;margin-top:8px}
+  .slot-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .stats-block{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .stats-sum{font-size:14px;color:var(--txt);margin:4px 0 12px}
+  .stats-sum b{color:var(--rose);font-weight:900}
+  .stats-tbl{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 14px}
+  .stats-tbl caption{text-align:left;font-size:12px;font-weight:800;color:var(--muted);padding:6px 0}
+  .stats-tbl th,.stats-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  .stats-tbl th:first-child,.stats-tbl td:first-child{text-align:left}
+  .stats-tbl th{color:var(--muted);font-weight:700;font-size:12px}
+  .stats-tbl tbody tr:last-child td{border-bottom:none}
+  .stats-rate{font-weight:900}
+  .stats-empty{font-size:13px;color:var(--muted);padding:10px 0}
+  .stats-scroll{overflow-x:auto}
+  .intro-setup{margin:2px 0 26px}
+  .intro-setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:9px;letter-spacing:.3px}
+  .intro-counts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+  .intro-counts button{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:10px 18px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;min-width:58px;transition:.12s}
+  .intro-counts button:hover{border-color:var(--serene)}
+  .intro-counts button.on{background:linear-gradient(135deg,var(--rose),var(--serene));color:#fff;border-color:transparent}
+  .intro-counts .ic-step{min-width:46px;font-size:20px;line-height:1}
+  .intro-counts .ic-num{min-width:72px}
+  .intro-unit{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .intro-unit input{width:16px;height:16px;accent-color:var(--rose)}
 </style>
 </head>
 <body>
+<!-- ================= 시작(랜딩) 화면 ================= -->
+<div class="intro" id="intro">
+  <div class="intro-inner">
+    <div class="intro-diamond"></div>
+    <h1 class="intro-title">세븐틴 가사 퀴즈</h1>
+    <p class="intro-sub">SVT LYRICS QUIZ</p>
+    <p class="intro-desc">세븐틴 가사를 듣고 원곡을 맞혀보세요.<br>사회자와 함께 즐기는 오프라인 팬 퀴즈쇼 🎤</p>
+    <div class="intro-chips">
+      <span>🔊 TTS 낭독</span><span>🙈 가사 가리기</span><span>👥 팀전</span><span>⏱️ 타이머</span>
+    </div>
+    <button class="intro-start" id="intro-start">▶ 시작하기</button>
+    <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
+    <p class="intro-note">설정 탭에서 문항·가사를 편집할 수 있어요</p>
+  </div>
+</div>
+
+<!-- ================= 참가자(온라인 방) 화면 ================= -->
+<div class="intro" id="room-guest" style="display:none">
+  <div class="intro-inner" style="max-width:420px">
+    <h1 class="intro-title" style="font-size:24px">방 참가</h1>
+    <div id="rg-join">
+      <p class="intro-desc">사회자 화면의 <b>방 코드</b>를 입력하세요.</p>
+      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase" />
+      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%">입장</button>
+      <div class="sl-err" id="rg-err"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-back" style="margin-top:14px">← 뒤로</button>
+    </div>
+    <div id="rg-pick" style="display:none">
+      <p class="intro-desc"><b>참가할 팀</b>을 선택하세요. <span style="color:var(--muted)">(한 팀당 한 명)</span></p>
+      <select class="num-input" id="rg-team" style="text-transform:none"><option value="">팀 목록 불러오는 중…</option></select>
+      <button class="intro-start" id="rg-claim" style="margin-top:14px;width:100%">이 팀으로 참가</button>
+      <div class="sl-err" id="rg-pick-err"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-pick-back" style="margin-top:14px">← 방 코드 다시</button>
+    </div>
+    <div id="rg-play" style="display:none">
+      <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
+      <div class="rg-toprow" style="display:flex;gap:8px;align-items:center;margin:6px 0 10px">
+        <button class="btn btn-play btn-sm" id="rg-speak">▶ 듣기</button>
+        <span class="rg-timer" id="rg-timer"></span>
+      </div>
+      <div class="rg-lyric" id="rg-lyric"></div>
+      <div class="hints" id="rg-hints" style="margin-top:10px"></div>
+      <div class="mc-options" id="rg-mc" style="display:none;margin-top:14px"></div>
+      <div class="video-wrap" id="rg-video" style="margin-top:14px"></div>
+      <div class="rg-score" id="rg-score"></div>
+      <button class="btn btn-ghost btn-sm" id="rg-leave" style="margin-top:16px">방 나가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 방장 로비(참가 대기) ================= -->
+<div class="intro" id="room-lobby" style="display:none">
+  <div class="setup-inner" style="max-width:440px">
+    <h2 class="setup-title">참가자 대기</h2>
+    <p class="setup-sub">모두 들어오면 게임을 시작하세요</p>
+    <div class="setup-card">
+      <div class="rhb-code" style="text-align:center;font-size:16px">방 코드 <b id="rl-code" style="font-size:26px;letter-spacing:4px;color:var(--rose)">----</b></div>
+      <div class="rl-conn" id="rl-conn" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">연결 확인 중…</div>
+      <div style="text-align:center;margin-top:12px">
+        <img id="rl-qr" alt="방 참가 QR" style="width:180px;height:180px;display:none;border-radius:12px;background:#fff;padding:8px" />
+        <div id="rl-qr-cap" style="font-size:12px;color:var(--muted);margin-top:6px;display:none">📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요</div>
+        <div id="rl-link" style="font-size:11px;color:var(--serene);word-break:break-all;margin-top:4px"></div>
+      </div>
+      <div class="setup-label" style="margin-top:16px">참가 팀 (<b id="rl-count">0</b>)</div>
+      <div id="rl-teams" style="font-size:14px;line-height:1.9">아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.</div>
+      <div class="video-wrap" id="rl-video" style="margin-top:14px"></div>
+    </div>
+    <div class="setup-actions">
+      <button class="btn btn-ghost" id="rl-cancel">← 취소</button>
+      <button class="intro-start" id="rl-start" style="flex:1;padding:15px">▶ 게임 시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 기본 설정(게임 옵션) ================= -->
+<div class="intro" id="setup" style="display:none">
+  <div class="setup-inner">
+    <h2 class="setup-title">게임 설정</h2>
+    <p class="setup-sub">옵션을 정하고 게임을 시작하세요</p>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-hide" checked /><span class="slider"></span></label>
+        <span style="font-size:14px">🎧 듣기 전용 (가사 가리기) <span style="color:var(--muted)">· 권장</span></span>
+      </div>
+      <div class="setup-tip">이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-label">문제 수</div>
+      <div class="intro-counts" id="intro-counts">
+        <button type="button" class="ic-step" id="ic-minus" aria-label="5개 줄이기">−</button>
+        <button type="button" class="ic-num" id="ic-num" data-n="15">15</button>
+        <button type="button" class="ic-step" id="ic-plus" aria-label="5개 늘리기">+</button>
+        <button type="button" class="ic-all on" id="ic-all" data-n="0">전체</button>
+      </div>
+      <label class="intro-unit" style="margin-top:14px"><input type="checkbox" id="intro-unit" checked /><span>유닛곡 비중 높이기</span></label>
+      <div class="setup-tip">문제 수는 <b>5문제 단위</b>로 −/+ 조절할 수 있어요. 처음 모이는 자리라면 <b>10~15문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-label">🎯 문제 범위 (그룹 선택)</div>
+      <div class="scope-dims" id="scope-dims">
+        <span class="chip active" data-dim="all">전체</span>
+        <span class="chip" data-dim="diff">난이도</span>
+        <span class="chip" data-dim="unit">구성</span>
+      </div>
+      <div class="scope-vals" id="scope-vals"></div>
+      <div class="setup-tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>구성</b>(완전체·유닛곡).<br>예: 가볍게 즐길 땐 <b>중·신곡</b>, 고인물끼리는 <b>상·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-timer" /><span class="slider"></span></label>
+        <span style="font-size:14px">타이머 사용 <span style="color:var(--muted)">(시작 시 카운트다운)</span></span>
+      </div>
+      <label class="hint" style="display:block;margin:10px 0 4px">문항별 제한 시간(초)</label>
+      <input class="num-input" type="number" id="c-timersec" min="5" max="120" value="20" />
+      <div class="setup-tip"><b>20초</b>면 충분해요! 곡을 떠올리고 손들기 딱 좋은 길이예요 ⏱️<br>더 쫄깃하게 즐기고 싶다면 <b>10초</b>에 도전해보세요.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-sfx" checked /><span class="slider"></span></label>
+        <span style="font-size:14px">🔊 효과음 <span style="color:var(--muted)">(정답·오답·카운트다운)</span></span>
+      </div>
+      <div class="setup-tip">정답 딩·오답 부저·막판 카운트다운 소리로 <b>더 쫄깃하게</b> 즐겨요. 정답 시 <b>연속 정답 콤보</b>도 표시돼요 🔥<br>조용한 자리라면 꺼두세요(소리는 이 기기에서만 재생 · 별도 파일 없음).</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-team" /><span class="slider"></span></label>
+        <span style="font-size:14px">팀전 모드 <span style="color:var(--muted)">(타이머 시 시간 보너스)</span></span>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+      <div class="team-editor" id="c-team-editor"></div>
+      <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px">🎲 랜덤 이름</button>
+      <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 빨리 맞힐수록 <b>남은 시간이 보너스 점수</b>로 쌓여요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
+        <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기 <span style="color:var(--muted)">· 변별력↓</span></span>
+      </div>
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-teamblind" /><span class="slider"></span></label>
+        <span style="font-size:14px">팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span></span>
+      </div>
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-quizonly" /><span class="slider"></span></label>
+        <span style="font-size:14px">문제만 맞추기 <span style="color:var(--muted)">(영상·자동낭독 없이 · 빠른 진행 · 변별력↓)</span></span>
+      </div>
+      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-autohost" /><span class="slider"></span></label>
+        <span style="font-size:14px">자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span></span>
+      </div>
+      <label class="hint" style="display:block;margin:10px 0 4px">정답 공개 후 다음까지(초)</label>
+      <input class="num-input" type="number" id="c-autointerval" min="2" max="60" value="20" />
+      <div class="toggle-row" style="margin-top:12px">
+        <label class="switch"><input type="checkbox" id="c-autohide" /><span class="slider"></span></label>
+        <span style="font-size:14px">진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span></span>
+      </div>
+      <div class="setup-tip">자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="toggle-row" style="margin-top:0">
+        <label class="switch"><input type="checkbox" id="c-online" /><span class="slider"></span></label>
+        <span style="font-size:14px">온라인 방 (각 팀 폰 참가) <span style="color:var(--muted)">· 실험적</span></span>
+      </div>
+      <label class="hint" style="display:block;margin:10px 0 4px">Firebase Realtime DB 주소 <span style="color:var(--muted)">(선택 · 원격 안정화)</span></label>
+      <input class="num-input" type="text" id="c-fburl" placeholder="https://내프로젝트.firebaseio.com" style="text-transform:none" />
+      <div class="setup-tip">켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개 제출</b> → 방장 화면 자동 채점.<br><b>원격(다른 공간)</b>도 지원: 참가자 폰이 가사·힌트·듣기·타이머·정답 MV를 모두 받습니다. 전송은 <b>같은 브라우저=즉시</b>, <b>다른 기기=공개 릴레이(베스트에포트)</b>.<br>🔒 <b>안정적 원격</b>이 필요하면 무료 <b>Firebase Realtime DB</b> 주소를 넣으세요(규칙 test 모드). 넣으면 그 경로로 확실히 동기화되고, 비우면 공개 릴레이로 동작합니다.</div>
+    </div>
+
+    <div class="setup-actions">
+      <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
+      <button class="intro-start" id="setup-start" style="flex:1;padding:15px">▶ 게임 시작</button>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -202,6 +557,10 @@
 
   <!-- ================= GAME ================= -->
   <section class="view active" id="view-game">
+    <div class="card room-host-bar" id="room-host-bar" style="display:none">
+      <div class="rhb-code">방 코드 <b id="rhb-code">----</b></div>
+      <div class="rhb-info" id="rhb-info">참가 팀 0 · 대기 중</div>
+    </div>
     <div class="card" id="team-card" style="display:none">
       <div class="teams" id="team-board"></div>
     </div>
@@ -211,8 +570,12 @@
         <div class="counter">
           문항 <b id="g-index">1</b> / <span id="g-total">40</span>
           &nbsp;·&nbsp; 정답 <b id="g-correct">0</b> · 오답 <b id="g-wrong">0</b>
+          <span class="streak-badge" id="g-streak" style="display:none">🔥2</span>
         </div>
-        <span class="badge b-중" id="g-badge">중</span>
+        <div class="status-right">
+          <button class="stage-btn" id="g-stage-btn" title="무대 모드 — 프로젝터/원거리용 크게 보기" aria-pressed="false">🎦 무대</button>
+          <span class="badge b-중" id="g-badge">중</span>
+        </div>
       </div>
       <div class="progress"><i id="g-bar"></i></div>
 
@@ -226,16 +589,24 @@
         <span class="lyric-text" id="g-lyric"></span>
       </div>
 
-      <div class="speed-row">
+      <div class="speed-row" id="g-speed-row">
         <span>🐢 속도</span>
         <input type="range" id="g-speed" min="0.5" max="1.2" step="0.1" value="1.0" />
         <span class="speed-val" id="g-speedval">1.0×</span>
       </div>
 
-      <div class="toggle-row">
+      <div class="toggle-row" id="g-hide-row">
         <label class="switch"><input type="checkbox" id="g-hide" /><span class="slider"></span></label>
         <span style="font-size:14px">가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span></span>
       </div>
+
+      <div class="hint-area">
+        <button class="btn btn-ghost btn-sm" id="g-hint">💡 힌트 <span id="g-hint-n">(0/3)</span></button>
+        <div class="hints" id="g-hints"></div>
+      </div>
+
+      <div class="mc-turn" id="g-mc-turn" style="display:none"></div>
+      <div class="mc-options" id="g-mc" style="display:none"></div>
 
       <div class="controls">
         <button class="btn btn-play" id="g-play">▶ 가사 낭독</button>
@@ -243,10 +614,17 @@
         <button class="btn btn-reveal" id="g-reveal">정답 공개</button>
       </div>
 
+      <div class="auto-bar" id="g-auto-bar" style="display:none">
+        <button class="auto-btn" id="g-auto-toggle">⏸ 일시정지</button>
+        <button class="auto-btn" id="g-auto-skip">⏭ 다음</button>
+        <span class="auto-status" id="g-auto-status">자동 진행 중</span>
+      </div>
+
       <div class="answer" id="g-answer">
         <div class="song-name" id="g-answer-name"></div>
         <div class="part-label" id="g-answer-part"></div>
         <div class="video-wrap" id="g-video"></div>
+        <button class="btn btn-ghost btn-sm" id="g-video-reload" style="margin-top:10px;width:100%">🔄 영상 다시 불러오기</button>
 
         <!-- solo scoring -->
         <div class="controls" id="g-solo-score">
@@ -272,37 +650,62 @@
         <span class="chip" data-filter="상">상</span>
         <span class="chip" data-filter="중">중</span>
         <span class="chip" data-filter="신곡">신곡</span>
+        <span class="chip chip-test" id="g-test-only" style="display:none">🧪 테스트 문제만</span>
         <span style="flex:1"></span>
         <span class="chip" id="g-shuffle">🔀 셔플</span>
         <span class="chip" id="g-restart">↻ 처음부터</span>
+      </div>
+      <div class="scope-line" id="g-scope">🎯 범위: 전체</div>
+      <div class="filter-bar" style="margin:12px 0 0">
+        <span class="chip" id="g-end">⏹ 게임 종료(결과)</span>
+        <span style="flex:1"></span>
+        <span class="chip" id="g-home">🏠 처음으로</span>
       </div>
     </div>
   </section>
 
   <!-- ================= SETTINGS ================= -->
   <section class="view" id="view-settings">
-    <!-- game mode config -->
-    <div class="card">
-      <h2 style="margin:0 0 12px;font-size:17px">게임 방식</h2>
-      <div class="cfg-grid">
+    <!-- 저장 슬롯 (비밀번호 잠금) · 저장 기능 일원화 -->
+    <div class="card locked" id="slot-card">
+      <div class="set-head">
         <div>
-          <div class="toggle-row" style="margin-top:0">
-            <label class="switch"><input type="checkbox" id="c-timer" /><span class="slider"></span></label>
-            <span style="font-size:14px">타이머 사용</span>
-          </div>
-          <label class="hint" style="display:block;margin:8px 0 4px">문항별 제한 시간(초)</label>
-          <input class="num-input" type="number" id="c-timersec" min="5" max="120" value="15" />
-        </div>
-        <div>
-          <div class="toggle-row" style="margin-top:0">
-            <label class="switch"><input type="checkbox" id="c-team" /><span class="slider"></span></label>
-            <span style="font-size:14px">팀전 모드</span>
-          </div>
-          <div class="team-editor" id="c-team-editor"></div>
-          <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+          <h2>저장 슬롯 <span style="font-size:12px;color:var(--muted);font-weight:600">여러 벌 저장 · 🔒 비밀번호</span></h2>
+          <div class="fill-count">저장된 구성 <b id="slot-count">0</b>개</div>
         </div>
       </div>
-      <p class="hint">팀전 모드에서는 정답 공개 후 맞힌 팀 버튼을 눌러 점수를 부여합니다. 타이머를 함께 켜면 남은 시간에 비례한 <b>시간 보너스</b>가 가산됩니다.</p>
+      <div class="slot-lock" id="slot-lock">
+        <span class="sl-emoji">🔒</span>
+        <input type="password" id="slot-pw" inputmode="numeric" placeholder="비밀번호 입력" autocomplete="off" />
+        <button class="btn btn-reveal btn-sm" id="slot-ok">잠금 해제</button>
+        <div class="sl-err" id="slot-err"></div>
+      </div>
+      <div id="slot-body">
+        <div class="slot-save-row">
+          <input id="slot-name" placeholder="저장 이름 (예: 1차 모임용)" maxlength="40" />
+          <button class="btn btn-reveal btn-sm" id="slot-save">+ 현재 상태 저장</button>
+        </div>
+        <div class="slot-actions">
+          <button class="btn btn-ghost btn-sm" id="s-import">⬆ 불러오기(파일)</button>
+          <button class="btn btn-ghost btn-sm" id="s-savefile">💾 배포본 저장(커밋용)</button>
+        </div>
+        <div id="slot-list"></div>
+        <p class="hint" style="margin-bottom:0">🔒 <b>비밀번호를 아는 관리자</b>만 저장 슬롯을 관리할 수 있습니다. <b>+ 현재 상태 저장</b>을 누르면 슬롯 보관과 함께 <code>svt-data.json</code>이 바로 <b>커밋용으로 내려받아져</b>, 저장소에 커밋하면 즉시 배포본에 반영됩니다. 각 슬롯의 <b>💾 배포본</b> 버튼으로 지난 구성도 언제든 커밋용 파일로 받을 수 있습니다.</p>
+
+        <div class="stats-block">
+          <div class="set-head" style="margin-top:6px">
+            <h2 style="font-size:16px">📊 분석 리포트 <span style="font-size:12px;color:var(--muted);font-weight:600">모드별 이용율 · 곡별 정답률 (이 기기 로컬)</span></h2>
+          </div>
+          <div class="slot-actions">
+            <button class="btn btn-ghost btn-sm" id="stats-refresh">↻ 새로고침</button>
+            <button class="btn btn-ghost btn-sm" id="stats-json">⬇ JSON</button>
+            <button class="btn btn-ghost btn-sm" id="stats-csv">⬇ CSV(곡별)</button>
+            <button class="btn btn-ghost btn-sm" id="stats-clear">🗑 초기화</button>
+          </div>
+          <div id="stats-report"></div>
+          <p class="hint" style="margin-bottom:0">게임을 끝까지 진행(결과 화면 도달)할 때마다 <b>모드·정답/오답·곡별 정답</b>이 이 기기에만 기록됩니다(최근 <b>200판</b>). 서버 전송·개인정보 수집은 없습니다.</p>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -313,8 +716,6 @@
         </div>
         <div class="set-actions">
           <button class="btn btn-ghost btn-sm" id="s-bulk">📋 일괄 입력</button>
-          <button class="btn btn-ghost btn-sm" id="s-export">⬇ 내보내기</button>
-          <button class="btn btn-ghost btn-sm" id="s-import">⬆ 불러오기</button>
           <button class="btn btn-ghost btn-sm" id="s-reset">↺ 기본값</button>
         </div>
       </div>
@@ -353,9 +754,16 @@
         <div class="stat"><div class="v" id="r-total">40</div><div class="k">전체 문항</div></div>
       </div>
       <div class="controls">
+        <button class="btn btn-ghost" id="r-next-round" style="flex:1">🆕 새 문제로 이어가기</button>
         <button class="btn btn-reveal" id="r-restart" style="flex:1">↻ 다시 시작</button>
       </div>
+      <div class="controls" style="margin-top:10px">
+        <button class="btn btn-ghost" id="r-home" style="flex:1">🏠 처음으로</button>
+      </div>
       <p class="hint" id="r-breakdown"></p>
+      <p class="hint" id="r-recap" style="margin-top:2px;display:none"></p>
+      <p class="hint" id="r-best" style="margin-top:2px;display:none"></p>
+      <p class="hint" id="r-next-note" style="margin-top:2px">🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).</p>
     </div>
   </section>
 </div>
@@ -397,9 +805,8 @@
    모든 상태는 localStorage(key: svt_lyrics_quiz_v1)에 저장.
    ========================================================================= */
 
-/* ---- 기본 곡 목록: 40문항 (상14 / 중20 / 신곡6) · 전곡 가사 입력 완료 ---- */
+/* ---- 기본 곡 목록: 56문항 (상 21 / 중 21 / 신곡 14) · 전곡 가사 입력 완료 ---- */
 const DEFAULT_SONGS = [
-  // 상 — 기본
   {id:"s2", name:"13월의 춤 (Lilili Yabbay)", part:"브릿지 · 퍼포먼스팀", diff:"상"},
   {id:"s3", name:"바람개비 (Pinwheel)", part:"1절 벌스 · 보컬팀", diff:"상"},
   {id:"s4", name:"Habit (입버릇)", part:"브릿지 · 보컬팀", diff:"상"},
@@ -410,7 +817,6 @@ const DEFAULT_SONGS = [
   {id:"s11", name:"Domino", part:"1절 벌스", diff:"상"},
   {id:"s12", name:"Back It Up", part:"랩 파트 · 힙합팀", diff:"상"},
   {id:"s13", name:"March", part:"1절 벌스", diff:"상"},
-  // 중 — 기본
   {id:"s14", name:"아낀다 (Adore U)", part:"1절 벌스", diff:"중"},
   {id:"s15", name:"만세 (Mansae)", part:"1절 벌스", diff:"중"},
   {id:"s16", name:"예쁘다 (Pretty U)", part:"1절 벌스", diff:"중"},
@@ -427,14 +833,12 @@ const DEFAULT_SONGS = [
   {id:"s29", name:"음악의 신 (God of Music)", part:"1절 벌스", diff:"중"},
   {id:"s30", name:"F*ck My Life", part:"1절 벌스", diff:"중"},
   {id:"s32", name:"파이팅 해야지 (Fighting)", part:"1절 벌스 · 부석순", diff:"중"},
-  // 신곡 — 기본
   {id:"s33", name:"MAESTRO", part:"1절 벌스 · 2024", diff:"신곡"},
   {id:"s34", name:"LALALI", part:"랩 파트 · 2024", diff:"신곡"},
   {id:"s36", name:"어젯밤 (Last Night)", part:"1절 벌스 · 정한 X 원우", diff:"신곡"},
   {id:"s37", name:"CBZ (Prime time)", part:"랩 파트 · 부석순 2025", diff:"신곡"},
   {id:"s39", name:"THUNDER", part:"1절 벌스 · 정규 5집", diff:"신곡"},
   {id:"s40", name:"청춘찬가 (Cheers to Youth)", part:"1절 벌스 · 보컬팀", diff:"신곡"},
-  // 확장 추가곡 (2차)
   {id:"s41", name:"Home", part:"1절 벌스", diff:"중"},
   {id:"s42", name:"Left & Right", part:"1절 벌스", diff:"중"},
   {id:"s43", name:"고맙다 (Thanks)", part:"1절 벌스", diff:"중"},
@@ -443,6 +847,24 @@ const DEFAULT_SONGS = [
   {id:"s46", name:"엄지척 (Chuck)", part:"1절 벌스", diff:"중"},
   {id:"s47", name:"Fire", part:"1절 벌스", diff:"상"},
   {id:"s48", name:"Network Love", part:"1절 벌스 · 유닛", diff:"상"},
+  // 유닛·솔로 확장 (3차) — 공식 MV 보유 서브유닛·페어링·솔로곡
+  {id:"s50", name:"거침없이 (Just do it)", part:"1절 벌스 · 부석순", diff:"상"},
+  {id:"s51", name:"CHEERS (건배)", part:"1절 벌스 · SVT LEADERS", diff:"상"},
+  {id:"s52", name:"Bittersweet (feat. 이하이)", part:"벌스 · 원우X민규", diff:"상"},
+  {id:"s53", name:"Spider", part:"벌스 · 호시 솔로", diff:"상"},
+  {id:"s54", name:"나란히 (Side By Side)", part:"1절 벌스 · 디에잇 솔로", diff:"상"},
+  {id:"s55", name:"You're My Christmas", part:"1절 벌스 · 도겸 솔로", diff:"중"},
+  {id:"s56", name:"동갑내기 (96ers)", part:"1절 벌스 · 호시X우지", diff:"신곡"},
+  {id:"s57", name:"Ruby", part:"벌스 · 우지 솔로 (영어)", diff:"상"},
+  {id:"s58", name:"Black Eye", part:"벌스 · 버논 솔로 (영어)", diff:"상"},
+  {id:"s59", name:"5, 4, 3 (Pretty woman)", part:"1절 벌스 · 쿱스X민규 (영어)", diff:"신곡"},
+  // 2025~2026 유닛 프로젝트 (V8 · D&S · CxM · HxW)
+  {id:"s60", name:"singasong", part:"1절 벌스 · V8 · 버논X디에잇 (영어)", diff:"신곡"},
+  {id:"s61", name:"미아 (mia)", part:"벌스 · 버논 솔로 · V8", diff:"신곡"},
+  {id:"s62", name:"girlsnboys", part:"벌스 · V8 · 버논X디에잇 (영어)", diff:"신곡"},
+  {id:"s63", name:"Blue", part:"1절 벌스 · 도겸X승관 (D&S)", diff:"신곡"},
+  {id:"s64", name:"For you", part:"벌스 · 쿱스X민규 (영어)", diff:"신곡"},
+  {id:"s65", name:"STUPID IDIOT", part:"벌스 · 호시X우지", diff:"신곡"},
 ];
 
 /* ---- 기본 콘텐츠 ----
@@ -450,55 +872,125 @@ const DEFAULT_SONGS = [
    mv  : 공식 유튜브(있는 곡만) · time: 운영자가 파트 시점으로 조정 권장 */
 /* time(시작 시간)은 MV·가사가 모두 있는 곡에 한해 "가사 3초 앞" 추정값(리허설 시 보정 권장) */
 const DEFAULT_CONTENT = {
-  s2:  {lyrics:"1월부터 12월 매번 돌아도 늘 널 찾고 있어 두 눈 말고 진정으로", mv:"https://youtu.be/MLlq4gtC55Q", time:"2:05"},
-  s3:  {lyrics:"너를 기다리다 바라봤어 저기 저기 멀리", mv:"", time:""},
-  s4:  {lyrics:"너를 부르며 애타게 찾았었다고", mv:"", time:""},
-  s6:  {lyrics:"안개 속 흐릿하지만 그 속에 누군가 있어", mv:"", time:""},
-  s7:  {lyrics:"너 IN 뷰파인더 초점은 Auto 자연스러운 움직임 따라 널 따라가", mv:"https://youtu.be/VqfiJCCbTjY", time:"1:55"},
-  s8:  {lyrics:"맘속엔 어린아이가 있어", mv:"", time:""},
-  s10: {lyrics:"겉으로는 낡고 헤져버려 쓸모없는 날 찾아와도", mv:"", time:""},
-  s11: {lyrics:"옆에 서 있을 때 위태로워 자연스러운 긴장이 좋은 나", mv:"https://youtu.be/EECg4lPL_nE", time:"0:15"},
-  s12: {lyrics:"그래서 우린 늘 안 들지 백기를", mv:"https://youtu.be/c0kBQiiRWBg", time:"0:12"},
-  s13: {lyrics:"세상은 그저 내겐 놀이터 all day 새로운 느낌 그게 날 숨 쉬게 해", mv:"", time:""},
-  s14: {lyrics:"너의 아픔 나로 덮어도 돼", mv:"https://youtu.be/E_PfhU7y9bo", time:"0:15"},
-  s15: {lyrics:"무뚝뚝한 내가 이젠 평소에도 널 걱정해", mv:"https://youtu.be/MKbwrcIjfy8", time:"0:15"},
-  s16: {lyrics:"어떤 표현법을 써야만 내 맘이 전해질까", mv:"https://youtu.be/j59LLNMEOZk", time:"0:18"},
-  s17: {lyrics:"너가 나의 모든 의문점에 대한 정답인 것 같애", mv:"https://youtu.be/J-wFp43XOrA", time:"0:10"},
-  s18: {lyrics:"마주치면 좋아지는 기분 넌 내 바이오리듬", mv:"https://youtu.be/IzplmS-VeBc", time:"0:20"},
-  s20: {lyrics:"널 찾아가야 돼 찾아가야 돼", mv:"https://youtu.be/97cx53Tpp6g", time:"0:12"},
-  s22: {lyrics:"그냥 왜인지 모르게 가끔씩 문득 그런 생각이 자꾸만 들어", mv:"https://youtu.be/PFCQiURzLkk", time:"0:12"},
-  s23: {lyrics:"내 머릿속을 파고들어 더 더 더 구석구석 파헤치고", mv:"https://youtu.be/cr_lx0GSfrA", time:"0:15"},
-  s24: {lyrics:"영원한 건 절대 없단 걸 알면서도 끝낼 수도 없어", mv:"https://youtu.be/ap14O5-G7UA", time:"0:20"},
-  s25: {lyrics:"태양 위를 달리는 마차", mv:"https://youtu.be/gRnuFC4Ualw", time:"0:08"},
-  s26: {lyrics:"지금 이 노래가 내가 될 수 있게 만들어 준 네가 다가온다", mv:"https://youtu.be/WpuatuzSDK4", time:"0:12"},
+  s2: {lyrics:"1월부터 12월 매번 돌아도 늘 널 찾고 있어 두 눈 말고 진정으로", mv:"https://youtu.be/VKuvYk-FsPM?si=S1rjXJ2uiaosyGh5", time:"2:53"},
+  s3: {lyrics:"너를 기다리다 바라봤어 저기 저기 멀리", mv:"https://youtu.be/3kPFq_seRUc", time:"0:10"},
+  s4: {lyrics:"너를 부르며 애타게 찾았었다고", mv:"https://youtu.be/XLObCU6iKOI?si=88IPOseHlwn2z6Hq", time:"1:17"},
+  s6: {lyrics:"안개 속 흐릿하지만 그 속에 누군가 있어", mv:"https://youtu.be/8ZA8PW48QTk?si=0gRJPoqa3MG7HI10", time:"0:24"},
+  s7: {lyrics:"너 IN 뷰파인더 초점은 Auto 자연스러운 움직임 따라 널 따라가", mv:"https://youtu.be/VqfiJCCbTjY", time:"1:27"},
+  s8: {lyrics:"맘속엔 어린아이가 있어", mv:"https://youtu.be/qwFr8DxW3SM?si=rXpL_vrxocPpl9IZ", time:"0:12"},
+  s10: {lyrics:"겉으로는 낡고 헤져버려 쓸모없는 날 찾아와도", mv:"https://youtu.be/xqwocp2dndE?si=_UhlrPTCGh4rQHtP", time:"1:12"},
+  s11: {lyrics:"옆에 서 있을 때 위태로워 자연스러운 긴장이 좋은 나", mv:"https://youtu.be/EECg4lPL_nE", time:"0:17"},
+  s12: {lyrics:"그래서 우린 늘 안 들지 백기를", mv:"https://youtu.be/iIgHSq59JrQ?si=RHNOvZBXs1rb1x1j", time:"0:24"},
+  s13: {lyrics:"세상은 그저 내겐 놀이터 all day 새로운 느낌 그게 날 숨 쉬게 해", mv:"https://youtu.be/2GTyTEvCoQI?si=FXKxMTlJpv7DCw1c", time:"4:19"},
+  s14: {lyrics:"너의 아픔 나로 덮어도 돼", mv:"https://youtu.be/E_PfhU7y9bo", time:"2:20"},
+  s15: {lyrics:"무뚝뚝한 내가 이젠 평소에도 널 걱정해", mv:"https://youtu.be/MKbwrcIjfy8", time:"0:59"},
+  s16: {lyrics:"어떤 표현법을 써야만 내 맘이 전해질까", mv:"https://youtu.be/j59LLNMEOZk", time:"0:10"},
+  s17: {lyrics:"너가 나의 모든 의문점에 대한 정답인 것 같애", mv:"https://youtu.be/J-wFp43XOrA", time:"1:05"},
+  s18: {lyrics:"마주치면 좋아지는 기분 넌 내 바이오리듬", mv:"https://youtu.be/IzplmS-VeBc", time:"0:40"},
+  s20: {lyrics:"널 찾아가야 돼 찾아가야 돼", mv:"https://youtu.be/97cx53Tpp6g", time:"1:45"},
+  s22: {lyrics:"그냥 왜인지 모르게 가끔씩 문득 그런 생각이 자꾸만 들어", mv:"https://youtu.be/PFCQiURzLkk", time:"1:22"},
+  s23: {lyrics:"내 머릿속을 파고들어 더 더 더 구석구석 파헤치고", mv:"https://youtu.be/cr_lx0GSfrA", time:"0:10"},
+  s24: {lyrics:"영원한 건 절대 없단 걸 알면서도 끝낼 수도 없어", mv:"https://youtu.be/ap14O5-G7UA", time:"0:15"},
+  s25: {lyrics:"태양 위를 달리는 마차", mv:"https://youtu.be/gRnuFC4Ualw", time:"0:04"},
+  s26: {lyrics:"지금 이 노래가 내가 될 수 있게 만들어 준 네가 다가온다", mv:"https://youtu.be/WpuatuzSDK4", time:"0:00"},
   s27: {lyrics:"널 만나 내 마음이 계속 더 자라서", mv:"https://youtu.be/yCvSR4lSqTg", time:"0:18"},
   s28: {lyrics:"땅을 보고 계속 올랐지 정상까지", mv:"https://youtu.be/-GQg25oP0S4", time:"0:12"},
-  s29: {lyrics:"전 세계, ah 공통의 language", mv:"https://youtu.be/Vl3SURrGP9g", time:"0:10"},
-  s30: {lyrics:"이런 빌어먹을 세상 나만 혼자 바보 됐어", mv:"https://youtu.be/9kpuOoIh3wU", time:"0:15"},
-  s32: {lyrics:"아뿔싸 일어나야지 아침인데", mv:"https://youtu.be/mBXBOLG06Wc", time:"0:10"},
-  s33: {lyrics:"시작하자, tuning 맞춰볼까?", mv:"https://youtu.be/ThI0pBAbFnk", time:"0:10"},
-  s34: {lyrics:"내가 네 말을 듣겠냐고 그렇게 할 일 없냐고", mv:"https://youtu.be/F2qZWD0F7rM", time:"0:12"},
-  s36: {lyrics:"달이 오른 밤 소리 없는 밤 맘에 없는 말들로 어지러운 맘", mv:"https://youtu.be/aPG_2rMAtVU", time:"0:12"},
-  s37: {lyrics:"뭣도 아닌 일에 입이 거칠어지는 평일", mv:"https://youtu.be/Mt9SBZam4X4", time:"0:15"},
-  s39: {lyrics:"떨어져 flash 온몸이 crash 회로가 미쳐버렸어 제멋대로", mv:"https://youtu.be/pS57UX6s-xw", time:"0:15"},
-  s40: {lyrics:"어쩌다 보니 처음으로 마주하는 오늘이라서", mv:"", time:""},
-  s41: {lyrics:"내가 뭘 어쩌겠어 나는 너가 없으면 낡은 로봇처럼 맘이 멈추고", mv:"https://youtu.be/R9VDPMk5ls0", time:"0:10"},
-  s42: {lyrics:"잊지 말아야 해 출발선에 설 때 두 눈 부릅뜨고 고갤 들어", mv:"https://youtu.be/HdZdxocqzq4", time:"0:15"},
-  s43: {lyrics:"난 그랬던 것 같아 네가 어디 있던지 들릴 때라면 고민도 없이 뛰어 갔었던", mv:"https://youtu.be/gZItyr1SNjU", time:"0:15"},
-  s44: {lyrics:"셀 수 없는 별들과 모래알 그 사이 폭죽을 쏘는 탕탕 소리에", mv:"", time:""},
-  s45: {lyrics:"오늘 멋은 챙겨줘 겉옷 챙겨서 나와", mv:"", time:""},
-  s46: {lyrics:"무대만 서도 시선은 끌었지 반응에 반응해 온몸은 땀 범벅임", mv:"", time:""},
-  s47: {lyrics:"조심해 손 델라 눈떠도 코 베인다", mv:"", time:""},
-  s48: {lyrics:"너무 멀어 우리의 거리 이렇게라도 너를 만난 기적", mv:"", time:""},
+  s29: {lyrics:"전 세계, ah 공통의 language", mv:"https://youtu.be/zSQ48zyWZrY?si=QiT0ljLfZlkDAtpA", time:"0:38"},
+  s30: {lyrics:"이런 빌어먹을 세상 나만 혼자 바보 됐어", mv:"https://youtu.be/9kpuOoIh3wU", time:"0:28"},
+  s32: {lyrics:"아뿔싸 일어나야지 아침인데", mv:"https://youtu.be/mBXBOLG06Wc", time:"0:06"},
+  s33: {lyrics:"시작하자, tuning 맞춰볼까?", mv:"https://youtu.be/ThI0pBAbFnk", time:"0:27"},
+  s34: {lyrics:"내가 네 말을 듣겠냐고 그렇게 할 일 없냐고", mv:"https://youtu.be/F2qZWD0F7rM", time:"0:14"},
+  s36: {lyrics:"달이 오른 밤 소리 없는 밤 맘에 없는 말들로 어지러운 맘", mv:"https://youtu.be/EJF2PV3BQtQ?si=dTuSrlmhpJ2KrR40", time:"0:28"},
+  s37: {lyrics:"뭣도 아닌 일에 입이 거칠어지는 평일", mv:"https://youtu.be/Mt9SBZam4X4", time:"0:22"},
+  s39: {lyrics:"떨어져 flash 온몸이 crash 회로가 미쳐버렸어 제멋대로", mv:"https://youtu.be/pS57UX6s-xw", time:"0:07"},
+  s40: {lyrics:"어쩌다 보니 처음으로 마주하는 오늘이라서", mv:"https://youtu.be/bw4AuPrLWeA", time:"0:15"},
+  s41: {lyrics:"내가 뭘 어쩌겠어 나는 너가 없으면 낡은 로봇처럼 맘이 멈추고", mv:"https://youtu.be/R9VDPMk5ls0", time:"0:20"},
+  s42: {lyrics:"잊지 말아야 해 출발선에 설 때 두 눈 부릅뜨고 고갤 들어", mv:"https://youtu.be/HdZdxocqzq4", time:"0:06"},
+  s43: {lyrics:"난 그랬던 것 같아 네가 어디 있던지 들릴 때라면 고민도 없이 뛰어 갔었던", mv:"https://youtu.be/gZItyr1SNjU", time:"0:10"},
+  s44: {lyrics:"셀 수 없는 별들과 모래알 그 사이 폭죽을 쏘는 탕탕 소리에", mv:"https://youtu.be/7FVieh_RjgU?si=yluoNY1l5UwJvr_6", time:"0:07"},
+  s45: {lyrics:"오늘 멋은 챙겨줘 겉옷 챙겨서 나와", mv:"https://youtu.be/M3crDLspdtY?si=2D-11lz8WVafl9IZ", time:"0:28"},
+  s46: {lyrics:"무대만 서도 시선은 끌었지 반응에 반응해 온몸은 땀 범벅임", mv:"https://youtu.be/U3fSv7ZEoTs?si=EelOF-o0pkVf1vGX", time:"0:08"},
+  s47: {lyrics:"조심해 손 델라 눈떠도 코 베인다", mv:"https://youtu.be/9uJJuYvCBEs?si=iz8htSD_Aj1eHDlh", time:"0:14"},
+  s48: {lyrics:"너무 멀어 우리의 거리 이렇게라도 너를 만난 기적", mv:"https://youtu.be/4GWunY73yzU", time:"0:08"},
+  s50: {lyrics:"근심걱정 가득 찬 세상살이 걷어차 걷어차 걷어차", mv:"https://youtu.be/YGXiVHTy0JE", time:"0:12"},
+  s51: {lyrics:"우린 지하 방에서 건물을 올리지", mv:"https://youtu.be/RnO0HhILXi4", time:"1:00"},
+  s52: {lyrics:"진심을 숨기고서 괜찮은 척 빗속에 난 숨어 늘 웃고 있어", mv:"https://youtu.be/gvdACvfuGFA", time:"0:33"},
+  s53: {lyrics:"난 느낄 수 있어 내가 위험하단 걸 도망칠 수 없단 걸", mv:"https://youtu.be/eOOsAeOx5a0", time:"0:16"},
+  s54: {lyrics:"나의 마음을 너에게 다 주고 싶지만 나는 왜 네 앞에 서면 말을 못 할까", mv:"https://youtu.be/e5bqgvfz84E", time:"1:18"},
+  s55: {lyrics:"하얀 눈이 쌓인 고요한 밤 별빛마저 우릴 비추죠", mv:"https://youtu.be/mHJNduifECM", time:"0:20"},
+  s56: {lyrics:"첫 만남은 코찔찔이 중2", mv:"https://youtu.be/rEBHjYQ8HoI", time:"0:22"},
+  s57: {lyrics:"Where am I running to now, blinded by shining lights pulling me close", mv:"https://youtu.be/gK43zTA7DWY?si=hnA5J5NWZXn2eI3G", time:"1:05"},
+  s58: {lyrics:"Running round the whole city for someone to look me in my eyes", mv:"https://youtu.be/vPQasPdd6fI", time:"0:15"},
+  s59: {lyrics:"You make me heat up, trip up, act up, what'd you do?", mv:"https://youtu.be/u89aNeJlyg0", time:"0:12"},
+  s60: {lyrics:"Let's kill the sunrise", mv:"https://youtu.be/pBpr9TnhhkE", time:"1:10"},
+  s61: {lyrics:"우린 정신을 좀 차려야 해", mv:"https://youtu.be/ltZuC48-PuQ", time:"0:54"},
+  s62: {lyrics:"She can't get out of bed when she home", mv:"https://youtu.be/pGxN5BYWssU", time:"0:20"},
+  s63: {lyrics:"하얗게 메마른 너의 그 표정에", mv:"https://youtu.be/N9X1o0q4aIc", time:"0:50"},
+  s64: {lyrics:"You're my favorite homie, never leave me lonely", mv:"https://youtu.be/Yly-1O7hMUA", time:"0:08"},
+  s65: {lyrics:"오늘은 밤새 노세 가득 채우고 건배 건배", mv:"https://youtu.be/hbZZmSb2I-s", time:"0:10"},
 };
 
 const DEFAULT_CONFIG = {
-  timerOn:false, timerSec:15, teamMode:false, teamNames:["팀 1","팀 2"]
+  timerOn:true, timerSec:20, teamMode:false, teamNames:["팀 1","팀 2"], mc:true, teamBlind:true,
+  autoHost:false, autoHideControls:false, autoInterval:20, onlineRoom:false, fbUrl:"", quizOnly:false,
+  hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
+  sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
+  stage:false,      // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
+  scope:{by:"all", val:""}   // 문제 범위(그룹): all | diff(난이도) | unit(구성)
 };
 
+/* 힌트용 앨범 정보 (곡 id → 발매연도·앨범종류) · 확신 있는 곡만 수록(없으면 해당 힌트 생략) */
+const ALBUM_INFO = {
+  s2:{year:2017,type:"정규"}, s3:{year:2017,type:"정규"}, s4:{year:2017,type:"미니"},
+  s6:{year:2017,type:"미니"}, s7:{year:2019,type:"미니"}, s8:{year:2020,type:"미니"},
+  s10:{year:2021,type:"미니"},   // Imperfect Love — Attacca(9번째 미니, 2021)
+  s11:{year:2022,type:"정규"}, s12:{year:2019,type:"정규"}, s13:{year:2022,type:"정규"},
+  s44:{year:2020,type:"스페셜"}, s45:{year:2019,type:"정규"}, s47:{year:2023,type:"미니"},
+  s48:{year:2019,type:"정규"},
+  s14:{year:2015,type:"미니"}, s15:{year:2015,type:"미니"}, s16:{year:2016,type:"정규"},
+  s17:{year:2016,type:"정규"}, s18:{year:2016,type:"미니"}, s20:{year:2017,type:"미니"},
+  s22:{year:2016,type:"정규"}, s23:{year:2019,type:"미니"}, s24:{year:2019,type:"정규"},
+  s25:{year:2022,type:"정규"}, s26:{year:2021,type:"미니"}, s27:{year:2021,type:"미니"},
+  s28:{year:2023,type:"미니"}, s29:{year:2023,type:"미니"}, s30:{year:2023,type:"미니"},
+  s32:{year:2023,type:"싱글"}, s41:{year:2018,type:"미니"}, s42:{year:2020,type:"미니"},
+  s43:{year:2018,type:"스페셜"}, s46:{year:2016,type:"정규"},
+  s33:{year:2024,type:"베스트"}, s34:{year:2024,type:"베스트"}, s36:{year:2024,type:"싱글"},
+  s37:{year:2025,type:"싱글"}, s39:{year:2025,type:"정규"}, s40:{year:2024,type:"베스트"},
+  s50:{year:2018,type:"디지털 싱글"}, s51:{year:2022,type:"정규"}, s52:{year:2021,type:"디지털 싱글"},
+  s53:{year:2021,type:"디지털 싱글"}, s54:{year:2021,type:"디지털 싱글"}, s55:{year:2021,type:"디지털 싱글"},
+  s56:{year:2025,type:"싱글"}, s57:{year:2022,type:"디지털 싱글"}, s58:{year:2022,type:"디지털 싱글"},
+  s59:{year:2025,type:"미니"}, s60:{year:2026,type:"미니"}, s61:{year:2026,type:"미니"},
+  s62:{year:2026,type:"미니"}, s63:{year:2026,type:"미니"}, s64:{year:2025,type:"미니"},
+  s65:{year:2025,type:"싱글"}
+};
+
+/* 4지선다 오답 보기용 세븐틴 곡명 풀 (웹서치로 확보한 실제 곡 · 정답 40곡과 함께 사용) */
+const EXTRA_TITLES = [
+  "Trauma","Space (끝이 안보여)","Shhh","박수 (CLAP)","어쩌나 (Oh My!)","거침없이 (Just do it)","Spell","Bad Influence",
+  "Shining Diamond","Fast Pace","Healing","Change Up (체인지업)","HIGHLIGHT","Rocket","Campfire","Good to Me",
+  "20","Home;Run","2 MINUS 1","Circles","Ash","_WORLD","HIT","Anyone","Darl+ing","24H","Fallin' Flower","Dream"
+];
+
+/* 팀명 랜덤 풀 — 세븐틴 멤버 케미 조합명·라인·유닛 (namu.wiki 세븐틴/멤버 간 케미 참조) */
+const TEAM_NAME_POOL = [
+  "호우주의보","달빛즈","투캡틴즈","날쏘가즈","댕냥즈","최씨즈","원정대",
+  "부석순","힙합팀","보컬팀","퍼포먼스팀",
+  "95즈","96즈","97즈","막내라인","07즈",
+  "캐럿","샤이닝 다이아몬드","다이아몬드 엣지","붐붐","아주 나이스","만세","예쁘다","손오공",
+  "음악의 신","하이라이트","열세즈","세봉이","호랭이","붕어즈"
+];
+
+/* ---- 스테이징(검수) 모드 ---- */
+// ?staging (또는 ?staging=1)로 접속하면 검수용 데이터(svt-data.staging.json)를 로드.
+// 실서비스 로컬 상태를 오염시키지 않도록 저장키를 분리하고, 상단에 배너를 띄운다.
+const STAGING = (function(){ try{ const sp=new URLSearchParams(location.search); return sp.has("staging") && sp.get("staging")!=="0" && sp.get("staging")!=="false"; }catch(e){ return false; } })();
+const DATA_FILE = STAGING ? "svt-data.staging.json" : "svt-data.json";
+
 /* ---- 상태 ---- */
-const STORE_KEY = "svt_lyrics_quiz_v1";
-let songs, content, config;
+const STORE_KEY = "svt_lyrics_quiz_v1" + (STAGING ? "__staging" : "");
+let songs, content, config, album=null;   // album: 데이터에 포함된 발매연도/앨범종류 맵({id:{year,type}}). 없으면 인라인 ALBUM_INFO 폴백
+let testIds=new Set();   // 스테이징 후보(테스트용) 곡 id 집합(데이터의 _test). 승격되면 비워짐
+function albumOf(id){ return (album && album[id]) || ALBUM_INFO[id] || null; }
 let uidCounter = 1000;
 
 /* runtime (비저장) */
@@ -507,23 +999,278 @@ let pos = 0;
 let marks = {};            // {songId: "correct"|"wrong"}
 let teamScores = [];
 let turn = 0;
-let activeFilter = "all";
 let timerHandle = null, timerLeft = 0;
+let autoTTSHandle = null;   // 카드 전환 후 자동 낭독 예약 핸들
+let quizCount = null;        // 출제 문제 수 (null = 전체)
+let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
 
 /* ---- 저장/로드 ---- */
-function loadState(){
+async function loadState(){
   let saved=null;
   try{ saved=JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){}
-  if(saved && Array.isArray(saved.songs) && saved.content){
-    songs=saved.songs;
-    content=saved.content;
-    config=Object.assign({}, DEFAULT_CONFIG, saved.config||{});
-  }else{
-    resetToDefault(false);
+  const localValid = !!(saved && Array.isArray(saved.songs) && saved.content);
+  const appliedRev = localValid ? (saved.rev||0) : 0;
+  // 호스팅(http/https) 시: 커밋된 svt-data.json의 rev가 더 최신이면 모든 기기에 동일 반영
+  if(location.protocol==="http:"||location.protocol==="https:"){
+    try{
+      // 타임아웃(4s) — 현장 와이파이가 느리거나 응답이 없어도 부팅이 멈추지 않도록
+      const ac=("AbortController" in window)?new AbortController():null;
+      const to=ac?setTimeout(()=>ac.abort(),4000):null;
+      const r=await fetch(DATA_FILE,{cache:"no-store", signal:ac?ac.signal:undefined});
+      if(to) clearTimeout(to);
+      if(r.ok){
+        const j=await r.json();
+        if(j && Array.isArray(j.songs) && j.content){
+          const committedRev = j.rev||0;
+          if(!localValid || committedRev>appliedRev){
+            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{}); album=j.album||null; testIds=new Set(Array.isArray(j._test)?j._test:[]);
+            saveState(committedRev);   // 이 커밋 버전을 적용 완료로 기록
+            return;
+          }
+        }
+      }
+    }catch(e){/* 파일이 없으면 로컬/내장 사용 */}
   }
+  if(localValid){   // 커밋본이 더 최신이 아니면 이 기기 편집본 유지
+    currentRev=appliedRev;
+    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{}); album=saved.album||null; testIds=new Set(Array.isArray(saved._test)?saved._test:[]);
+    return;
+  }
+  resetToDefault(false);
 }
-function saveState(){
-  localStorage.setItem(STORE_KEY, JSON.stringify({songs, content, config}));
+/* 현재 설정을 커밋용 파일로 저장(다운로드) · 새 rev를 부여해 커밋 시 다른 기기에 전파 */
+/* 배포본(svt-data.json) 내려받기 — 어떤 구성이든 rev를 새로 찍어 커밋 가능한 파일로 저장 */
+function downloadDeploy(data){
+  const rev=Date.now();
+  const payload={rev, songs:data.songs, content:data.content, album:data.album||album||undefined, config:data.config};
+  if(testIds.size) payload._test=[...testIds];   // 스테이징 후보 목록 보존(프로덕션엔 testIds 없음)
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="svt-data.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  return rev;
+}
+function downloadDataFile(){
+  const rev=downloadDeploy({songs, content, config});
+  saveState(rev);
+  toast("svt-data.json 저장됨 · 저장소에 커밋하면 배포본에 반영");
+}
+/* 임의 텍스트를 파일로 내려받기(리포트 JSON/CSV 등) — downloadDeploy의 범용 형제 */
+function downloadBlob(filename, text, type){
+  const blob=new Blob([text],{type:type||"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+/* ---- 저장 슬롯 (여러 벌 저장) ---- */
+const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
+function loadSlots(){ try{ return JSON.parse(localStorage.getItem(SLOTS_KEY))||[]; }catch(e){ return []; } }
+function persistSlots(s){ try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 슬롯을 저장하지 못했어요"); } }
+function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config, album, _test:[...testIds]})); }
+function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
+
+/* ---- 통계(telemetry) — 모드별 이용율·곡별 정답률 (로컬 전용, 관리자 리포트용) ---- */
+const STATS_KEY="svt_lyrics_quiz_stats_v1";
+const STATS_MAX=200;   // 세션 상한(오래된 것부터 폐기)
+function loadStats(){
+  try{ const o=JSON.parse(localStorage.getItem(STATS_KEY)); if(o&&o.v===1&&Array.isArray(o.sessions)&&o.modeCounts&&o.songStats) return o; }catch(e){}
+  return {v:1, sessions:[], modeCounts:{}, songStats:{}, best:{rate:0, streak:0}};
+}
+function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 통계를 저장하지 못했어요"); } }
+function statsModeLabel(cfg){
+  if(cfg.onlineRoom) return "온라인 방";
+  let s = cfg.teamMode ? "팀전" : "솔로";
+  if(cfg.autoHost) s+="·자동";
+  if(cfg.quizOnly) s+="·문제만";
+  s += cfg.mc ? "·4지선다" : "·주관식";
+  return s;
+}
+let gameRecorded=false;   // 판당 1회 적재 가드(결과탭 재진입·재시작 중복 방지)
+let newBestFlag=false;    // 방금 최고기록 갱신 여부(결과 화면 표시용)
+function recordStats(){
+  try{
+    let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
+    const answered=c+w; if(answered<=0) return false;
+    const st=loadStats();
+    const mode=statsModeLabel(config), rate=Math.round(c/answered*100);
+    st.sessions.unshift({ts:nowStamp(), mode, served:answered, correct:c, wrong:w, rate});
+    if(st.sessions.length>STATS_MAX) st.sessions.length=STATS_MAX;
+    const mc=st.modeCounts[mode]||(st.modeCounts[mode]={games:0,served:0,correct:0,wrong:0});
+    mc.games++; mc.served+=answered; mc.correct+=c; mc.wrong+=w;
+    for(const k in marks){ const v=marks[k]; if(v!=="correct"&&v!=="wrong") continue; const ss=st.songStats[k]||(st.songStats[k]={served:0,correct:0}); ss.served++; if(v==="correct") ss.correct++; }
+    // 개인 최고기록(정답률·최다 연속)
+    st.best = st.best || {rate:0, streak:0};
+    newBestFlag=false;
+    if(answered>=3 && rate>(st.best.rate||0)){ st.best.rate=rate; newBestFlag=true; }
+    if(sessionMaxStreak>(st.best.streak||0)){ st.best.streak=sessionMaxStreak; newBestFlag=true; }
+    saveStats(st);
+    return true;
+  }catch(e){ return false; }   // 통계 실패는 결과 화면을 막지 않음
+}
+
+/* ---- 재미 요소(W3): 효과음 · 연속정답 · 축하 애니 · 최고기록 ---- */
+let streak=0, sessionMaxStreak=0;   // 솔로 연속 정답(startNewGame/startNextRound에서 0)
+let _actx=null;
+function audioCtx(){
+  try{ if(!_actx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null; _actx=new AC(); }
+       if(_actx.state==="suspended") _actx.resume(); return _actx;
+  }catch(e){ return null; }
+}
+function beep(freq,dur,type,vol,when){
+  const ac=audioCtx(); if(!ac) return;
+  try{
+    const t0=ac.currentTime+(when||0);
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type=type||"sine"; o.frequency.value=freq; o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(vol||0.15,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.start(t0); o.stop(t0+dur+0.03);
+  }catch(e){}
+}
+function sfxCorrect(){ if(!config.sfx) return; beep(660,0.13,"sine",0.18,0); beep(990,0.19,"sine",0.15,0.10); }
+function sfxWrong(){ if(!config.sfx) return; beep(200,0.16,"sawtooth",0.15,0); beep(150,0.26,"sawtooth",0.13,0.12); }
+function sfxTick(){ if(!config.sfx) return; beep(880,0.05,"square",0.07,0); }
+function sfxWin(){ if(!config.sfx) return; [523,659,784,1047].forEach((f,i)=>beep(f,0.16,"triangle",0.15,i*0.085)); }
+// 사용자 제스처에서 오디오 컨텍스트 unlock(iOS 자동재생 제약 회피)
+function unlockAudio(){ if(config.sfx) audioCtx(); }
+/* 정답 시 짧은 ✨ 축하 버스트(모션 최소화 설정 존중) */
+function celebrateBurst(){
+  try{
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const host=document.getElementById("g-lyricbox"); if(!host) return;
+    const wrap=document.createElement("div"); wrap.className="celebrate";
+    const marks=["✨","🎉","⭐","💛","✨"];
+    for(let i=0;i<marks.length;i++){ const s=document.createElement("span"); s.textContent=marks[i]; s.style.left=(12+i*19)+"%"; s.style.animationDelay=(i*40)+"ms"; wrap.appendChild(s); }
+    host.appendChild(wrap);
+    setTimeout(()=>wrap.remove(),1100);
+  }catch(e){}
+}
+/* 연속정답 갱신(솔로 정답/오답 시 호출) */
+function bumpStreak(correct){
+  if(correct){ streak++; if(streak>sessionMaxStreak) sessionMaxStreak=streak;
+    if(streak>=3 && (streak===3||streak===5||streak%10===0||streak===7)){ toast("🔥 "+streak+"연속 정답!"); sfxWin(); }
+  } else streak=0;
+  updateStreakBadge();
+}
+function updateStreakBadge(){
+  const el=document.getElementById("g-streak"); if(!el) return;
+  if(streak>=2){ el.textContent="🔥"+streak; el.style.display=""; } else el.style.display="none";
+}
+/* 무대 모드(프로젝터 대형) 적용/토글 (W4) */
+function applyStage(){
+  document.body.classList.toggle("stage", !!config.stage);
+  const btn=document.getElementById("g-stage-btn");
+  if(btn) btn.setAttribute("aria-pressed", config.stage?"true":"false");
+}
+
+function addSlot(){
+  const inp=document.getElementById("slot-name");
+  let name=(inp.value||"").trim();
+  const slots=loadSlots();
+  if(!name) name="저장 "+(slots.length+1);
+  const snap=snapshotState();
+  slots.unshift({id:slotId(), name, savedAt:nowStamp(), data:snap});
+  persistSlots(slots); inp.value=""; renderSlots();
+  downloadDeploy(snap);   // 저장과 동시에 커밋용 svt-data.json 내려받기 → 바로 커밋 가능
+  toast(`'${name}' 저장 · svt-data.json 내려받음(커밋하면 배포 반영)`);
+}
+function loadSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  if(!s.data || !Array.isArray(s.data.songs) || !s.data.content){ toast("이 슬롯 데이터가 손상되어 불러올 수 없어요"); return; }
+  if(!confirm(`'${s.name}' 구성을 불러올까요? 현재 편집 내용은 대체됩니다.`)) return;
+  try{
+    songs=JSON.parse(JSON.stringify(s.data.songs));
+    content=JSON.parse(JSON.stringify(s.data.content));
+    config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
+    album=s.data.album?JSON.parse(JSON.stringify(s.data.album)):null;
+    testIds=new Set(Array.isArray(s.data._test)?s.data._test:[]);
+  }catch(e){ toast("슬롯을 불러오는 중 오류가 발생했어요"); return; }
+  saveState(); renderSettings(); startNewGame(); toast(`'${s.name}' 불러옴`);
+}
+function delSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  if(!confirm(`'${s.name}' 저장을 삭제할까요?`)) return;
+  persistSlots(loadSlots().filter(x=>x.id!==id)); renderSlots();
+}
+function fileSlot(id){
+  const s=loadSlots().find(x=>x.id===id); if(!s) return;
+  downloadDeploy(s.data);   // 해당 슬롯을 커밋용 svt-data.json으로 내려받기
+  toast(`'${s.name}' → svt-data.json 내려받음 · 커밋하면 배포본에 반영`);
+}
+function renderSlots(){
+  const slots=loadSlots();
+  const cnt=document.getElementById("slot-count"); if(cnt) cnt.textContent=slots.length;
+  const list=document.getElementById("slot-list"); if(!list) return;
+  if(!slots.length){ list.innerHTML='<p class="hint" style="margin:4px 0 12px">아직 저장된 구성이 없습니다. 이름을 입력하고 <b>현재 상태 저장</b>을 눌러 보세요.</p>'; return; }
+  list.innerHTML="";
+  slots.forEach(s=>{
+    const n=(s.data.songs||[]).length;
+    const f=Object.values(s.data.content||{}).filter(c=>c&&c.lyrics&&c.lyrics.trim()).length;
+    const el=document.createElement("div"); el.className="slot-item";
+    el.innerHTML=`<div class="si-main"><div class="si-name">${escapeHtml(s.name)}</div>
+      <div class="si-time">${escapeHtml(s.savedAt||"")} · 곡 ${n} · 가사 ${f}</div></div>
+      <div class="si-btns">
+        <button class="si-load" data-load="${s.id}">불러오기</button>
+        <button class="si-file" data-file="${s.id}">💾 배포본</button>
+        <button class="si-del" data-del="${s.id}">삭제</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll("[data-load]").forEach(b=>b.addEventListener("click",()=>loadSlot(b.dataset.load)));
+  list.querySelectorAll("[data-file]").forEach(b=>b.addEventListener("click",()=>fileSlot(b.dataset.file)));
+  list.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>delSlot(b.dataset.del)));
+}
+
+/* ---- 분석 리포트 렌더/내보내기(W2) ---- */
+function renderStats(){
+  const box=document.getElementById("stats-report"); if(!box) return;
+  const st=loadStats();
+  const totGames=st.sessions.length;
+  let tc=0,ts=0; for(const m in st.modeCounts){ tc+=st.modeCounts[m].correct; ts+=st.modeCounts[m].served; }
+  const tRate=ts?Math.round(tc/ts*100):0;
+  if(!totGames){ box.innerHTML='<p class="stats-empty">아직 기록된 게임이 없어요. 게임을 끝까지 진행하면 이곳에 통계가 쌓입니다.</p>'; return; }
+  // 모드별
+  const modeRows=Object.keys(st.modeCounts).sort((a,b)=>st.modeCounts[b].games-st.modeCounts[a].games).map(m=>{
+    const d=st.modeCounts[m], r=d.served?Math.round(d.correct/d.served*100):0;
+    const share=totGames?Math.round(d.games/totGames*100):0;
+    return `<tr><td>${escapeHtml(m)}</td><td>${d.games} (${share}%)</td><td>${d.served}</td><td class="stats-rate" style="color:${rateColor(r)}">${r}%</td></tr>`;
+  }).join("");
+  // 곡별(정답률 낮은 순, 응답 1회 이상)
+  const songRows=Object.keys(st.songStats).map(id=>{
+    const d=st.songStats[id], s=songById(id), r=d.served?Math.round(d.correct/d.served*100):0;
+    return {id, name:(s?s.name:id), diff:(s?s.diff:"–"), served:d.served, correct:d.correct, r};
+  }).filter(x=>x.served>0).sort((a,b)=>a.r-b.r || b.served-a.served);
+  const songBody=songRows.map(x=>`<tr><td>${escapeHtml(x.name)} <span style="color:var(--muted)">${escapeHtml(x.diff)}</span></td><td>${x.served}</td><td>${x.correct}</td><td class="stats-rate" style="color:${rateColor(x.r)}">${x.r}%</td></tr>`).join("");
+  box.innerHTML=`
+    <p class="stats-sum">총 <b>${totGames}</b>판 · 누적 응답 <b>${ts}</b> · 전체 정답률 <b>${tRate}%</b></p>
+    <div class="stats-scroll"><table class="stats-tbl"><caption>모드별 이용율 · 정답률</caption>
+      <thead><tr><th>모드</th><th>판수(비중)</th><th>응답</th><th>정답률</th></tr></thead><tbody>${modeRows}</tbody></table></div>
+    <div class="stats-scroll"><table class="stats-tbl"><caption>곡별 정답률 (낮은 순 · 가장 어려운 곡부터)</caption>
+      <thead><tr><th>곡 (난이도)</th><th>응답</th><th>정답</th><th>정답률</th></tr></thead><tbody>${songBody}</tbody></table></div>`;
+}
+function rateColor(r){ return r>=70?"var(--green)":(r>=40?"var(--amber)":"var(--red)"); }
+function statsExportJSON(){ downloadBlob("svt-quiz-stats.json", JSON.stringify(loadStats(),null,2), "application/json"); toast("통계 JSON 내려받음"); }
+function statsExportCSV(){
+  const st=loadStats();
+  const esc=v=>{ const s=String(v==null?"":v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const rows=[["songId","name","diff","served","correct","rate"]];
+  Object.keys(st.songStats).forEach(id=>{ const d=st.songStats[id], s=songById(id), r=d.served?Math.round(d.correct/d.served*100):0; if(d.served>0) rows.push([id,(s?s.name:id),(s?s.diff:""),d.served,d.correct,r]); });
+  const csv="﻿"+rows.map(r=>r.map(esc).join(",")).join("\n");   // BOM: 엑셀 한글 대응
+  downloadBlob("svt-quiz-song-stats.csv", csv, "text/csv;charset=utf-8");
+  toast("곡별 정답률 CSV 내려받음");
+}
+function statsClear(){ if(!confirm("이 기기의 모든 분석 통계를 삭제할까요? 되돌릴 수 없습니다.")) return; try{ localStorage.removeItem(STATS_KEY); }catch(e){} renderStats(); toast("통계를 초기화했어요"); }
+let currentRev=0;
+function saveState(rev){
+  if(rev!=null) currentRev=rev;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config, album, _test:[...testIds]})); }
+  catch(e){ if(typeof toast==="function") toast("저장 공간이 부족하거나 사용할 수 없어요(설정 유지 실패)"); }
 }
 function resetToDefault(doSave){
   songs = DEFAULT_SONGS.map(s=>Object.assign({},s));
@@ -561,6 +1308,13 @@ function parseYouTube(url){
   for(const p of pats){ const m=url.match(p); if(m) return m[1]; }
   return null;
 }
+/* 대기 화면용: 보유한 MV 중 랜덤 1곡을 음소거 자동재생 임베드 */
+function randomMvEmbed(){
+  const ids=(songs||[]).map(s=>s.id).filter(id=>{ const c=content[id]; return c&&c.mv&&parseYouTube(c.mv); });
+  if(!ids.length) return "";
+  const yt=parseYouTube(content[ids[Math.floor(Math.random()*ids.length)]].mv);
+  return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${yt}?autoplay=1&mute=1&loop=1&playlist=${yt}&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+}
 
 /* ---- 탭 ---- */
 document.querySelectorAll("nav.tabs button").forEach(b=>{
@@ -570,6 +1324,7 @@ document.querySelectorAll("nav.tabs button").forEach(b=>{
     b.classList.add("active");
     document.getElementById("view-"+b.dataset.view).classList.add("active");
     stopTTS(); stopTimer();
+    if(b.dataset.view!=="game") autoStopTimers();   // 게임 화면 벗어나면 자동 진행 예약 정지
     if(b.dataset.view==="result") renderResult();
     if(b.dataset.view==="settings") renderSettings();
     if(b.dataset.view==="game") renderGame();
@@ -593,20 +1348,224 @@ const els={
 
 function songById(id){ return songs.find(s=>s.id===id); }
 
-function buildOrder(filter, shuffle){
-  let list=songs.map(s=>s.id);
-  if(filter && filter!=="all") list=list.filter(id=>songById(id).diff===filter);
-  if(shuffle){
-    for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+/* ---- 3단계 힌트 (곡 메타에서 자동 생성) ---- */
+const CHOSEONG=["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+function toChoseong(str){
+  let out=[], prevSpace=true;
+  for(const ch of str){
+    const c=ch.charCodeAt(0);
+    if(c>=0xAC00 && c<=0xD7A3){ out.push(CHOSEONG[Math.floor((c-0xAC00)/588)]); prevSpace=false; }
+    else if(/[A-Za-z]/.test(ch)){ if(prevSpace) out.push(ch.toUpperCase()); prevSpace=false; }
+    else if(/\s/.test(ch)){ out.push(" "); prevSpace=true; }
+    else { out.push(ch); prevSpace=false; }
   }
+  return out.join("").replace(/\s+/g," ").trim();
+}
+function primaryTitle(name){ const i=name.indexOf("("); return (i>0? name.slice(0,i):name).trim(); }
+function maskTitle(t){
+  let shown=false;
+  return [...t].map(ch=>{ if(/\s/.test(ch)) return " "; if(!shown){ shown=true; return ch; } return "○"; }).join("");
+}
+/* 6개 카테고리 중 랜덤 3개 힌트 생성 */
+function buildHints(song){
+  const t=primaryTitle(song.name);
+  const info=albumOf(song.id);
+  const cands=[];
+  cands.push({k:"구성", v: isUnitSong(song)? "<b>유닛곡</b>" : "<b>단체곡</b> (완전체)"});
+  cands.push({k:"제목 초성", v:"<b>"+escapeHtml(toChoseong(t))+"</b>"});
+  cands.push({k:"파트", v:escapeHtml(song.part)});
+  cands.push({k:"첫 글자", v:"<b>"+escapeHtml(maskTitle(t))+"</b>"});
+  if(info && info.year) cands.push({k:"발매 연도", v:"<b>"+info.year+"</b>년"});
+  if(info && info.type) cands.push({k:"앨범 종류", v:"<b>"+escapeHtml(info.type)+"</b>"});
+  shuffleArr(cands);
+  return cands.slice(0,3);
+}
+let hintLevel=0, currentHints=[];
+function prepareHints(){ currentHints = order.length? buildHints(songById(order[pos])) : []; }
+function renderHints(){
+  const box=document.getElementById("g-hints");
+  const nEl=document.getElementById("g-hint-n");
+  const btn=document.getElementById("g-hint");
+  if(!box) return;
+  box.innerHTML="";
+  if(order.length===0){ nEl.textContent="(0/3)"; btn.disabled=true; return; }
+  for(let i=0;i<hintLevel && i<currentHints.length;i++){
+    const d=document.createElement("div"); d.className="hint-chip";
+    d.innerHTML='<span class="hk">'+currentHints[i].k+'</span><span class="hv">'+currentHints[i].v+'</span>';
+    box.appendChild(d);
+  }
+  nEl.textContent="("+hintLevel+"/3)";
+  btn.disabled = hintLevel>=currentHints.length;
+}
+function revealHint(){ if(order.length===0) return; if(hintLevel<currentHints.length){ hintLevel++; renderHints(); if(Room.host.active) Room.hostPushHint(); } }
+function resetHints(){ hintLevel=0; prepareHints(); renderHints(); }
+
+/* ---- 4지선다 (객관식) ---- */
+let mcOptions=[];
+function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildMcOptions(){
+  mcOptions=[];
+  if(!config.mc || order.length===0) return;
+  const correct=songById(order[pos]).name;
+  const pool=Array.from(new Set(songs.map(s=>s.name).concat(EXTRA_TITLES))).filter(n=>n && n!==correct);
+  shuffleArr(pool);
+  const opts=[{name:correct,correct:true}].concat(pool.slice(0,3).map(n=>({name:n,correct:false})));
+  mcOptions=shuffleArr(opts);
+}
+/* 팀전 4지선다: 각 팀이 순서대로 선택 → 자동 채점 (개인전/솔로는 먼저 맞히기) */
+let teamPicks=[], pickingOrder=[], pickIdx=0, teamRoundDone=false;
+function teamCount(){ return (config.teamNames||[]).length||1; }
+function resetTeamRound(){
+  const n=teamCount();
+  teamPicks=new Array(n).fill(null);
+  pickingOrder=[]; for(let k=0;k<n;k++) pickingOrder.push((turn+k)%n);   // 시작 팀부터 순환
+  pickIdx=0; teamRoundDone=false;
+}
+function renderMc(){
+  const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
+  if(!box) return;
+  // 온라인 방: 참가자가 각자 폰에서 고름 → 방장 화면엔 보기 그리드 숨김(방장은 진행 화면)
+  if(config.onlineRoom && Room.host.active){ box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML="📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인"; } return; }
+  if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; if(turnEl) turnEl.style.display="none"; return; }
+  box.style.display="grid"; box.innerHTML="";
+  const keys=["A","B","C","D"];
+  mcOptions.forEach((o,i)=>{
+    const b=document.createElement("button"); b.className="mc-opt"; b.type="button";
+    b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(o.name)}</span><span class="mc-badges"></span>`;
+    if(config.teamMode) b.addEventListener("click",()=>pickMcTeam(i));
+    else b.addEventListener("click",()=>pickMc(i));
+    box.appendChild(b);
+  });
+  if(config.teamMode){ turnEl.style.display="block"; renderTeamRound(); }
+  else { turnEl.style.display="none"; }
+}
+/* --- 개인전/솔로: 먼저 맞히기 (선택한 보기 하나만 표시) --- */
+function pickMc(i){
+  const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
+  btns.forEach(b=>{ b.disabled=true; });
+  const ok=!!mcOptions[i].correct;
+  btns[i].classList.add(ok?"correct":"wrong");
+  marks[order[pos]]=ok?"correct":"wrong";   // 혼자 플레이: 고른 즉시 정답/오답 자동 집계
+  updateCounters();
+  bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
+  toast(ok?"✔ 정답!":"✘ 오답");
+  showAnswer();
+}
+/* --- 팀전: 팀별 순차 선택 --- */
+function renderTeamRound(){
+  const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
+  const btns=[...box.querySelectorAll(".mc-opt")]; const names=config.teamNames||[];
+  btns.forEach(b=>{ const c=b.querySelector(".mc-badges"); if(c) c.innerHTML=""; });
+  const blind=config.teamBlind!==false;
+  // 가리기 모드에선 채점 전까지 어느 팀이 뭘 골랐는지 표시하지 않음(동시/온라인)
+  const showBadges = teamRoundDone || !blind;
+  if(showBadges) teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=names[t]||("팀"+(t+1)); c.appendChild(s); } } });
+  if(!turnEl) return;
+  if(teamRoundDone){
+    turnEl.className="mc-turn done";
+    const ci=mcOptions.findIndex(o=>o.correct);
+    turnEl.innerHTML="채점 완료 · "+teamPicks.map((p,t)=>`${escapeHtml(names[t]||("팀"+(t+1)))} ${p===ci?"✔":"✘"}`).join(" · ");
+  } else {
+    turnEl.className="mc-turn";
+    const cur=pickingOrder[pickIdx];
+    const done=teamPicks.filter(p=>p!=null).length;
+    const note=blind?' · <span style="color:var(--muted)">선택은 비공개</span>':'';
+    turnEl.innerHTML=`🎤 <b>${escapeHtml(names[cur]||("팀"+(cur+1)))}</b> 차례 · 보기를 선택하세요 (${done+1}/${pickingOrder.length})${note}`;
+  }
+}
+function pickMcTeam(i){
+  if(teamRoundDone) return;
+  teamPicks[pickingOrder[pickIdx]]=i; pickIdx++;
+  if(pickIdx>=pickingOrder.length) finalizeTeamRound();
+  else { renderTeamRound(); if(config.teamMode) renderTeamBoard(); }
+}
+function finalizeTeamRound(){
+  if(teamRoundDone) return;
+  teamRoundDone=true; stopTimer();
+  const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
+  const ci=mcOptions.findIndex(o=>o.correct);
+  const bonus=config.timerOn? Math.max(0,Math.ceil(timerLeft/5)):0;
+  btns.forEach((b,idx)=>{ b.disabled=true; if(idx===ci) b.classList.add("correct"); });
+  let anyCorrect=false;
+  teamPicks.forEach((p,t)=>{
+    if(p==null) return;
+    if(p===ci){ teamScores[t]=(teamScores[t]||0)+(1+bonus); anyCorrect=true; }
+    else if(btns[p]) btns[p].classList.add("wrong");
+  });
+  marks[order[pos]]=anyCorrect?"correct":"wrong";
+  if(anyCorrect){ sfxCorrect(); celebrateBurst(); } else sfxWrong();   // 팀전은 개인 streak 미집계
+  turn=(turn+1)%teamCount();   // 다음 문항은 다음 팀부터 시작
+  updateCounters(); renderTeamBoard(); renderTeamRound();
+  showAnswer();
+}
+
+function isUnitSong(s){ return /팀|부석순|유닛|정한|LEADERS|솔로|[가-힣]X[가-힣]/.test((s&&s.part)||""); }
+let playedIds=new Set();   // 지금까지 출제된 문항(라운드 이어가기용)
+
+/* ---- 문제 범위(그룹) — 난이도/시대/구성으로 출제 범위 좁히기 ---- */
+const SCOPE_DEFS = {
+  diff:{ label:"난이도", vals:[{v:"상",label:"상"},{v:"중",label:"중"},{v:"신곡",label:"신곡"}] },
+  unit:{ label:"구성",   vals:[{v:"full",label:"완전체(단체곡)"},{v:"unit",label:"유닛곡"}] }
+};
+function songMatchesScope(id, by, val){
+  if(by==="test") return testIds.has(id);   // 스테이징 후보(테스트용)만
+  if(by==="all"||!val) return true;
+  const s=songById(id); if(!s) return false;
+  if(by==="diff") return s.diff===val;
+  if(by==="unit") return (val==="unit")===isUnitSong(s);
+  return true;
+}
+function currentScope(){ const sc=config.scope||{by:"all",val:""}; return {by:sc.by||"all", val:sc.val||""}; }
+function songInScope(id){ const sc=currentScope(); return songMatchesScope(id, sc.by, sc.val); }
+function scopeCount(by, val){ return songs.reduce((n,s)=>n+(songMatchesScope(s.id, by, val)?1:0), 0); }
+function scopeSummary(){
+  const sc=currentScope();
+  if(sc.by==="test") return "🧪 테스트 문제 "+testIds.size+"곡";
+  if(sc.by==="all"||!sc.val) return "전체 "+songs.length+"곡";
+  let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
+  if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
+  return vlabel+" · "+scopeCount(sc.by, sc.val)+"곡";
+}
+
+function buildOrder(shuffle, exclude){
+  let list=songs.map(s=>s.id);
+  if(exclude && exclude.size) list=list.filter(id=>!exclude.has(id));
+  list=list.filter(songInScope);
+  if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).filter(id=>!(exclude&&exclude.has(id))); }   // 범위가 비면 전체로 폴백
+  const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
+  if(doShuffle){
+    if(quizUnitBoost){
+      // 유닛곡 가중치 2배 → 부분 출제 시 유닛곡이 더 자주 뽑힘
+      list = list.map(id=>({id, k:Math.pow(Math.random(), 1/(isUnitSong(songById(id))?2:1))}))
+                 .sort((a,b)=>b.k-a.k).map(o=>o.id);
+    }else{
+      for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+    }
+  }
+  if(quizCount!=null && quizCount>0) list=list.slice(0, quizCount);
   order=list; pos=0;
 }
-function startNewGame(){
-  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0;
-  buildOrder(activeFilter,false);
+function startNewGame(shuffle){
+  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
+  if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
+  buildOrder(!!shuffle);
+}
+/* 새 문제로 이어가기 — 지금까지 출제된 문항 제외하고 새로 뽑기(점수는 유지) */
+function startNextRound(){
+  order.forEach(id=>playedIds.add(id));
+  buildOrder(true, playedIds);
+  if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(true); }
+  marks={}; pos=0; gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
+  if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
+  renderGame();
+  document.querySelector('nav.tabs button[data-view="game"]').click();
 }
 
 function renderGame(){
+  const gvv=document.getElementById("view-game");
+  if(gvv && gvv.classList.contains("active")) window.scrollTo({top:0, behavior:"smooth"});   // 문항 전환 시 맨 위로
+  applyStage();   // 무대 모드 상태 반영
+  syncGameScopeChips();   // 문제 범위 칩·표시 동기화
   const total=order.length;
   els.total.textContent=total;
   // team card
@@ -617,7 +1576,7 @@ function renderGame(){
   if(total===0){
     els.index.textContent=0;
     els.lyric.innerHTML='<span class="placeholder">선택한 난이도에 해당하는 문항이 없습니다.</span>';
-    els.bar.style.width="0%"; hideAnswer(); stopTimer(); return;
+    els.bar.style.width="0%"; hideAnswer(); stopTimer(); resetHints(); buildMcOptions(); renderMc(); return;
   }
   if(pos>=total) pos=total-1; if(pos<0) pos=0;
   const id=order[pos]; const song=songById(id); const c=getC(id);
@@ -629,15 +1588,27 @@ function renderGame(){
   if(c.lyrics && c.lyrics.trim()) els.lyric.textContent=c.lyrics.trim();
   else els.lyric.innerHTML='<span class="placeholder">이 문항의 가사가 아직 입력되지 않았습니다.<br>설정 탭에서 입력하세요.</span>';
 
-  applyHide(); hideAnswer(); updateCounters(); resetTimer();
+  // 문제만 맞추기: 낭독(TTS) 관련 컨트롤 숨김 — 속도/가사 낭독/정지
+  const qo=!!config.quizOnly;
+  document.getElementById("g-speed-row").style.display=qo?"none":"";
+  document.getElementById("g-play").style.display=qo?"none":"";
+  document.getElementById("g-stopread").style.display=qo?"none":"";
+  applyHide(); hideAnswer(); updateCounters();
+  resetTimer(); if(config.timerOn && gameActive) startTimer();   // 게임 시작·문항 전환 시 타이머 시작
+  resetHints(); buildMcOptions(); resetTeamRound(); renderMc();
+  scheduleAutoTTS();   // 카드 전환 시 2초 뒤 자동 낭독
+  autoStartQuestion();   // 오토 호스트: 응답창 후 자동 공개 예약 + 컨트롤 바 갱신
+  if(Room.host.active){ Room.hostPushState(); }   // 온라인 방: 새 문항 참가자에게 전송
 }
 
 function renderTeamBoard(){
   const board=document.getElementById("team-board");
   board.innerHTML="";
+  // 4지선다 팀전 진행 중엔 지금 선택할 팀을 하이라이트
+  const activeTeam=(config.mc && !teamRoundDone && pickingOrder.length) ? pickingOrder[pickIdx] : turn;
   (config.teamNames||[]).forEach((nm,i)=>{
     const d=document.createElement("div");
-    d.className="team"+(i===turn?" active":"");
+    d.className="team"+(i===activeTeam?" active":"");
     d.innerHTML=`<span class="turn-tag">▶ 차례</span>
       <div class="tn">${escapeHtml(nm)}</div>
       <div class="ts">${teamScores[i]||0}</div>
@@ -658,24 +1629,53 @@ function updateCounters(){
 }
 function hideAnswer(){ els.answer.classList.remove("show"); els.video.innerHTML=""; }
 
-function showAnswer(){
+function renderVideo(){
   if(order.length===0) return;
-  const id=order[pos]; const song=songById(id); const c=getC(id);
-  els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
+  const c=getC(order[pos]);
   const vid=parseYouTube(c.mv);
+  const reloadBtn=document.getElementById("g-video-reload");
   if(vid){
     const start=parseTime(c.time);
-    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    // cache-busting param forces the iframe to reload even on the same video
+    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&rel=0&_=${videoReloadNonce}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    if(reloadBtn) reloadBtn.style.display="inline-flex";
   }else{
     els.video.innerHTML=`<div class="no-video">🎬 등록된 MV 주소가 없습니다.<br>설정 탭에서 유튜브 주소를 입력하면 재생됩니다.</div>`;
+    if(reloadBtn) reloadBtn.style.display="none";
   }
-  // scoring UI
-  document.getElementById("g-solo-score").style.display=config.teamMode?"none":"flex";
+}
+let videoReloadNonce=0;
+function reloadVideo(){ videoReloadNonce++; renderVideo(); toast("영상을 다시 불러옵니다"); }
+
+function showAnswer(){
+  if(order.length===0) return;
+  const id=order[pos]; const song=songById(id);
+  els.ansName.textContent=song.name; els.ansPart.textContent=song.part;
+  if(config.quizOnly){   // 문제만 맞추기: 영상 영역 완전 숨김(빈 검은 박스도 제거)·낭독 없음
+    const gv=document.getElementById("g-video"); gv.innerHTML=""; gv.style.display="none";
+    document.getElementById("g-video-reload").style.display="none";
+  } else {
+    document.getElementById("g-video").style.display="";
+    document.getElementById("g-video-reload").style.display="";
+    renderVideo();
+  }
+  // scoring UI — 솔로+4지선다는 고른 즉시 자동 채점되므로 수동 버튼 숨김(4지선다 끈 솔로만 수동)
+  document.getElementById("g-solo-score").style.display=(config.teamMode||config.mc)?"none":"flex";
   document.getElementById("g-team-score").style.display=config.teamMode?"block":"none";
-  if(config.teamMode) renderAwardRow();
+  if(config.teamMode){
+    if(config.mc){   // 4지선다 팀전은 팀별 선택으로 이미 자동 채점 → 수동 버튼 숨김
+      document.getElementById("g-award-row").innerHTML="";
+      document.getElementById("g-noone").style.display="none";
+    } else {
+      renderAwardRow();
+      document.getElementById("g-noone").style.display="";
+    }
+  }
   stopTimer();
   els.answer.classList.add("show");
   els.answer.scrollIntoView({behavior:"smooth",block:"nearest"});
+  if(Room.host.active){ Room.hostReveal(); }   // 온라인 방: 참가자 답 채점·정답 전송
+  autoAfterReveal();   // 오토 호스트: 공개 후 다음 문항 자동 예약
 }
 
 function renderAwardRow(){
@@ -700,20 +1700,43 @@ function awardTeam(i,pts){
 }
 
 /* ---- TTS ---- */
-let koVoice=null;
-function pickVoice(){ const vs=speechSynthesis.getVoices(); koVoice=vs.find(v=>v.lang==="ko-KR")||vs.find(v=>v.lang&&v.lang.startsWith("ko"))||null; }
+let koVoice=null, enVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  koVoice=vs.find(v=>v.lang==="ko-KR")||vs.find(v=>v.lang&&v.lang.startsWith("ko"))||null;
+  enVoice=vs.find(v=>v.lang==="en-US")||vs.find(v=>v.lang&&v.lang.startsWith("en"))||null;   // 영어 가사용 영어 성우
+}
 if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-function stopTTS(){ if("speechSynthesis" in window) speechSynthesis.cancel(); }
+// 가사가 (거의) 영어면 영어 성우로 — 한글 음절이 없거나 라틴 문자가 압도적일 때
+function isEnglishText(s){ const ko=(s.match(/[가-힣]/g)||[]).length, en=(s.match(/[A-Za-z]/g)||[]).length; return en>0 && (ko===0 || ko/(ko+en)<0.2); }
+function makeUtterance(text){
+  const en=isEnglishText(text);
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=en?"en-US":"ko-KR";
+  const v=en?enVoice:koVoice; if(v) u.voice=v;
+  return u;
+}
+function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
+function scheduleAutoTTS(){
+  clearAutoTTS();
+  if(config.quizOnly) return;                   // 문제만 맞추기: 자동 낭독 없음
+  if(!gameActive) return;                       // 게임 시작 전에는 예약 안 함
+  const gv=document.getElementById("view-game");
+  if(!gv || !gv.classList.contains("active")) return;   // 게임 화면일 때만
+  if(order.length===0) return;
+  const c=getC(order[pos]); if(!c || !(c.lyrics||"").trim()) return;   // 가사 있을 때만
+  autoTTSHandle=setTimeout(()=>{ autoTTSHandle=null; speak(); }, 2000);
+}
+function stopTTS(){ clearAutoTTS(); if("speechSynthesis" in window) speechSynthesis.cancel(); }
 function speak(){
   if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
   if(order.length===0) return;
   const c=getC(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
   stopTTS();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="ko-KR"; if(koVoice) u.voice=koVoice; u.rate=parseFloat(els.speed.value); u.pitch=1;
+  const u=makeUtterance(text);
+  u.rate=parseFloat(els.speed.value); u.pitch=1;
   speechSynthesis.speak(u);
-  if(config.timerOn) startTimer();
 }
 
 /* ---- Timer ---- */
@@ -738,58 +1761,165 @@ function startTimer(){
     const pct=Math.max(0,timerLeft/config.timerSec*100);
     els.timerFill.style.width=pct+"%";
     els.timerFill.className = timerLeft<=3?"danger":(timerLeft<=Math.ceil(config.timerSec/2)?"warn":"");
-    if(timerLeft<=0){ stopTimer(); toast("⏰ 시간 종료!"); }
+    if(timerLeft<=3 && timerLeft>0) sfxTick();   // 카운트다운 긴장(3·2·1)
+    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료!"); if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()) showAnswer(); }
   };
   els.timerFill.style.width=(timerLeft/config.timerSec*100)+"%";
   timerHandle=setInterval(tick,1000);
 }
 function stopTimer(){ if(timerHandle){ clearInterval(timerHandle); timerHandle=null; } }
 
+/* ---- 오토 호스트(자동 진행) ---- */
+let autoRun=false, autoAnsT=null, autoNextT=null, autoCdI=null, autoCdLeft=0, autoHintT=[];
+function autoClearHints(){ autoHintT.forEach(t=>clearTimeout(t)); autoHintT=[]; }
+function autoStopTimers(){ if(autoAnsT){clearTimeout(autoAnsT);autoAnsT=null;} if(autoNextT){clearTimeout(autoNextT);autoNextT=null;} if(autoCdI){clearInterval(autoCdI);autoCdI=null;} autoClearHints(); }
+function autoScheduleHints(){   // 자동 호스트: 제한시간 비율로 힌트 하나씩 공개(예 20초→5·10·15초 경과)
+  autoClearHints();
+  if(!config.autoHost) return;
+  const n=(currentHints||[]).length; if(!n) return;
+  const total=(config.timerOn?config.timerSec:12);
+  for(let i=1;i<=n;i++){
+    autoHintT.push(setTimeout(()=>{ if(hintLevel<i){ hintLevel=i; renderHints(); if(Room.host.active) Room.hostPushHint(); } }, Math.round(total*i/(n+1)*1000)));
+  }
+}
+function answerShown(){ return els.answer.classList.contains("show"); }
+function autoBarVisible(){ return (config.autoHost||config.onlineRoom) && !config.autoHideControls; }
+function updateAutoBar(){
+  const bar=document.getElementById("g-auto-bar");
+  if(!bar) return;
+  bar.style.display=(autoBarVisible() && gameActive)?"flex":"none";
+  const tg=document.getElementById("g-auto-toggle");
+  const st=document.getElementById("g-auto-status");
+  if(tg) tg.textContent=autoRun?"⏸ 일시정지":"▶ 재생";
+  if(st) st.textContent = !autoRun ? "일시정지됨" : (autoCdI ? `다음까지 ${Math.max(0,autoCdLeft)}초` : "자동 진행 중");
+}
+function autoStartQuestion(){   // 문항 표시 직후: 응답창 후 자동 공개 예약 + 자동 힌트
+  autoStopTimers();
+  if(!((config.autoHost||config.onlineRoom) && autoRun && gameActive) || order.length===0) { updateAutoBar(); return; }
+  autoScheduleHints();
+  const winSec=(config.timerOn?config.timerSec:12)+1;   // TTS 낭독 리드타임 +1초
+  autoAnsT=setTimeout(()=>{ autoAnsT=null; autoReveal(); }, winSec*1000);
+  updateAutoBar();
+}
+function autoReveal(){
+  if(answerShown()) return;
+  if(config.mc && config.teamMode && !teamRoundDone && order.length){
+    // 자동 진행+팀전: 아무도 안 골랐으면 전부 오답 처리하지 말고 정답만 공개(오프라인 단일화면엔 팀 입력이 없음)
+    if(teamPicks.some(p=>p!=null)) finalizeTeamRound();
+    else showAnswer();
+  }
+  else showAnswer();   // 두 경로 모두 끝에서 autoAfterReveal() 호출
+}
+function autoAfterReveal(){   // showAnswer 끝에서 호출 — 자동 모드(오토호스트/온라인 방)면 다음 예약
+  if(!((config.autoHost||config.onlineRoom) && autoRun && gameActive)) { updateAutoBar(); return; }
+  autoStopTimers();
+  const sec=Math.max(2, config.autoInterval||20);
+  autoCdLeft=sec;
+  autoCdI=setInterval(()=>{ autoCdLeft--; updateAutoBar(); if(autoCdLeft<=0){ clearInterval(autoCdI); autoCdI=null; } },1000);
+  autoNextT=setTimeout(()=>{ autoNextT=null; autoAdvance(); }, sec*1000);
+  updateAutoBar();
+}
+function autoAdvance(){
+  autoStopTimers();
+  if(pos<order.length-1){ next(); }   // next→renderGame→autoStartQuestion 로 순환
+  else { autoRun=false; if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }   // 온라인 방은 닫지 않고 대기 → 새 라운드로 이어감
+}
+function autoPause(){ autoRun=false; autoStopTimers(); stopTimer(); stopTTS(); updateAutoBar(); }
+function autoResume(){ autoRun=true; if(answerShown()) autoAfterReveal(); else autoStartQuestion(); updateAutoBar(); }
+function autoSkip(){ if(!answerShown()) autoReveal(); else autoAdvance(); }
+
 /* ---- 채점 / 이동 ---- */
 function mark(kind){
   if(order.length===0) return;
+  const ok=kind==="correct";
   marks[order[pos]]=kind; updateCounters();
-  toast(kind==="correct"?"✔ 정답 처리":"✘ 오답 처리");
+  bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
+  toast(ok?"✔ 정답 처리":"✘ 오답 처리");
   setTimeout(next,350);
 }
-function next(){ stopTTS(); stopTimer(); if(pos<order.length-1){ pos++; renderGame(); } else { toast("마지막 문항입니다 · 결과 탭에서 확인하세요"); } }
+function goResult(){ if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }
+function next(){ stopTTS(); stopTimer(); if(pos<order.length-1){ pos++; renderGame(); } else { goResult(); } }   // 마지막 문항 다음 = 자동으로 결과 화면
 function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
 
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
-els.hide.addEventListener("change",applyHide);
+els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });
+document.getElementById("g-stage-btn").addEventListener("click",()=>{ config.stage=!config.stage; saveState(); applyStage(); toast(config.stage?"🎦 무대 모드 켜짐(크게 보기)":"무대 모드 꺼짐"); });
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
-document.getElementById("g-reveal").addEventListener("click",showAnswer);
+document.getElementById("g-reveal").addEventListener("click",()=>{
+  // 팀전 4지선다에서 아직 팀 선택이 안 끝났으면 현재까지의 선택으로 채점
+  if(config.mc && config.teamMode && !teamRoundDone && order.length) finalizeTeamRound();
+  else showAnswer();
+});
+document.getElementById("g-auto-toggle").addEventListener("click",()=>{ if(autoRun) autoPause(); else autoResume(); });
+document.getElementById("g-auto-skip").addEventListener("click",autoSkip);
+document.getElementById("g-hint").addEventListener("click",revealHint);
+document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));
 document.getElementById("g-mark-wrong").addEventListener("click",()=>mark("wrong"));
 document.getElementById("g-noone").addEventListener("click",()=>{ if(order.length){ marks[order[pos]]="wrong"; turn=(turn+1)%(config.teamNames.length||1); updateCounters(); renderTeamBoard(); } next(); });
 document.getElementById("g-next").addEventListener("click",next);
 document.getElementById("g-prev").addEventListener("click",prev);
 
+function syncGameScopeChips(){
+  const sc=currentScope();
+  document.querySelectorAll('#view-game .chip[data-filter]').forEach(x=>{
+    const v=x.dataset.filter;
+    const on = (v==="all") ? (sc.by==="all") : (sc.by==="diff" && sc.val===v);
+    x.classList.toggle("active", on);
+  });
+  // 스테이징 전용: 테스트 후보 곡이 있을 때만 '테스트 문제만' 버튼 노출
+  const tb=document.getElementById("g-test-only");
+  if(tb){
+    const show = STAGING && testIds.size>0;
+    tb.style.display = show?"":"none";
+    tb.textContent = "🧪 테스트 문제만 ("+testIds.size+")";
+    tb.classList.toggle("active", sc.by==="test");
+  }
+  const ind=document.getElementById("g-scope"); if(ind) ind.textContent="🎯 범위: "+scopeSummary();
+}
 document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
   c.addEventListener("click",()=>{
-    document.querySelectorAll('#view-game .chip[data-filter]').forEach(x=>x.classList.remove("active"));
-    c.classList.add("active"); activeFilter=c.dataset.filter;
-    buildOrder(activeFilter,false); renderGame();
+    const v=c.dataset.filter;
+    config.scope = (v==="all") ? {by:"all",val:""} : {by:"diff",val:v};   // 인게임 난이도 칩 = 난이도 범위 빠른 전환
+    saveState(); syncGameScopeChips(); buildOrder(false); renderGame();
   });
 });
-document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(activeFilter,true); renderGame(); toast("🔀 순서를 섞었습니다"); });
+document.getElementById("g-test-only").addEventListener("click",()=>{
+  if(!(STAGING && testIds.size>0)) return;
+  config.scope={by:"test",val:"1"}; saveState(); syncGameScopeChips(); buildOrder(true); renderGame();
+  toast("🧪 테스트용 문제 "+testIds.size+"곡만 출제합니다");
+});
+document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast("🔀 순서를 섞었습니다"); });
 document.getElementById("g-restart").addEventListener("click",()=>{
   if(!confirm("채점 기록·팀 점수를 지우고 처음부터 다시 시작할까요?")) return;
-  startNewGame(); renderGame(); toast("처음부터 다시 시작");
+  startNewGame(true); renderGame(); toast("처음부터 다시 시작");
 });
+function stopEverything(){ autoRun=false; autoStopTimers(); stopTTS(); stopTimer(); }
+document.getElementById("g-end").addEventListener("click",()=>{
+  if(!confirm("게임을 종료하고 결과를 볼까요?")) return;
+  stopEverything();
+  if(Room.host.active) Room.hostEnd();   // 온라인 방: 참가자에게 종료 알림 후 방 닫기
+  document.querySelector('nav.tabs button[data-view="result"]').click();
+});
+function goHome(){
+  stopEverything(); gameActive=false;
+  if(Room.host.active) Room.hostEnd();
+  document.getElementById("room-lobby").style.display="none";
+  document.getElementById("intro").classList.remove("hide");
+  window.scrollTo({top:0});
+}
+document.getElementById("g-home").addEventListener("click",()=>{
+  if(gameActive && !confirm("처음 화면으로 돌아갈까요? (진행 중인 게임은 중단됩니다)")) return;
+  goHome();
+});
+document.getElementById("r-home").addEventListener("click",goHome);   // 결과 화면 → 처음으로(게임 이미 종료 상태라 확인 없이 이동)
 
 /* =====================  SETTINGS  ===================== */
 let sFilter="all";
 function diffCounts(){ const c={상:0,중:0,신곡:0}; songs.forEach(s=>{ if(c[s.diff]!=null)c[s.diff]++; }); return c; }
 
 function renderSettings(){
-  // config controls
-  document.getElementById("c-timer").checked=!!config.timerOn;
-  document.getElementById("c-timersec").value=config.timerSec;
-  document.getElementById("c-team").checked=!!config.teamMode;
-  renderTeamEditor();
-
   // counts on chips
   const cc=diffCounts();
   document.querySelectorAll('#view-settings .chip[data-sfilter]').forEach(ch=>{
@@ -828,7 +1958,7 @@ function renderSettings(){
       </div>`;
     list.appendChild(slot);
   });
-  bindSlotInputs(); updateFilled();
+  bindSlotInputs(); updateFilled(); renderSlots(); renderStats();
 }
 function bindSlotInputs(){
   document.querySelectorAll("#s-list [data-f]").forEach(inp=>{
@@ -891,19 +2021,27 @@ function renderTeamEditor(){
   }));
 }
 document.getElementById("c-team-add").addEventListener("click",()=>{ config.teamNames.push("팀 "+(config.teamNames.length+1)); saveState(); renderTeamEditor(); });
+document.getElementById("c-team-random").addEventListener("click",()=>{
+  const pool=TEAM_NAME_POOL.slice(); shuffleArr(pool);
+  config.teamNames = config.teamNames.map((_,i)=> pool[i] || ("팀 "+(i+1)));
+  saveState(); renderTeamEditor(); toast("🎲 팀 이름을 랜덤으로 지었어요");
+});
+document.getElementById("c-hide").addEventListener("change",e=>{ config.hideLyrics=e.target.checked; saveState(); });
+document.getElementById("c-sfx").addEventListener("change",e=>{ config.sfx=e.target.checked; saveState(); if(config.sfx) audioCtx(); });
 document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
+document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); });
+document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
+document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
+document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });
+document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||20)); saveState(); });
+document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); });
+document.getElementById("c-fburl").addEventListener("input",e=>{ config.fbUrl=(e.target.value||"").trim(); saveState(); });
+document.getElementById("c-quizonly").addEventListener("change",e=>{ config.quizOnly=e.target.checked; saveState(); });
 
 /* ---- 내보내기 / 불러오기 ---- */
 const dlgJson=document.getElementById("dlg-json");
-document.getElementById("s-export").addEventListener("click",()=>{
-  document.getElementById("dlg-json-title").textContent="JSON 내보내기";
-  document.getElementById("dlg-json-desc").textContent="아래 내용을 복사해 백업하세요. 다른 기기의 불러오기에 붙여넣으면 그대로 복원됩니다.";
-  const ta=document.getElementById("dlg-json-text");
-  ta.value=JSON.stringify({songs,content,config},null,2); ta.readOnly=true;
-  document.getElementById("dlg-json-ok").textContent="복사"; dlgJson._mode="export"; dlgJson.showModal();
-});
 document.getElementById("s-import").addEventListener("click",()=>{
   document.getElementById("dlg-json-title").textContent="JSON 불러오기";
   document.getElementById("dlg-json-desc").textContent="내보내기 한 JSON을 붙여넣고 확인을 누르세요. 기존 내용은 덮어쓰기 됩니다.";
@@ -921,7 +2059,7 @@ document.getElementById("dlg-json-ok").addEventListener("click",()=>{
   try{
     const obj=JSON.parse(ta.value);
     if(!obj||!Array.isArray(obj.songs)||!obj.content) throw 0;
-    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{});
+    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{}); album=obj.album||null; testIds=new Set(Array.isArray(obj._test)?obj._test:[]);
     saveState(); renderSettings(); startNewGame();
     toast("불러오기 완료"); dlgJson.close();
   }catch(e){ toast("올바른 형식의 JSON이 아닙니다"); }
@@ -946,14 +2084,24 @@ document.getElementById("dlg-bulk-ok").addEventListener("click",()=>{
 });
 
 /* =====================  RESULT  ===================== */
+// 결과 순위 행 — 동점은 같은 등수(1,2,2,4), 등수 숫자 + 메달 함께 표기
+function renderRankRows(rank){
+  const medals=["🥇","🥈","🥉"];
+  let prevScore=null, rn=0;
+  return rank.map((r,i)=>{
+    if(prevScore===null || r.score!==prevScore){ rn=i+1; prevScore=r.score; }   // 동점이면 등수 유지
+    return `<div class="r"><span class="rank-no">${rn}위</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`;
+  }).join("");
+}
 function renderResult(){
   let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
   const answered=c+w, rate=answered?Math.round(c/answered*100):0;
+  if(!gameRecorded && recordStats()) gameRecorded=true;   // 판당 1회 통계 적재(W2)
   document.getElementById("r-correct").textContent=c;
   document.getElementById("r-answered").textContent=answered;
   document.getElementById("r-rate").textContent=rate+"%";
   document.getElementById("r-done").textContent=answered;
-  document.getElementById("r-total").textContent=songs.length;
+  document.getElementById("r-total").textContent=order.length||songs.length;
 
   const g=grade(rate,answered);
   document.getElementById("r-grade").textContent=g.emoji+" "+g.title;
@@ -963,35 +2111,481 @@ function renderResult(){
   for(const k in marks){ const s=songById(k); if(!s)continue; if(!by[s.diff])continue; by[s.diff].t++; if(marks[k]==="correct")by[s.diff].c++; }
   document.getElementById("r-breakdown").innerHTML=`난이도별 정답 · 상 ${by.상.c}/${by.상.t} &nbsp; 중 ${by.중.c}/${by.중.t} &nbsp; 신곡 ${by.신곡.c}/${by.신곡.t}`;
 
+  // 라운드 리캡 — 이번 판 놓친 곡(최대 5) (W3)
+  const missed=[]; for(const k in marks){ if(marks[k]==="wrong"){ const s=songById(k); if(s) missed.push(s.name); } }
+  const recapEl=document.getElementById("r-recap");
+  if(missed.length){ recapEl.style.display=""; recapEl.innerHTML=`🎧 이번에 놓친 곡: <b>${missed.slice(0,5).map(escapeHtml).join(", ")}</b>${missed.length>5?` 외 ${missed.length-5}곡`:""}`; }
+  else recapEl.style.display="none";
+
+  // 개인 최고기록 (W3)
+  const best=(loadStats().best)||{rate:0,streak:0};
+  const bestEl=document.getElementById("r-best");
+  if((best.rate||0)>0 || (best.streak||0)>0){
+    bestEl.style.display="";
+    bestEl.innerHTML=`${newBestFlag?"🎉 <b>최고 기록 갱신!</b> · ":"🏆 "}최고 정답률 <b>${best.rate||0}%</b> · 최다 연속 <b>${best.streak||0}</b>`;
+  } else bestEl.style.display="none";
+  if(newBestFlag){ sfxWin(); toast("🎉 최고 기록 갱신!"); }
+
   // team ranking
   const tb=document.getElementById("r-team-block");
-  if(config.teamMode){
+  const roomRoster = Room.host.roster && Object.keys(Room.host.roster).length ? Object.values(Room.host.roster) : null;
+  if(config.onlineRoom && roomRoster){
+    tb.style.display="block";
+    const rank=roomRoster.map(t=>({nm:t.name,score:t.score})).sort((a,b)=>b.score-a.score);
+    document.getElementById("r-rank").innerHTML=renderRankRows(rank);
+  } else if(config.teamMode){
     tb.style.display="block";
     const rank=(config.teamNames||[]).map((nm,i)=>({nm,score:teamScores[i]||0})).sort((a,b)=>b.score-a.score);
-    const medals=["🥇","🥈","🥉"];
-    document.getElementById("r-rank").innerHTML=rank.map((r,i)=>
-      `<div class="r"><span class="medal">${medals[i]||"·"}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`).join("");
+    document.getElementById("r-rank").innerHTML=renderRankRows(rank);
   }else tb.style.display="none";
 }
 function grade(rate,answered){
   if(answered===0) return {emoji:"🎬",title:"아직 시작 전",desc:"게임 탭에서 채점을 시작해 보세요"};
-  if(rate>=95) return {emoji:"🏆",title:"칼럿 인증",desc:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬"};
+  if(rate>=95) return {emoji:"🏆",title:"캐럿 인증",desc:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬"};
   if(rate>=80) return {emoji:"💎",title:"코어 팬",desc:"수록곡까지 꿰뚫은 진성 캐럿"};
   if(rate>=60) return {emoji:"⭐",title:"찐팬",desc:"웬만한 곡은 다 아는 실력"};
   if(rate>=40) return {emoji:"🌱",title:"라이트 팬",desc:"조금만 더 들으면 코어 팬까지 금방!"};
   return {emoji:"🐣",title:"입덕 준비생",desc:"이제부터 세븐틴 정주행 시작해볼까요?"};
 }
 document.getElementById("r-restart").addEventListener("click",()=>{
-  startNewGame();
+  gameActive=true;
+  startNewGame(true);
+  if(Room.host.active){   // 온라인 방: 점수 초기화 + 라운드↑ → 참가자도 새 판으로 동반 이동
+    Object.keys(Room.host.roster).forEach(k=>Room.host.roster[k].score=0);
+    autoRun=true; Room.hostNextRound();
+  }
   document.querySelector('nav.tabs button[data-view="game"]').click();
   toast("다시 시작합니다");
 });
+document.getElementById("r-next-round").addEventListener("click",()=>{
+  gameActive=true; autoRun=!!(config.autoHost||config.onlineRoom);
+  startNextRound();
+  toast("🆕 새 문제로 이어갑니다");
+});
 
 /* =====================  INIT  ===================== */
-loadState();
+// 시작 화면 → 기본 설정(게임 옵션) → 게임 시작
+let gameActive=false;
+function renderSetup(){
+  document.getElementById("c-hide").checked=config.hideLyrics!==false;
+  document.getElementById("c-sfx").checked=config.sfx!==false;
+  document.getElementById("c-timer").checked=!!config.timerOn;
+  document.getElementById("c-timersec").value=config.timerSec;
+  document.getElementById("c-team").checked=!!config.teamMode;
+  document.getElementById("c-mc").checked=!!config.mc;
+  document.getElementById("c-teamblind").checked=config.teamBlind!==false;
+  document.getElementById("c-autohost").checked=!!config.autoHost;
+  document.getElementById("c-autohide").checked=!!config.autoHideControls;
+  document.getElementById("c-autointerval").value=config.autoInterval||20;
+  document.getElementById("c-online").checked=!!config.onlineRoom;
+  document.getElementById("c-fburl").value=config.fbUrl||"";
+  document.getElementById("c-quizonly").checked=!!config.quizOnly;
+  renderTeamEditor();
+  renderScopeSetup();
+}
+function renderScopeSetup(){
+  const sc=currentScope();
+  const dims=document.getElementById("scope-dims"); if(!dims) return;
+  dims.querySelectorAll("[data-dim]").forEach(x=>x.classList.toggle("active", x.dataset.dim===(sc.by==="all"?"all":sc.by)));
+  const vwrap=document.getElementById("scope-vals"); if(!vwrap) return; vwrap.innerHTML="";
+  const def=SCOPE_DEFS[sc.by]; if(!def) return;
+  def.vals.forEach(o=>{
+    const c=document.createElement("span");
+    c.className="chip"+(sc.val===o.v?" active":"");
+    c.textContent=o.label+" "+scopeCount(sc.by,o.v);
+    c.addEventListener("click",()=>{ config.scope={by:sc.by,val:o.v}; saveState(); renderScopeSetup(); });
+    vwrap.appendChild(c);
+  });
+}
+document.querySelectorAll('#scope-dims [data-dim]').forEach(btn=>btn.addEventListener("click",()=>{
+  const d=btn.dataset.dim;
+  config.scope = (d==="all") ? {by:"all",val:""} : {by:d, val:SCOPE_DEFS[d].vals[0].v};   // 축 전환 시 첫 값 자동 선택
+  saveState(); renderScopeSetup();
+}));
+/* =====================  온라인 방(Room)  =====================
+   기획: 호스트 PC로 방을 열면 같은 공간의 참가자들이 모바일로 참가 → 각자 폰에서 답 선택 → 결과 취합.
+   전송: 같은 브라우저는 BroadcastChannel(검증됨), 다른 기기는 공개 MQTT 릴레이(베스트에포트, 지연 로드·폴백).
+   타입별 처리라 자기 메시지 에코는 무시. 상태/명단/결과는 retain 발행으로 늦게 들어온 참가자도 동기화. */
+const Room = (function(){
+  let mqttTried=false;
+  function loadMqtt(){
+    return new Promise(res=>{
+      if(window.mqtt || mqttTried) return res(!!window.mqtt);
+      mqttTried=true;
+      if(!(location.protocol==="http:"||location.protocol==="https:")) return res(false);
+      const s=document.createElement("script");
+      s.src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js";
+      s.onload=()=>res(!!window.mqtt); s.onerror=()=>res(false);
+      document.head.appendChild(s);
+      setTimeout(()=>res(!!window.mqtt), 5000);
+    });
+  }
+  function makeTransport(code,onConn){
+    const outs=[]; let cb=null;
+    // BroadcastChannel 미지원(구형 사파리/웹뷰)에서도 릴레이(MQTT/Firebase)만으로 동작하도록 방어
+    if("BroadcastChannel" in window){
+      try{
+        const bc=new BroadcastChannel("svtq-"+code);
+        bc.onmessage=e=>{ if(cb) cb(e.data); };
+        outs.push({send:m=>bc.postMessage(m), close:()=>bc.close()});
+      }catch(e){}
+    }
+    if(config.fbUrl){
+      // Firebase Realtime DB REST — 이벤트 로그에 POST, EventSource로 스트리밍(원격 안정)
+      const base=config.fbUrl.replace(/\/+$/,"")+"/svtq/"+code+"/events";
+      try{
+        const es=new EventSource(base+".json");
+        const handle=v=>{ if(v && v.type && cb) cb(v); };
+        es.addEventListener("put",e=>{ try{ const d=JSON.parse(e.data); if(d.data==null) return; if(d.path==="/"){ Object.values(d.data).forEach(handle); } else handle(d.data); }catch(x){} });
+        es.addEventListener("patch",e=>{ try{ const d=JSON.parse(e.data); if(d.data) Object.values(d.data).forEach(handle); }catch(x){} });
+        es.onopen=()=>{ if(onConn) onConn(true); };
+        outs.push({ send:m=>{ try{ fetch(base+".json",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(m)}); }catch(e){} }, clear:()=>{ try{ fetch(base+".json",{method:"DELETE"}); }catch(e){} }, close:()=>{ try{ es.close(); }catch(e){} }, relay:true });
+      }catch(e){}
+    } else if(window.mqtt){
+      try{
+        const client=window.mqtt.connect("wss://broker.hivemq.com:8884/mqtt",{connectTimeout:4000,reconnectPeriod:3000,clean:true});
+        const topic="svt-lyrics-quiz-v1/"+code;
+        client.on("connect",()=>{ client.subscribe(topic); if(onConn) onConn(true); });
+        client.on("close",()=>{ if(onConn) onConn(false); });
+        client.on("message",(t,p)=>{ if(cb){ try{ cb(JSON.parse(p.toString())); }catch(e){} } });
+        outs.push({send:(m,retain)=>{ try{ client.publish(topic, JSON.stringify(m), {retain:!!retain}); }catch(e){} }, clear:()=>{ try{ client.publish(topic,"",{retain:true}); }catch(e){} }, close:()=>{ try{ client.end(); }catch(e){} }, mqtt:true});
+      }catch(e){}
+    }
+    return {
+      send:(m,retain)=>outs.forEach(o=>o.send(m,retain)),
+      onmsg:c=>{cb=c;},
+      hasRelay:()=>outs.some(o=>o.mqtt||o.relay),
+      clear:()=>outs.forEach(o=>o.clear&&o.clear()),
+      close:()=>outs.forEach(o=>o.close&&o.close())
+    };
+  }
+  function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+
+  /* ---- 호스트 ---- */
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0 };
+  async function hostOpen(){
+    if(!config.fbUrl) await loadMqtt();
+    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0;
+    host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
+    host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
+    host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
+    host.tx.onmsg(m=>{
+      if(m.type==="hello"){ hostPushSlots(); hostSyncGuest(); }
+      else if(m.type==="claim"){ hostClaim(m.dev, m.name); }
+      else if(m.type==="answer" && host.claims[m.name]){ if((m.round||0)!==(host.round||0)) return; (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
+    });
+    document.getElementById("rl-code").textContent=host.code;
+    document.getElementById("rhb-code").textContent=host.code;
+    // 참가 QR — 폰 카메라로 스캔하면 방 코드가 채워진 참가 화면으로 바로 이동
+    const joinUrl=location.origin+location.pathname+"#room="+host.code;
+    if(location.protocol==="http:"||location.protocol==="https:"){
+      const qr=document.getElementById("rl-qr");
+      qr.src="https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=8&data="+encodeURIComponent(joinUrl);
+      qr.style.display="inline-block"; document.getElementById("rl-qr-cap").style.display="block";
+    }
+    document.getElementById("rl-link").textContent=joinUrl;
+    document.getElementById("rl-video").innerHTML=randomMvEmbed();   // 대기 화면 랜덤 MV
+    hostPushSlots();
+    lobbyConn(); lobbyTeams();
+  }
+  function hostPushSlots(){ if(!host.active) return; host.tx.send({type:"slots", teams:host.slots.map(n=>({name:n, taken:!!host.claims[n]}))}, true); }
+  function hostClaim(dev,name){
+    if(!host.active || host.slots.indexOf(name)<0) return;
+    if(host.claims[name] && host.claims[name]!==dev){ host.tx.send({type:"claimno", dev:dev, name:name}); hostPushSlots(); return; }   // 이미 다른 사람이 선택
+    // 같은 기기가 다른 팀을 다시 고르면 이전 선택 해제
+    Object.keys(host.claims).forEach(nm=>{ if(host.claims[nm]===dev && nm!==name){ delete host.claims[nm]; delete host.roster[nm]; } });
+    host.claims[name]=dev; host.roster[name]=host.roster[name]||{name:name,dev:dev,score:0}; host.roster[name].dev=dev;
+    host.tx.send({type:"claimok", dev:dev, name:name});
+    hostPushSlots(); hostSyncGuest(); lobbyTeams(); hostBar();
+  }
+  function rosterArr(){ return Object.keys(host.roster).map(n=>({id:n,name:host.roster[n].name,score:host.roster[n].score})); }
+  function teamsJoined(){ return Object.keys(host.roster).length; }
+  function lobbyConn(){ const e=document.getElementById("rl-conn"); if(e) e.textContent = host.relay ? "🌐 릴레이 연결됨 · 다른 기기에서 참가 가능" : "💻 같은 브라우저(멀티탭)만 연결 · 다른 기기 릴레이 대기 중…"; }
+  function lobbyTeams(){
+    const box=document.getElementById("rl-teams"); const cnt=document.getElementById("rl-count");
+    const ids=Object.keys(host.roster);
+    if(cnt) cnt.textContent=ids.length;
+    if(box) box.innerHTML = ids.length ? ids.map(id=>"• "+escapeHtml(host.roster[id].name)).join("<br>") : "아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.";
+  }
+  function hostSyncGuest(){ if(host.phase==="playing"){ hostPushState(); hostPushRoster(); } else { host.tx.send({type:"lobby"}, true); hostPushRoster(); } }
+  function hostStartPlaying(){ host.phase="playing"; document.getElementById("rl-video").innerHTML=""; hostPushState(); }
+  function allAnswered(qid){ const a=host.answers[qid]||{}; const n=teamsJoined(); return n>0 && Object.keys(a).length>=n; }
+  function maybeAutoReveal(qid){ if(host.phase!=="playing"||qid!==pos) return; if(!answerShown() && allAnswered(qid)) showAnswer(); }
+  function hostState(){
+    if(order.length===0) return null;
+    const c=getC(order[pos]);
+    return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
+      lyric:(c.lyrics||"").trim(),
+      options:mcOptions.map(o=>o.name),
+      sec:(config.timerOn?config.timerSec:0),
+      quizOnly:!!config.quizOnly,
+      phase:"answer" };   // 힌트는 진행에 따라 별도(type:"hint")로 하나씩 공개
+  }
+  function hintTexts(n){ return (currentHints||[]).slice(0,n).map(h=>h.k+" · "+String(h.v).replace(/<[^>]+>/g,"")); }
+  function hostPushHint(){ if(!host.active||host.phase!=="playing") return; host.tx.send({type:"hint", qid:pos, hints:hintTexts(hintLevel)}, true); }
+  function hostPushState(){ if(!host.active||host.phase!=="playing") return; const s=hostState(); if(s) host.tx.send(s, true); }
+  function hostPushRoster(){ if(!host.active) return; host.tx.send({type:"roster", roster:rosterArr()}, true); }
+  function hostReveal(){
+    if(!host.active||host.phase!=="playing") return;
+    const ci=mcOptions.findIndex(o=>o.correct);
+    const ans=host.answers[pos]||{};
+    let any=false;
+    Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]) host.roster[tid].score+=1; any=true; } });
+    marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
+    updateCounters();
+    const song=songById(order[pos]); const c=getC(order[pos]);
+    host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
+    hostBar();
+  }
+  function hostBar(){
+    if(!host.active) return;
+    const n=teamsJoined(); const sub=Object.keys(host.answers[pos]||{}).length;
+    const conn=host.relay?"🌐":"💻";
+    const top=n?" · "+rosterArr().sort((a,b)=>b.score-a.score).slice(0,3).map(t=>escapeHtml(t.name)+" "+t.score).join(" · "):"";
+    document.getElementById("rhb-info").textContent=`${conn} 참가 ${n} · 제출 ${sub}/${n}`+top;
+  }
+  function hostIntermission(){   // 라운드 종료 — 방은 열어둔 채 참가자에게 대기 안내(다음 라운드로 이어감)
+    if(!host.active) return;
+    host.phase="intermission";
+    host.tx.send({type:"intermission", roster:rosterArr()}, true);
+  }
+  function hostNextRound(){   // 새 라운드 시작: 라운드 번호 증가·답안 초기화 → renderGame이 새 상태 전송
+    if(!host.active) return;
+    host.round=(host.round||0)+1; host.answers={}; host.phase="playing";
+  }
+  function hostEnd(){ if(host.active){ try{ host.tx.send({type:"ended", roster:rosterArr()}, true); }catch(e){} } hostClose(); }
+  function hostClose(){ if(host.tx){ try{ host.tx.clear(); }catch(e){} host.tx.close(); } host.active=false; host.phase="lobby"; document.getElementById("room-host-bar").style.display="none"; document.getElementById("rl-video").innerHTML=""; }
+
+  /* ---- 참가자 ---- */
+  const guest={ active:false, code:null, tx:null, teamId:null, team:null, qid:null, answered:false };
+  async function guestConnect(code){
+    if(guest.tx){ try{ guest.tx.close(); }catch(e){} guest.tx=null; }   // 이전 방 연결 정리(새로고침 없이 재입장 대비)
+    if(!config.fbUrl) await loadMqtt();
+    guest.active=true; guest.code=code; guest.team=null; guest.qid=null; guest.answered=false; guest.revealedQid=null;
+    guest.teamId=localStorage.getItem("svtq_teamid")||("t"+Math.random().toString(36).slice(2,8));
+    localStorage.setItem("svtq_teamid",guest.teamId);
+    guest.gotSlots=false;
+    guest.tx=makeTransport(code,(c)=>{ if(c){ guestHello(); const e=document.getElementById("rg-pick-err"); if(e && !guest.gotSlots) e.textContent="🌐 연결됨 · 팀 목록을 받는 중…"; } });
+    guest.tx.onmsg(m=>{
+      if(m.type==="slots"){ guestSlots(m.teams||[]); }
+      else if(m.type==="claimok"){ if(m.dev===guest.teamId){ guest.team=m.name; guestEnterPlay(); } }
+      else if(m.type==="claimno"){ if(m.dev===guest.teamId){ const e=document.getElementById("rg-pick-err"); if(e) e.textContent="이미 선택된 팀이에요. 다른 팀을 골라주세요."; } }
+      else if(m.type==="state"){ if(guest.team) guestState(m); }
+      else if(m.type==="reveal"){ if(guest.team) guestReveal(m); }
+      else if(m.type==="roster") guestRoster(m);
+      else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
+      else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
+      else if(m.type==="intermission"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 라운드 종료 · 방장이 다음 라운드를 준비 중이에요"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-timer").textContent=""; }
+      else if(m.type==="ended"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 게임이 종료되었습니다 · 최종 순위"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-video").innerHTML=""; document.getElementById("rg-timer").textContent=""; }
+    });
+    guestHello();
+    // 팀 목록을 받을 때까지 hello 재전송(최대 ~8s). 그래도 응답 없으면 실패 안내 + 다시 시도 노출.
+    let tries=0; const iv=setInterval(()=>{
+      if(!guest.active||guest.team||guest.gotSlots){ clearInterval(iv); return; }
+      if(tries++>=6){ clearInterval(iv); guestConnFailed(code); return; }
+      guestHello();
+    }, 1200);
+    document.getElementById("rg-join").style.display="none";
+    document.getElementById("rg-pick").style.display="block";
+    document.getElementById("rg-pick-err").textContent="🔌 사회자 방에 연결 중…";
+  }
+  function guestConnFailed(code){
+    if(guest.team||guest.gotSlots) return;
+    const e=document.getElementById("rg-pick-err"); if(!e) return;
+    e.innerHTML='⚠️ 사회자 방에서 응답이 없어요. <b>방 코드</b>를 확인하거나 다시 시도해 주세요. <button class="btn btn-ghost btn-sm" id="rg-retry" style="margin-top:8px">🔄 다시 시도</button>';
+    const rb=document.getElementById("rg-retry"); if(rb) rb.addEventListener("click",()=>{ e.textContent="🔌 다시 연결 중…"; guestConnect(code); });
+  }
+  function guestHello(){ if(guest.tx) guest.tx.send({type:"hello", dev:guest.teamId}); }
+  function guestSlots(teams){
+    const first=!guest.gotSlots; guest.gotSlots=true;
+    const sel=document.getElementById("rg-team"); if(!sel) return;
+    if(first){ const e=document.getElementById("rg-pick-err"); if(e) e.textContent=""; }   // 연결/실패 안내 해제
+    const prev=sel.value;
+    if(!teams.length){ sel.innerHTML='<option value="">방장이 팀을 아직 설정하지 않았어요</option>'; return; }
+    sel.innerHTML="";
+    teams.forEach(t=>{ const o=document.createElement("option"); o.value=t.name; o.textContent=t.taken?(t.name+" (선택됨)"):t.name; o.disabled=!!t.taken; sel.appendChild(o); });
+    const keep=teams.find(t=>t.name===prev && !t.taken);
+    const firstFree=teams.find(t=>!t.taken);
+    sel.value = keep?prev:(firstFree?firstFree.name:"");
+  }
+  function guestClaim(){
+    const sel=document.getElementById("rg-team"); const name=sel?sel.value:""; const e=document.getElementById("rg-pick-err");
+    if(!name){ if(e) e.textContent="참가할 팀을 선택하세요."; return; }
+    if(e) e.textContent="확인 중…";
+    if(guest.tx) guest.tx.send({type:"claim", dev:guest.teamId, name:name});
+  }
+  function guestEnterPlay(){
+    document.getElementById("rg-pick").style.display="none";
+    document.getElementById("rg-play").style.display="block";
+    document.getElementById("rg-status").textContent="입장 완료 ("+escapeHtml(guest.team)+") · 방장을 기다리는 중…";
+    document.getElementById("rg-video").innerHTML=randomMvEmbed();
+  }
+  function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
+  function guestSpeak(){
+    if(!("speechSynthesis" in window) || !guest.lyric) return;
+    try{ speechSynthesis.cancel(); speechSynthesis.speak(makeUtterance(guest.lyric)); }catch(e){}
+  }
+  function guestCdStop(){ if(guest.cdI){ clearInterval(guest.cdI); guest.cdI=null; } }
+  function guestCountdown(sec){
+    guestCdStop(); const el=document.getElementById("rg-timer");
+    if(!sec||sec<=0){ if(el) el.textContent=""; return; }
+    guest.cdLeft=sec; if(el) el.textContent="⏱️ "+guest.cdLeft+"초";
+    guest.cdI=setInterval(()=>{ guest.cdLeft--; if(el) el.textContent="⏱️ "+Math.max(0,guest.cdLeft)+"초"; if(guest.cdLeft<=0) guestCdStop(); },1000);
+  }
+  function guestState(m){
+    if((m.round||0)!==(guest.round||0)){ guest.round=m.round||0; guest.revealedQid=null; guest.qid=null; }   // 새 라운드: 문항 가드 초기화
+    if(guest.revealedQid===m.qid) return;   // 이미 공개된 문항이면 재렌더 금지(중복 state 방지)
+    const isNew = m.qid!==guest.qid;
+    if(isNew){ guest.qid=m.qid; guest.answered=false; document.getElementById("rg-video").innerHTML=""; }
+    guest.lyric=m.lyric||"";
+    document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
+    document.getElementById("rg-lyric").textContent=m.lyric||"";
+    document.getElementById("rg-mc").style.display="grid";
+    if(isNew){ guestCountdown(m.sec||0); if(!m.quizOnly) guestSpeak(); document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독(문제만 맞추기 제외)+카운트다운, 힌트 초기화
+    const box=document.getElementById("rg-mc"); box.style.display="grid"; box.innerHTML="";
+    const keys=["A","B","C","D"];
+    (m.options||[]).forEach((nm,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(nm)}</span>`; b.disabled=guest.answered; b.addEventListener("click",()=>guestAnswer(i)); box.appendChild(b); });
+  }
+  function guestAnswer(i){
+    if(guest.answered) return; guest.answered=true;
+    [...document.querySelectorAll("#rg-mc .mc-opt")].forEach((b,idx)=>{ b.disabled=true; if(idx===i) b.classList.add("picked"); });
+    const qid=guest.qid, rnd=guest.round||0;   // 스냅샷 — 재전송이 다음 라운드(같은 qid)로 새지 않도록
+    const send=()=>guest.tx.send({type:"answer", qid:qid, round:rnd, name:guest.team, pick:i});
+    send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 1200);
+    document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
+  }
+  function guestReveal(m){
+    if((m.round||0)<(guest.round||0)) return;   // 이전 라운드의 잔여(retained) 공개는 무시
+    if((m.round||0)>(guest.round||0)){ guest.round=m.round||0; }
+    if(m.qid!==guest.qid){ guest.qid=m.qid; }
+    guest.revealedQid=m.qid;   // 이 문항은 공개됨 → 중복 state 무시
+    guestCdStop(); document.getElementById("rg-timer").textContent="";
+    const btns=[...document.querySelectorAll("#rg-mc .mc-opt")];
+    btns.forEach((b,idx)=>{ b.disabled=true; if(idx===m.correctIdx) b.classList.add("correct"); });
+    document.getElementById("rg-status").textContent=`정답: ${m.answer}`+(m.part?` · ${m.part}`:"");
+    if(m.mv){ const id=parseYouTube(m.mv); if(id){ const st=parseTime(m.time)||0; document.getElementById("rg-video").innerHTML=`<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}?start=${st}&autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; } }
+    guestRoster(m);
+  }
+  function guestRoster(m){
+    if(!m.roster) return;
+    const me=m.roster.find(t=>t.name===guest.team);
+    const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
+    document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
+  }
+
+  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
+})();
+
+(function(){
+  const intro=document.getElementById("intro");
+  const setup=document.getElementById("setup");
+  const counts=document.getElementById("intro-counts");
+  const icNum=document.getElementById("ic-num");
+  const icAll=document.getElementById("ic-all");
+  function countMax(){ return Math.max(5, Math.floor(((songs&&songs.length)||60)/5)*5); }   // 5단위 상한(곡 수 기준)
+  function setCount(n){ n=Math.max(5, Math.min(countMax(), n)); icNum.dataset.n=n; icNum.textContent=n; icNum.classList.add("on"); icAll.classList.remove("on"); }
+  document.getElementById("ic-minus").addEventListener("click",()=>setCount((parseInt(icNum.dataset.n,10)||5)-5));
+  document.getElementById("ic-plus").addEventListener("click",()=>setCount((parseInt(icNum.dataset.n,10)||5)+5));
+  icNum.addEventListener("click",()=>setCount(parseInt(icNum.dataset.n,10)||5));
+  icAll.addEventListener("click",()=>{ icAll.classList.add("on"); icNum.classList.remove("on"); });
+  function showSetup(){ renderSetup(); intro.classList.add("hide"); setup.style.display="flex"; setup.scrollTop=0; }
+  function backToIntro(){ setup.style.display="none"; intro.classList.remove("hide"); }
+  function startGame(){
+    const sel=counts.querySelector("button.on");
+    const n=sel? (parseInt(sel.dataset.n,10)||0):0;
+    quizCount = n>0 ? n : null;
+    quizUnitBoost = document.getElementById("intro-unit").checked;
+    gameActive=true;
+    if(config.onlineRoom){
+      // 온라인 방: 4지선다 강제, 자동 진행(제출 완료·시간초과 시 공개→다음), 로비에서 대기 후 시작
+      config.mc=true; autoRun=true;
+      startNewGame(true);
+      Room.hostOpen();
+      setup.style.display="none";
+      document.getElementById("room-lobby").style.display="flex";
+      return;
+    }
+    autoRun=!!config.autoHost;               // 오토 호스트면 자동 진행 시작
+    startNewGame(true); renderGame();       // 자동 셔플 1회 + (타이머 켜짐 시) 타이머 시작
+    setup.style.display="none";
+  }
+  function startRoomPlay(){
+    document.getElementById("room-lobby").style.display="none";
+    Room.hostStartPlaying();
+    renderGame();   // 첫 문항 표시 + 참가자에게 상태 전송
+  }
+  document.getElementById("intro-start").addEventListener("click",()=>{ unlockAudio(); showSetup(); });
+  document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });
+  document.getElementById("setup-back").addEventListener("click",backToIntro);
+
+  // 참가자(온라인 방) 진입
+  const guestView=document.getElementById("room-guest");
+  document.getElementById("intro-join").addEventListener("click",()=>{ intro.classList.add("hide"); guestView.style.display="flex"; });
+  document.getElementById("rg-back").addEventListener("click",()=>{ guestView.style.display="none"; intro.classList.remove("hide"); });
+  document.getElementById("rg-enter").addEventListener("click",()=>{
+    const code=(document.getElementById("rg-code").value||"").trim().toUpperCase();
+    const err=document.getElementById("rg-err");
+    if(code.length<4){ err.textContent="방 코드를 확인하세요."; return; }
+    err.textContent=""; Room.guestConnect(code);
+  });
+  document.getElementById("rg-claim").addEventListener("click",()=>Room.guestClaim());
+  document.getElementById("rg-pick-back").addEventListener("click",()=>{
+    Room.guestLeave();
+    document.getElementById("rg-pick").style.display="none";
+    document.getElementById("rg-join").style.display="block";
+  });
+  document.getElementById("rg-speak").addEventListener("click",()=>Room.guestSpeak());
+  document.getElementById("rg-leave").addEventListener("click",()=>{
+    Room.guestLeave();
+    document.getElementById("rg-play").style.display="none";
+    document.getElementById("rg-pick").style.display="none";
+    document.getElementById("rg-join").style.display="block";
+    guestView.style.display="none"; intro.classList.remove("hide");
+  });
+  // 방장 로비: 게임 시작 / 취소
+  document.getElementById("rl-start").addEventListener("click",startRoomPlay);
+  document.getElementById("rl-cancel").addEventListener("click",()=>{
+    Room.hostClose(); gameActive=false; autoRun=false;
+    document.getElementById("room-lobby").style.display="none";
+    intro.classList.remove("hide");
+  });
+  // URL #room=CODE 로 바로 참가 화면
+  if((location.hash||"").indexOf("room=")>=0){ intro.classList.add("hide"); guestView.style.display="flex"; document.getElementById("rg-code").value=(location.hash.split("room=")[1]||"").toUpperCase(); }
+})();
+
+// 저장 슬롯 잠금 (비밀번호로 슬롯 수정 보호)
+const SLOT_PW="19950719";
+(function(){
+  const card=document.getElementById("slot-card");
+  const pw=document.getElementById("slot-pw");
+  const err=document.getElementById("slot-err");
+  function tryUnlock(){
+    if(pw.value===SLOT_PW){ card.classList.remove("locked"); err.textContent=""; pw.value=""; renderStats(); }
+    else{ err.textContent="비밀번호가 올바르지 않습니다."; pw.value=""; pw.focus(); }
+  }
+  document.getElementById("slot-ok").addEventListener("click",tryUnlock);
+  pw.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); tryUnlock(); } });
+})();
+document.getElementById("stats-refresh").addEventListener("click",renderStats);
+document.getElementById("stats-json").addEventListener("click",statsExportJSON);
+document.getElementById("stats-csv").addEventListener("click",statsExportCSV);
+document.getElementById("stats-clear").addEventListener("click",statsClear);
+
+document.getElementById("s-savefile").addEventListener("click",downloadDataFile);
+document.getElementById("slot-save").addEventListener("click",addSlot);
+document.getElementById("slot-name").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); addSlot(); } });
+
 els.speedval.textContent="1.0×";
-startNewGame();
-renderGame();
+(async ()=>{
+  if(STAGING){
+    document.body.classList.add("staging");
+    document.body.insertAdjacentHTML("afterbegin", '<div id="staging-banner">🧪 스테이징(검수용) 모드 · 실제 게임 데이터가 아닙니다 · <a href="?">실서비스로</a></div>');
+  }
+  await loadState();
+  if(STAGING && testIds.size>0){ config.scope={by:"test",val:"1"}; }   // 스테이징: 후보 곡이 있으면 테스트 문제만으로 시작
+  startNewGame();
+  renderGame();
+})();
 </script>
 </body>
 </html>

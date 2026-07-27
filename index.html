@@ -155,6 +155,8 @@
   #staging-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:repeating-linear-gradient(45deg,#3a2a00,#3a2a00 12px,#4a3600 12px,#4a3600 24px);color:#ffcf5c;font-size:13px;font-weight:800;text-align:center;padding:8px 12px;border-bottom:1px solid var(--amber)}
   #staging-banner a{color:#fff;text-decoration:underline}
   body.staging{padding-top:38px}
+  .chip-test{background:rgba(255,207,92,.16);border-color:var(--amber);color:var(--amber)}
+  .chip-test.active{background:var(--amber);color:#3a2a00;border-color:transparent}
   .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene)}
   .scope-dims{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .scope-vals{display:flex;gap:8px;flex-wrap:wrap}
@@ -648,6 +650,7 @@
         <span class="chip" data-filter="상">상</span>
         <span class="chip" data-filter="중">중</span>
         <span class="chip" data-filter="신곡">신곡</span>
+        <span class="chip chip-test" id="g-test-only" style="display:none">🧪 테스트 문제만</span>
         <span style="flex:1"></span>
         <span class="chip" id="g-shuffle">🔀 셔플</span>
         <span class="chip" id="g-restart">↻ 처음부터</span>
@@ -986,6 +989,7 @@ const DATA_FILE = STAGING ? "svt-data.staging.json" : "svt-data.json";
 /* ---- 상태 ---- */
 const STORE_KEY = "svt_lyrics_quiz_v1" + (STAGING ? "__staging" : "");
 let songs, content, config, album=null;   // album: 데이터에 포함된 발매연도/앨범종류 맵({id:{year,type}}). 없으면 인라인 ALBUM_INFO 폴백
+let testIds=new Set();   // 스테이징 후보(테스트용) 곡 id 집합(데이터의 _test). 승격되면 비워짐
 function albumOf(id){ return (album && album[id]) || ALBUM_INFO[id] || null; }
 let uidCounter = 1000;
 
@@ -1019,7 +1023,7 @@ async function loadState(){
         if(j && Array.isArray(j.songs) && j.content){
           const committedRev = j.rev||0;
           if(!localValid || committedRev>appliedRev){
-            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{}); album=j.album||null;
+            songs=j.songs; content=j.content; config=Object.assign({}, DEFAULT_CONFIG, j.config||{}); album=j.album||null; testIds=new Set(Array.isArray(j._test)?j._test:[]);
             saveState(committedRev);   // 이 커밋 버전을 적용 완료로 기록
             return;
           }
@@ -1029,7 +1033,7 @@ async function loadState(){
   }
   if(localValid){   // 커밋본이 더 최신이 아니면 이 기기 편집본 유지
     currentRev=appliedRev;
-    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{}); album=saved.album||null;
+    songs=saved.songs; content=saved.content; config=Object.assign({}, DEFAULT_CONFIG, saved.config||{}); album=saved.album||null; testIds=new Set(Array.isArray(saved._test)?saved._test:[]);
     return;
   }
   resetToDefault(false);
@@ -1039,6 +1043,7 @@ async function loadState(){
 function downloadDeploy(data){
   const rev=Date.now();
   const payload={rev, songs:data.songs, content:data.content, album:data.album||album||undefined, config:data.config};
+  if(testIds.size) payload._test=[...testIds];   // 스테이징 후보 목록 보존(프로덕션엔 testIds 없음)
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
@@ -1066,7 +1071,7 @@ function downloadBlob(filename, text, type){
 const SLOTS_KEY="svt_lyrics_quiz_slots_v1";
 function loadSlots(){ try{ return JSON.parse(localStorage.getItem(SLOTS_KEY))||[]; }catch(e){ return []; } }
 function persistSlots(s){ try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(s)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 슬롯을 저장하지 못했어요"); } }
-function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config, album})); }
+function snapshotState(){ return JSON.parse(JSON.stringify({songs, content, config, album, _test:[...testIds]})); }
 function nowStamp(){ const d=new Date(), p=n=>(""+n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
 
@@ -1184,6 +1189,7 @@ function loadSlot(id){
     content=JSON.parse(JSON.stringify(s.data.content));
     config=Object.assign({}, DEFAULT_CONFIG, s.data.config||{});
     album=s.data.album?JSON.parse(JSON.stringify(s.data.album)):null;
+    testIds=new Set(Array.isArray(s.data._test)?s.data._test:[]);
   }catch(e){ toast("슬롯을 불러오는 중 오류가 발생했어요"); return; }
   saveState(); renderSettings(); startNewGame(); toast(`'${s.name}' 불러옴`);
 }
@@ -1263,7 +1269,7 @@ function statsClear(){ if(!confirm("이 기기의 모든 분석 통계를 삭제
 let currentRev=0;
 function saveState(rev){
   if(rev!=null) currentRev=rev;
-  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config, album})); }
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({rev:currentRev, songs, content, config, album, _test:[...testIds]})); }
   catch(e){ if(typeof toast==="function") toast("저장 공간이 부족하거나 사용할 수 없어요(설정 유지 실패)"); }
 }
 function resetToDefault(doSave){
@@ -1502,6 +1508,7 @@ const SCOPE_DEFS = {
   unit:{ label:"구성",   vals:[{v:"full",label:"완전체(단체곡)"},{v:"unit",label:"유닛곡"}] }
 };
 function songMatchesScope(id, by, val){
+  if(by==="test") return testIds.has(id);   // 스테이징 후보(테스트용)만
   if(by==="all"||!val) return true;
   const s=songById(id); if(!s) return false;
   if(by==="diff") return s.diff===val;
@@ -1513,6 +1520,7 @@ function songInScope(id){ const sc=currentScope(); return songMatchesScope(id, s
 function scopeCount(by, val){ return songs.reduce((n,s)=>n+(songMatchesScope(s.id, by, val)?1:0), 0); }
 function scopeSummary(){
   const sc=currentScope();
+  if(sc.by==="test") return "🧪 테스트 문제 "+testIds.size+"곡";
   if(sc.by==="all"||!sc.val) return "전체 "+songs.length+"곡";
   let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
   if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
@@ -1860,6 +1868,14 @@ function syncGameScopeChips(){
     const on = (v==="all") ? (sc.by==="all") : (sc.by==="diff" && sc.val===v);
     x.classList.toggle("active", on);
   });
+  // 스테이징 전용: 테스트 후보 곡이 있을 때만 '테스트 문제만' 버튼 노출
+  const tb=document.getElementById("g-test-only");
+  if(tb){
+    const show = STAGING && testIds.size>0;
+    tb.style.display = show?"":"none";
+    tb.textContent = "🧪 테스트 문제만 ("+testIds.size+")";
+    tb.classList.toggle("active", sc.by==="test");
+  }
   const ind=document.getElementById("g-scope"); if(ind) ind.textContent="🎯 범위: "+scopeSummary();
 }
 document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
@@ -1868,6 +1884,11 @@ document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
     config.scope = (v==="all") ? {by:"all",val:""} : {by:"diff",val:v};   // 인게임 난이도 칩 = 난이도 범위 빠른 전환
     saveState(); syncGameScopeChips(); buildOrder(false); renderGame();
   });
+});
+document.getElementById("g-test-only").addEventListener("click",()=>{
+  if(!(STAGING && testIds.size>0)) return;
+  config.scope={by:"test",val:"1"}; saveState(); syncGameScopeChips(); buildOrder(true); renderGame();
+  toast("🧪 테스트용 문제 "+testIds.size+"곡만 출제합니다");
 });
 document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast("🔀 순서를 섞었습니다"); });
 document.getElementById("g-restart").addEventListener("click",()=>{
@@ -2038,7 +2059,7 @@ document.getElementById("dlg-json-ok").addEventListener("click",()=>{
   try{
     const obj=JSON.parse(ta.value);
     if(!obj||!Array.isArray(obj.songs)||!obj.content) throw 0;
-    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{}); album=obj.album||null;
+    songs=obj.songs; content=obj.content; config=Object.assign({}, DEFAULT_CONFIG, obj.config||{}); album=obj.album||null; testIds=new Set(Array.isArray(obj._test)?obj._test:[]);
     saveState(); renderSettings(); startNewGame();
     toast("불러오기 완료"); dlgJson.close();
   }catch(e){ toast("올바른 형식의 JSON이 아닙니다"); }
@@ -2561,6 +2582,7 @@ els.speedval.textContent="1.0×";
     document.body.insertAdjacentHTML("afterbegin", '<div id="staging-banner">🧪 스테이징(검수용) 모드 · 실제 게임 데이터가 아닙니다 · <a href="?">실서비스로</a></div>');
   }
   await loadState();
+  if(STAGING && testIds.size>0){ config.scope={by:"test",val:"1"}; }   // 스테이징: 후보 곡이 있으면 테스트 문제만으로 시작
   startNewGame();
   renderGame();
 })();

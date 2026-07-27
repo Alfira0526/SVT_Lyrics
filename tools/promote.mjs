@@ -42,8 +42,18 @@ out.config = staging.config;
 // _review는 프로덕션에 싣지 않음(승격 = 검수 완료)
 
 writeJsonPretty(TO, out);
-// 스테이징의 rev도 프로덕션과 맞춰 두어 다음 사이클에서 역전 방지(+_review 유지)
+
+// 승격된 곡은 더 이상 '테스트용'이 아니므로 스테이징의 _test/_review를 비우고 rev를 맞춘다.
+const clearedTest = Array.isArray(staging._test) ? staging._test.length : 0;
+const clearedReview = review.length;
+staging.rev = newRev;
+delete staging._test;
+delete staging._review;
+writeJsonPretty(FROM, staging);
+
 if (force && review.length) console.log(`\n⚠️  --force로 검수요청 ${review.length}건을 무시하고 승격했습니다.`);
-console.log(`\n✅ 승격 완료 → ${TO} (rev ${prevRev} → ${newRev}, 곡 ${out.songs.length}개). 이제 커밋·푸시하면 배포 반영됩니다.`);
+console.log(`\n✅ 승격 완료 → ${TO} (rev ${prevRev} → ${newRev}, 곡 ${out.songs.length}개).`);
+console.log(`   스테이징 정리: 테스트 문제 ${clearedTest}건·검수요청 ${clearedReview}건 제거 → ${FROM}`);
+console.log(`   이제 두 파일을 커밋·푸시하면 배포에 반영됩니다.`);
 
 function writeJsonPretty(file, obj) { writeFileSync(file, JSON.stringify(obj, null, 2) + "\n"); }

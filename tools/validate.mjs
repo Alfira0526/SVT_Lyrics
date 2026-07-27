@@ -96,7 +96,7 @@ if (isMain) {
 
   const { errors, warnings, review } = validateData(data);
   console.log(`\n=== 검증: ${file} ===`);
-  console.log(`곡 ${Array.isArray(data.songs) ? data.songs.length : "?"}개 · rev ${data.rev ?? "?"}`);
+  console.log(`곡 ${Array.isArray(data.songs) ? data.songs.length : "?"}개 · rev ${data.rev ?? "?"}` + (Array.isArray(data._test) && data._test.length ? ` · 🧪 테스트용 ${data._test.length}곡` : ""));
 
   if (errors.length) { console.log(`\n🔴 오류 ${errors.length}건 (승격 불가):`); errors.forEach((m) => console.log("  - " + m)); }
   if (warnings.length) { console.log(`\n🟡 경고 ${warnings.length}건 (승격 가능, 확인 권장):`); warnings.forEach((m) => console.log("  - " + m)); }

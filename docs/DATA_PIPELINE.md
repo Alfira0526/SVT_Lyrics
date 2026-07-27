@@ -33,11 +33,15 @@ svt-data.staging.json ──► ?staging=1 로 플레이 ──► tools/ 스크
 ## 워크플로
 
 ### 1) 곡 추가/수정
-`svt-data.staging.json`을 편집한다(직접, 또는 `?staging=1` 화면의 설정 편집기에서 편집 후 배포본 내려받아 교체).
-- `songs`에 `{id,name,part,diff}` 추가(id는 기존과 겹치지 않게, 예: `s70`).
-- `content[id]`에 `{lyrics,mv,time}` 추가.
-- `album[id]`에 `{year,type}` 추가.
-- **정확도가 불확실하면** `_review[id] = {reason, fields}`로 표시.
+가장 쉬운 방법은 헬퍼 스크립트:
+```bash
+node tools/add-song.mjs --id s70 --name "새 곡 (New)" --diff 중 --year 2025 --type 미니
+# 가사/MV/시간은 ?staging=1 편집기에서 채워도 됨. --lyrics/--mv/--time 으로 바로 줄 수도 있음.
+```
+- 자동으로 `songs`·`content`·`album`에 추가하고, **`_test`(테스트용 목록)** 와 **`_review`(검수요청)** 에 등록한다.
+- 직접 편집도 가능: `songs`에 `{id,name,part,diff}`, `content[id]`에 `{lyrics,mv,time}`, `album[id]`에 `{year,type}`, 그리고 새 곡 id를 최상위 `_test` 배열에 추가.
+
+> **`_test`**: 아직 승격 전인 **테스트용 후보 곡** 목록. `?staging=1` 화면에 **🧪 테스트 문제만** 버튼이 뜨고, 후보 곡이 있으면 자동으로 **그 곡들만** 출제된다(전체 56곡을 다 돌 필요 없이 추가분만 검수). 승격되면 자동으로 비워진다.
 
 ### 2) 검증
 ```bash
@@ -48,6 +52,7 @@ node tools/validate.mjs svt-data.staging.json
 
 ### 3) 검수 사이트에서 확인
 `https://alfira0526.github.io/SVT_Lyrics/?staging=1` 로 접속(상단에 🧪 배너).
+- 후보 곡이 있으면 **자동으로 🧪 테스트 문제만** 출제 → 추가한 곡만 빠르게 검수. 상단 **🧪 테스트 문제만 (N)** 버튼으로 언제든 전환, 전체/난이도/구성 칩으로 되돌릴 수 있음.
 - 새 곡의 **가사 낭독·MV·타임스탬프·힌트**를 실제로 플레이하며 확인.
 - 저장 상태는 실서비스와 **분리된 로컬 키**를 써서 프로덕션에 영향 없음.
 
@@ -60,8 +65,9 @@ node tools/validate.mjs svt-data.staging.json
 node tools/promote.mjs            # 스테이징 → svt-data.json
 # (미해결 _review가 있으면 중단. 강행하려면 --force)
 ```
-- 검증 통과 & 미해결 검수요청 없음 → `svt-data.json`에 반영(rev 자동 증가, `_review` 제거).
-- 이후 `git add -A && git commit && git push` → GitHub Pages가 새 데이터를 배포.
+- 검증 통과 & 미해결 검수요청 없음 → `svt-data.json`에 반영(rev 자동 증가).
+- **승격된 곡은 스테이징의 `_test`·`_review`에서 자동 제거** → 다음 검수 때 테스트 목록에서 빠진다.
+- 이후 `git add -A && git commit && git push`로 **`svt-data.json`과 `svt-data.staging.json` 둘 다** 커밋 → GitHub Pages가 새 데이터를 배포.
 
 ## 참고
 - 앱은 http(s)에서만 데이터 파일을 fetch한다(`file://`는 index.html 내장 기본값 사용).

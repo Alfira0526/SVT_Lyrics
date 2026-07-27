@@ -1,5 +1,5 @@
 {
-  "rev": 1785176007147,
+  "rev": 1785177070198,
   "songs": [
     {
       "id": "s2",
@@ -650,7 +650,7 @@
       "time": "0:10"
     },
     "s66": {
-      "lyrics": "",
+      "lyrics": "내가 헛스윙해도 / You make me feel like I hit it home",
       "mv": "https://youtu.be/ecVL81Jmqdk",
       "time": "0:45"
     },
@@ -665,12 +665,12 @@
       "time": "0:50"
     },
     "s69": {
-      "lyrics": "",
+      "lyrics": "我没有时间试探 / 我没有兴趣计算",
       "mv": "https://youtu.be/dNimGCqZOI0",
       "time": "0:40"
     },
     "s70": {
-      "lyrics": "",
+      "lyrics": "Tryna make a smash hit / ‘Til I’m in the casket",
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:35"
     }
@@ -947,9 +947,8 @@
   ],
   "_review": {
     "s66": {
-      "reason": "Friend: 가사 원문 미확보(가사사이트 접근차단) — 검수 시 입력 필요 · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
+      "reason": "Friend: 가사 확보(벅스) · MV=비공식 가사영상(공식 공개 시 교체) · 추천구간 추정",
       "fields": [
-        "lyrics",
         "mv_check",
         "time_est"
       ]
@@ -971,16 +970,14 @@
       ]
     },
     "s69": {
-      "reason": "8DM: 가사 원문 미확보 — 검수 시 입력 필요 · MV=THE8 공식영상 · 추천구간 추정",
+      "reason": "8DM: 가사 확보(벅스) · MV=THE8 공식영상 · 추천구간 추정",
       "fields": [
-        "lyrics",
         "time_est"
       ]
     },
     "s70": {
-      "reason": "rat race: 가사 원문 미확보 — 검수 시 입력 필요 · MV=MBC 뮤직코어 공식무대 · 추천구간 추정",
+      "reason": "rat race: 가사 확보(벅스) · MV=MBC 뮤직코어 공식무대 · 추천구간 추정",
       "fields": [
-        "lyrics",
         "time_est"
       ]
     }

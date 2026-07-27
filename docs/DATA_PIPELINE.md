@@ -35,10 +35,13 @@ svt-data.staging.json ──► ?staging=1 로 플레이 ──► tools/ 스크
 ### 1) 곡 추가/수정
 가장 쉬운 방법은 헬퍼 스크립트:
 ```bash
-node tools/add-song.mjs --id s70 --name "새 곡 (New)" --diff 중 --year 2025 --type 미니
-# 가사/MV/시간은 ?staging=1 편집기에서 채워도 됨. --lyrics/--mv/--time 으로 바로 줄 수도 있음.
+node tools/add-song.mjs --id s70 --name "새 곡 (New)" --diff 중 --year 2025 --type 미니 \
+  --lyrics "후렴 1~2줄" --mv "https://youtu.be/xxxxxxxxxxx" --time "0:45"
 ```
-- 자동으로 `songs`·`content`·`album`에 추가하고, **`_test`(테스트용 목록)** 와 **`_review`(검수요청)** 에 등록한다.
+- **추천 가사(`--lyrics`)·유튜브 영상(`--mv`)·추천 시작구간(`--time`)은 기본으로 연결**한다(퀴즈 출제·정답 재생용). 셋 중 하나라도 비면 스크립트가 경고를 출력한다. 당장 못 채우면 `?staging=1` 편집기에서 채운다.
+  - 가사: 후렴/대표 구절 **1~2줄만** 발췌(전체 금지), 검증된 실제 가사만 — 확실치 않으면 지어내지 말고 `_review`로 남긴다.
+  - MV: 공식 MV > 비주얼라이저/필름 > 공식 오디오 > 방송 무대 > (없으면) 신뢰 가능한 가사영상 순. 실재하는 영상만.
+- 자동으로 `songs`·`content`·`album`에 추가하고, **`_test`(테스트용 목록)** 와 **`_review`(검수요청)** 에 등록하며 **`rev`를 올린다**(캐시된 `?staging=1`에도 전파).
 - 직접 편집도 가능: `songs`에 `{id,name,part,diff}`, `content[id]`에 `{lyrics,mv,time}`, `album[id]`에 `{year,type}`, 그리고 새 곡 id를 최상위 `_test` 배열에 추가.
 
 > **`_test`**: 아직 승격 전인 **테스트용 후보 곡** 목록. `?staging=1` 화면에 **🧪 테스트 문제만** 버튼이 뜨고, 후보 곡이 있으면 자동으로 **그 곡들만** 출제된다(전체 56곡을 다 돌 필요 없이 추가분만 검수). 승격되면 자동으로 비워진다.

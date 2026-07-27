@@ -25,6 +25,8 @@ if (!["상", "중", "신곡"].includes(diff)) { console.error(`✗ diff는 상/�
 
 data.songs.push({ id: a.id, name: a.name, part: a.part || "1절 벌스", diff });
 data.content[a.id] = { lyrics: a.lyrics || "", mv: a.mv || "", time: a.time || "" };
+// 언어(TTS): 보통 가사 문자로 자동 인식(한/영/중/일). 중국어·일본어처럼 확실히 할 땐 --lang zh|ja|en|ko 로 고정.
+if (a.lang && ["ko", "en", "zh", "ja"].includes(a.lang)) data.content[a.id].lang = a.lang;
 if (a.year || a.type) data.album[a.id] = { year: a.year ? parseInt(a.year, 10) : undefined, type: a.type || undefined };
 
 // 테스트용 목록에 등록

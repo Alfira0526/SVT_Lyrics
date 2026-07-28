@@ -88,6 +88,21 @@ await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTim
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });
 P(s69==='zh-CN', `s69 8DM(중국어) → ${s69}===zh-CN`);
 
+// 한글 독음 대체: 중국어 음성이 없으면 s69 낭독이 read(한글 독음)를 한국어 음성으로 재생
+const fb=await pg.evaluate(async ()=>{
+  pickVoice();
+  const rec=[];
+  speechSynthesis.getVoices=()=>[{lang:'ko-KR',name:'K'},{lang:'en-US',name:'E'}];  // 중국어 음성 없음
+  pickVoice();  // zhVoice=null 로 재설정
+  speechSynthesis.speak=(u)=>{ rec.push({lang:u.lang,text:u.text}); setTimeout(()=>u.onend&&u.onend(),0); };
+  const c=getC('s69');   // 8DM 중국어, read=한글 독음
+  speakLyric(c.lyrics, c.lang, 1, c.read);
+  await new Promise(r=>setTimeout(r,300));
+  return rec;
+});
+P(fb.length===1 && fb[0].lang==='ko-KR', `중국어 음성 없음 → 한글 독음을 ko-KR로 낭독 (${fb.map(r=>r.lang).join(',')})`);
+P(fb[0] && /워 메이여우/.test(fb[0].text), `독음 텍스트로 대체됨: "${(fb[0]||{}).text||''}"`);
+
 // 음성 준비 확인: 필요한 언어 산출 + 누락 경고(중국어 음성 없음 가정)
 const vc=await pg.evaluate(()=>{
   const need=[...neededLangs()].sort();
@@ -96,6 +111,6 @@ const vc=await pg.evaluate(()=>{
   return { need, html:document.getElementById('voice-check-body').innerHTML };
 });
 P(['ko','en','zh'].every(l=>vc.need.includes(l)), `neededLangs 스테이징: [${vc.need}] (ko·en·zh 포함)`);
-P(/중국어/.test(vc.html) && /없어요/.test(vc.html), '중국어 음성 없을 때 시작 전 경고 표시');
+P(/중국어/.test(vc.html) && /독음|괜찮/.test(vc.html), '중국어 음성 없을 때 한글 독음 대체 안내 표시');
 P(/Windows/.test(vc.html), 'Windows 음성 설치 안내 포함');
 console.log('done'); await b.close();

@@ -27,6 +27,8 @@ data.songs.push({ id: a.id, name: a.name, part: a.part || "1절 벌스", diff })
 data.content[a.id] = { lyrics: a.lyrics || "", mv: a.mv || "", time: a.time || "" };
 // 언어(TTS): 보통 가사 문자로 자동 인식(한/영/중/일). 중국어·일본어처럼 확실히 할 땐 --lang zh|ja|en|ko 로 고정.
 if (a.lang && ["ko", "en", "zh", "ja"].includes(a.lang)) data.content[a.id].lang = a.lang;
+// 한글 독음(--read): 원어 음성팩이 없는 기기에서 한국어 음성으로 대체 낭독할 텍스트(비한국어 곡 권장).
+if (a.read) data.content[a.id].read = String(a.read);
 if (a.year || a.type) data.album[a.id] = { year: a.year ? parseInt(a.year, 10) : undefined, type: a.type || undefined };
 
 // 테스트용 목록에 등록

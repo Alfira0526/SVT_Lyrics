@@ -333,6 +333,17 @@
   .mode-card .nm{font-weight:800;font-size:14px;margin-top:5px;color:var(--txt)}
   .mode-card.sel .nm{color:var(--rose-ink)}
   .mode-card .ds{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+  /* 무한(서바이벌) 게임오버 오버레이 */
+  .io-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(60,40,80,.5);backdrop-filter:blur(4px)}
+  .io-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 20px 50px rgba(120,80,160,.3);animation:pop .4s ease-out}
+  .io-emoji{font-size:48px;line-height:1}
+  .io-title{font-size:20px;font-weight:900;margin-top:8px;color:var(--rose-ink)}
+  .io-score{font-size:46px;font-weight:900;color:var(--txt);margin:10px 0 0}
+  .io-score span{font-size:16px;font-weight:700;color:var(--muted);margin-left:6px}
+  .io-best{font-size:14px;color:var(--serene-ink);font-weight:800;margin-top:4px}
+  .io-miss{font-size:13px;color:var(--muted);margin-top:10px}
+  .io-btns{display:flex;gap:8px;margin-top:18px}
+  .io-btns .btn{flex:1}
   .setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:10px}
   .setup-tip{font-size:12.5px;line-height:1.6;color:#574F70;background:rgba(150,120,190,.08);border-radius:9px;padding:9px 12px;margin-top:11px}
   .setup-tip b{color:var(--rose-ink);font-weight:800}
@@ -1486,9 +1497,11 @@ function pickMc(i){
   btns[i].classList.add(ok?"correct":"wrong");
   marks[order[pos]]=ok?"correct":"wrong";   // 혼자 플레이: 고른 즉시 정답/오답 자동 집계
   updateCounters();
+  const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
   toast(ok?"✔ 정답!":"✘ 오답");
   showAnswer();
+  if(isInfinite() && !ok) infiniteGameOver(survived);   // 서바이벌: 한 번 틀리면 종료
 }
 /* --- 팀전: 팀별 순차 선택 --- */
 function renderTeamRound(){
@@ -1571,7 +1584,7 @@ function buildOrder(shuffle, exclude){
   let list=songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
   if(exclude && exclude.size) list=list.filter(k=>!exclude.has(k));
   if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).flatMap(expandKeys); if(exclude&&exclude.size) list=list.filter(k=>!exclude.has(k)); }   // 범위가 비면 전체로 폴백
-  const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
+  const doShuffle = shuffle || (quizCount!=null) || config.mode==="infinite";   // 문제 수 제한·무한모드 시 항상 랜덤
   if(doShuffle){
     if(quizUnitBoost){
       // 유닛곡 가중치 2배 → 부분 출제 시 유닛곡이 더 자주 뽑힘
@@ -1581,8 +1594,18 @@ function buildOrder(shuffle, exclude){
       for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
     }
   }
-  if(quizCount!=null && quizCount>0) list=list.slice(0, quizCount);
+  if(quizCount!=null && quizCount>0 && config.mode!=="infinite") list=list.slice(0, quizCount);   // 무한모드는 무제한
   order=list; pos=0;
+}
+function isInfinite(){ return config.mode==="infinite"; }
+// 무한모드: order 끝에서 새 배치를 이어붙임(직전 곡 연속 방지).
+function refillInfinite(){
+  const last=order.length?idOf(order[order.length-1]):null;
+  let batch=songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
+  if(!batch.length) batch=songs.map(s=>s.id).flatMap(expandKeys);
+  for(let i=batch.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [batch[i],batch[j]]=[batch[j],batch[i]]; }
+  if(batch.length>1 && idOf(batch[0])===last){ [batch[0],batch[1]]=[batch[1],batch[0]]; }
+  order=order.concat(batch);
 }
 function startNewGame(shuffle){
   marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
@@ -1945,7 +1968,10 @@ function startTimer(){
     els.timerFill.style.width=pct+"%";
     els.timerFill.className = timerLeft<=3?"danger":(timerLeft<=Math.ceil(config.timerSec/2)?"warn":"");
     if(timerLeft<=3 && timerLeft>0) sfxTick();   // 카운트다운 긴장(3·2·1)
-    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료!"); if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()) showAnswer(); }
+    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료!");
+      if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()) showAnswer();
+      if(isInfinite() && !answerShown()){ marks[order[pos]]="wrong"; updateCounters(); const survived=streak; bumpStreak(false); showAnswer(); infiniteGameOver(survived); }
+    }
   };
   els.timerFill.style.width=(timerLeft/config.timerSec*100)+"%";
   timerHandle=setInterval(tick,1000);
@@ -2021,8 +2047,36 @@ function mark(kind){
   setTimeout(next,350);
 }
 function goResult(){ if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }
-function next(){ stopTTS(); stopTimer(); if(pos<order.length-1){ pos++; renderGame(); } else { goResult(); } }   // 마지막 문항 다음 = 자동으로 결과 화면
+function next(){ stopTTS(); stopTimer();
+  if(pos>=order.length-1 && isInfinite()){ refillInfinite(); }   // 무한: 끝에서 새 배치 이어붙임
+  if(pos<order.length-1){ pos++; renderGame(); } else { goResult(); }
+}   // 마지막 문항 다음 = (무한 아니면) 결과 화면
 function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
+// 무한(서바이벌) 게임오버: 연속 기록 표시·최고기록 경신·다시 도전.
+function infiniteGameOver(n){
+  stopTimer(); stopTTS();
+  const missed=order.length?songById(order[pos]):null;
+  if(els.video) els.video.innerHTML="";   // 배경 영상/소리 정지
+  let best=0, isNew=false;
+  try{ const st=loadStats(); st.best=st.best||{rate:0,streak:0}; best=st.best.streak||0;
+    if(n>best){ st.best.streak=n; best=n; isNew=true; saveStats(st); } }catch(e){}
+  let ov=document.getElementById("infinite-over");
+  if(!ov){ ov=document.createElement("div"); ov.id="infinite-over"; ov.className="io-overlay"; document.body.appendChild(ov); }
+  ov.innerHTML=`<div class="io-card">
+    <div class="io-emoji">${isNew?"🎉":"💀"}</div>
+    <div class="io-title">${isNew?"최고기록 경신!":"게임 오버"}</div>
+    <div class="io-score">${n}<span>곡 연속</span></div>
+    <div class="io-best">🏆 최고기록 ${best}곡</div>
+    <div class="io-miss">${missed?("정답: <b>"+escapeHtml(missed.name)+"</b>"):""}</div>
+    <div class="io-btns">
+      <button class="btn btn-play" id="io-retry">🔄 다시 도전</button>
+      <button class="btn btn-ghost" id="io-quit">🏠 그만두기</button>
+    </div></div>`;
+  ov.style.display="flex";
+  document.getElementById("io-retry").onclick=()=>{ ov.style.display="none"; restartInfinite(); };
+  document.getElementById("io-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
+}
+function restartInfinite(){ stopTTS(); stopTimer(); startNewGame(true); renderGame(); }
 
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
 els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });

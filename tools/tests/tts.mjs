@@ -69,6 +69,20 @@ await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTim
 const beat=await pg.evaluate(()=>{ const c=getC('s67'); return makeUtterance(c.lyrics, c.lang).text; });
 P(!beat.includes('/'), `s67 BEAT 낭독 슬래시 없음: "${beat.slice(0,40)}…"`);
 
+// speakLyric 체인: 혼합 가사가 onend로 순차 재생되어 구간마다 다른 음성 utterance가 나오는지(런타임)
+const chain=await pg.evaluate(async ()=>{
+  const rec=[];
+  const real=speechSynthesis.speak.bind(speechSynthesis);
+  speechSynthesis.speak=(u)=>{ rec.push({lang:u.lang,text:u.text}); setTimeout(()=>u.onend&&u.onend(),0); };  // 재생완료 흉내로 체인 구동
+  const c=getC('s66'); speakLyric(c.lyrics, c.lang, 1);
+  await new Promise(r=>setTimeout(r,400));
+  speechSynthesis.speak=real;
+  return rec;
+});
+P(chain.length===2, `speakLyric 체인: s66이 2개 utterance로 순차 재생(${chain.length})`);
+P(chain[0]&&chain[0].lang==='ko-KR' && chain[1]&&chain[1].lang==='en-US', `체인 순서/언어: ${chain.map(r=>r&&r.lang).join(' → ')}`);
+P(chain.every(r=>!r.text.includes('/')), '체인 각 구간에 슬래시 없음');
+
 // 실제 스테이징 데이터: s69 8DM은 lang=zh → zh-CN 로 낭독
 await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });

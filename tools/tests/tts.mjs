@@ -113,4 +113,24 @@ const vc=await pg.evaluate(()=>{
 P(['ko','en','zh'].every(l=>vc.need.includes(l)), `neededLangs 스테이징: [${vc.need}] (ko·en·zh 포함)`);
 P(/중국어/.test(vc.html) && /독음|괜찮/.test(vc.html), '중국어 음성 없을 때 한글 독음 대체 안내 표시');
 P(/Windows/.test(vc.html), 'Windows 음성 설치 안내 포함');
+// ttsPlan: 음성 유무별 낭독 계획 + 무음 방지(해외 시나리오)
+const plan=await pg.evaluate(()=>{
+  const out={};
+  speechSynthesis.getVoices=()=>[{lang:'ko-KR',name:'K'}]; pickVoice();   // 한국어 음성만
+  out.zhWithKo=ttsPlan(getC('s69'));   // 중국어곡+독음 → read
+  out.koOnly=ttsPlan(getC('s61'));     // 한국어곡 → orig
+  speechSynthesis.getVoices=()=>[{lang:'en-US',name:'E'}]; pickVoice();   // 한국어 음성 없음(해외)
+  out.koNoVoice=ttsPlan(getC('s61'));  // 한국어곡 낭독 불가 → none(자막 대체)
+  out.zhNoKo=ttsPlan(getC('s69'));     // 독음도 koVoice 필요 → none
+  return out;
+});
+P(plan.zhWithKo==='read', `ttsPlan 중국어곡+한국어음성 → read (${plan.zhWithKo})`);
+P(plan.koOnly==='orig', `ttsPlan 한국어곡 → orig (${plan.koOnly})`);
+P(plan.koNoVoice==='none', `ttsPlan 한국어음성 없음(해외) → none·자막대체 (${plan.koNoVoice})`);
+P(plan.zhNoKo==='none', `ttsPlan 한국어음성 없어 독음도 불가 → none (${plan.zhNoKo})`);
+
+// s68 숫자: read에 원문 숫자 유지 → forSpeech가 한 자리씩 낭독
+const s68r=await pg.evaluate(()=>makeUtterance(getC('s68').read,'ko').text);
+P(/1 2 3 4 5 6/.test(s68r), `s68 독음 숫자 낭독됨: "…${s68r.slice(-22)}"`);
+
 console.log('done'); await b.close();

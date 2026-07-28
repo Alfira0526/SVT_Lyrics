@@ -1861,11 +1861,30 @@ function scheduleAutoTTS(){
   autoTTSHandle=setTimeout(()=>{ autoTTSHandle=null; speak(); }, 2000);
 }
 function stopTTS(){ clearAutoTTS(); ttsToken++; if("speechSynthesis" in window) speechSynthesis.cancel(); }
+// 이 곡을 낭독할 수단이 있는가: "orig"(원어 음성 있음) / "read"(독음 대체 가능) / "none"(불가).
+// 해외 등에서 한국어 음성조차 없으면 "none" → 무음 대신 가사 자막을 보여준다.
+function ttsPlan(c){
+  if(!c || !(c.lyrics||"").trim()) return "none";
+  if(!("speechSynthesis" in window)) return "none";
+  if(!(koVoice||enVoice||zhVoice||jaVoice)) pickVoice();
+  if(speechSynthesis.getVoices().length===0) return "orig";   // 아직 로딩 중 — 일단 시도
+  const segs=(c.lang && LANG_BCP[c.lang]) ? [{lang:c.lang}] : segmentByLang(c.lyrics);
+  if(segs.every(s=>voiceForLang(s.lang))) return "orig";
+  if((c.read||"").trim() && koVoice) return "read";
+  return "none";
+}
 function speak(){
   if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
   if(order.length===0) return;
   const c=getC(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
+  if(ttsPlan(c)==="none"){
+    // 낭독 수단 없음(예: 해외 기기에 한국어 음성 없음) → 무음 대신 가사 노출 + 안내
+    if(els.lyricbox) els.lyricbox.classList.remove("hidden-mode");
+    if(els.hidenote) els.hidenote.style.display="none";
+    if(!speak._noVoiceToasted){ toast("이 기기엔 맞는 음성이 없어 낭독 대신 가사를 보여드려요 🙂"); speak._noVoiceToasted=true; }
+    return;
+  }
   stopTTS();
   speakLyric(text, c.lang, parseFloat(els.speed.value), c.read);   // 혼합=구간별 낭독 / 원어 음성 없으면 한글 독음(read) 대체
 }

@@ -1113,7 +1113,7 @@ function recordStats(){
     if(st.sessions.length>STATS_MAX) st.sessions.length=STATS_MAX;
     const mc=st.modeCounts[mode]||(st.modeCounts[mode]={games:0,served:0,correct:0,wrong:0});
     mc.games++; mc.served+=answered; mc.correct+=c; mc.wrong+=w;
-    for(const k in marks){ const v=marks[k]; if(v!=="correct"&&v!=="wrong") continue; const ss=st.songStats[k]||(st.songStats[k]={served:0,correct:0}); ss.served++; if(v==="correct") ss.correct++; }
+    for(const k in marks){ const v=marks[k]; if(v!=="correct"&&v!=="wrong") continue; const sid=idOf(k); const ss=st.songStats[sid]||(st.songStats[sid]={served:0,correct:0}); ss.served++; if(v==="correct") ss.correct++; }
     // 개인 최고기록(정답률·최다 연속)
     st.best = st.best || {rate:0, streak:0};
     newBestFlag=false;
@@ -1291,6 +1291,20 @@ function resetToDefault(doSave){
 }
 function newId(){ return "u"+(++uidCounter); }
 function getC(id){ if(!content[id]) content[id]={lyrics:"",mv:"",time:""}; return content[id]; }
+/* ── 문항 키(variants) ── 곡당 여러 문제. 키는 "s60"(기본) 또는 "s60#1"(변형). marks·order는 이 키를 씀. */
+function idOf(k){ return String(k).split("#")[0]; }                          // 문항키 → 곡 id
+function viOf(k){ const p=String(k).split("#"); return p.length>1?(parseInt(p[1],10)||0):0; }  // 변형 인덱스(0=기본)
+// 곡을 문항 키 배열로 확장: [id, id#1, ...] (content[id].variants 개수만큼)
+function expandKeys(id){ const c=content[id]; const n=(c&&Array.isArray(c.variants))?c.variants.length:0; const out=[id]; for(let i=1;i<=n;i++) out.push(id+"#"+i); return out; }
+// 문항 콘텐츠(변형 반영): 변형은 lyrics/mv/time/read/lang을 부분 override, 없으면 곡 기본값으로 폴백.
+function qc(k){
+  const base=getC(idOf(k)), vi=viOf(k);
+  if(!vi) return base;
+  const v=(base.variants&&base.variants[vi-1])||{};
+  const pick=(a,b)=> (a!=null && a!=="") ? a : b;
+  return { lyrics: (v.lyrics!=null?v.lyrics:base.lyrics), mv: pick(v.mv,base.mv), time: pick(v.time,base.time),
+           read: (v.read!=null?v.read:base.read), lang: pick(v.lang,base.lang) };
+}
 function isFilled(id){ const c=content[id]; return !!(c && c.lyrics && c.lyrics.trim()); }
 
 /* ---- 유틸 ---- */
@@ -1356,7 +1370,7 @@ const els={
   timerFill:document.getElementById("g-timer-fill"),
 };
 
-function songById(id){ return songs.find(s=>s.id===id); }
+function songById(id){ const b=idOf(id); return songs.find(s=>s.id===b); }   // 문항키("s60#1")도 곡으로 해석
 
 /* ---- 3단계 힌트 (곡 메타에서 자동 생성) ---- */
 const CHOSEONG=["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
@@ -1538,16 +1552,16 @@ function scopeSummary(){
 }
 
 function buildOrder(shuffle, exclude){
-  let list=songs.map(s=>s.id);
-  if(exclude && exclude.size) list=list.filter(id=>!exclude.has(id));
-  list=list.filter(songInScope);
-  if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).filter(id=>!(exclude&&exclude.has(id))); }   // 범위가 비면 전체로 폴백
+  // 범위 내 곡 → 문항 키로 확장(곡당 variants 개수만큼 문제) → 제외(이미 출제분) 필터
+  let list=songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
+  if(exclude && exclude.size) list=list.filter(k=>!exclude.has(k));
+  if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).flatMap(expandKeys); if(exclude&&exclude.size) list=list.filter(k=>!exclude.has(k)); }   // 범위가 비면 전체로 폴백
   const doShuffle = shuffle || (quizCount!=null);   // 문제 수 제한 시 항상 랜덤
   if(doShuffle){
     if(quizUnitBoost){
       // 유닛곡 가중치 2배 → 부분 출제 시 유닛곡이 더 자주 뽑힘
-      list = list.map(id=>({id, k:Math.pow(Math.random(), 1/(isUnitSong(songById(id))?2:1))}))
-                 .sort((a,b)=>b.k-a.k).map(o=>o.id);
+      list = list.map(k=>({k, r:Math.pow(Math.random(), 1/(isUnitSong(songById(k))?2:1))}))
+                 .sort((a,b)=>b.r-a.r).map(o=>o.k);
     }else{
       for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
     }
@@ -1589,7 +1603,7 @@ function renderGame(){
     els.bar.style.width="0%"; hideAnswer(); stopTimer(); resetHints(); buildMcOptions(); renderMc(); return;
   }
   if(pos>=total) pos=total-1; if(pos<0) pos=0;
-  const id=order[pos]; const song=songById(id); const c=getC(id);
+  const id=order[pos]; const song=songById(id); const c=qc(id);
 
   els.index.textContent=pos+1;
   els.badge.className=badgeClass(song.diff); els.badge.textContent=song.diff;
@@ -1641,7 +1655,7 @@ function hideAnswer(){ els.answer.classList.remove("show"); els.video.innerHTML=
 
 function renderVideo(){
   if(order.length===0) return;
-  const c=getC(order[pos]);
+  const c=qc(order[pos]);
   const vid=parseYouTube(c.mv);
   const reloadBtn=document.getElementById("g-video-reload");
   if(vid){
@@ -1861,7 +1875,7 @@ function scheduleAutoTTS(){
   const gv=document.getElementById("view-game");
   if(!gv || !gv.classList.contains("active")) return;   // 게임 화면일 때만
   if(order.length===0) return;
-  const c=getC(order[pos]); if(!c || !(c.lyrics||"").trim()) return;   // 가사 있을 때만
+  const c=qc(order[pos]); if(!c || !(c.lyrics||"").trim()) return;   // 가사 있을 때만
   autoTTSHandle=setTimeout(()=>{ autoTTSHandle=null; speak(); }, 2000);
 }
 function stopTTS(){ clearAutoTTS(); ttsToken++; if("speechSynthesis" in window) speechSynthesis.cancel(); }
@@ -1880,7 +1894,7 @@ function ttsPlan(c){
 function speak(){
   if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
   if(order.length===0) return;
-  const c=getC(order[pos]); const text=(c.lyrics||"").trim();
+  const c=qc(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
   if(ttsPlan(c)==="none"){
     // 낭독 수단 없음(예: 해외 기기에 한국어 음성 없음) → 무음 대신 가사 노출 + 안내
@@ -2467,7 +2481,7 @@ const Room = (function(){
   function maybeAutoReveal(qid){ if(host.phase!=="playing"||qid!==pos) return; if(!answerShown() && allAnswered(qid)) showAnswer(); }
   function hostState(){
     if(order.length===0) return null;
-    const c=getC(order[pos]);
+    const c=qc(order[pos]);
     return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
       lyric:(c.lyrics||"").trim(), lang:c.lang||"", read:c.read||"",
       options:mcOptions.map(o=>o.name),
@@ -2487,7 +2501,7 @@ const Room = (function(){
     Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]) host.roster[tid].score+=1; any=true; } });
     marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
     updateCounters();
-    const song=songById(order[pos]); const c=getC(order[pos]);
+    const song=songById(order[pos]); const c=qc(order[pos]);
     host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
     hostBar();
   }

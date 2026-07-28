@@ -55,6 +55,20 @@ P(!spk.a.includes('/'), '낭독 텍스트에 슬래시 없음(구간1)');
 P(!spk.b.includes('/') && !spk.b.includes('·'), '낭독 텍스트에 / · 없음');
 P(spk.fs==='가, 나, 다, 라', `forSpeech 구분자→쉼표: "${spk.fs}"`);
 
+// 숫자: 3자리+ 는 한 자리씩, 2자리(12월 등)는 유지
+const num=await pg.evaluate(()=>({
+  a:forSpeech('123456'), b:forSpeech('015B'), c:forSpeech('12월'), d:forSpeech('나는 7위')
+}));
+P(num.a==='1 2 3 4 5 6', `123456 → "${num.a}"`);
+P(num.b==='0 1 5B', `015B → "${num.b}"`);
+P(num.c==='12월', `12월 유지 → "${num.c}"`);
+P(num.d==='나는 7위', `한 자리 숫자 유지 → "${num.d}"`);
+
+// 실제 스테이징 데이터: s67 BEAT(영어+슬래시) 낭독 텍스트에 슬래시 없음(현재 빌드 확인 — 캐시 아닌 코드 검증)
+await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
+const beat=await pg.evaluate(()=>{ const c=getC('s67'); return makeUtterance(c.lyrics, c.lang).text; });
+P(!beat.includes('/'), `s67 BEAT 낭독 슬래시 없음: "${beat.slice(0,40)}…"`);
+
 // 실제 스테이징 데이터: s69 8DM은 lang=zh → zh-CN 로 낭독
 await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });

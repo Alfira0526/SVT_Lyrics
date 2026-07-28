@@ -64,6 +64,20 @@ export function validateData(data) {
       // 비한국어(영/중/일) 가사인데 한글 독음(read)이 없으면 경고 — 원어 음성 없는 기기에서 무음 위험.
       if (c.lyrics && /[A-Za-z一-鿿぀-ヿ]/.test(c.lyrics) && !(c.read && String(c.read).trim()))
         W(`[${s.id} ${s.name}] 비한국어 가사인데 한글 독음(read) 없음 — 원어 음성 없는 기기에서 낭독 안 됨(add-song --read)`);
+
+      // 변형(variants) — 곡당 여러 문제. 각 변형도 가사·MV·독음 검증.
+      if (c.variants != null) {
+        if (!Array.isArray(c.variants)) E(`[${s.id} ${s.name}] variants가 배열이 아님`);
+        else c.variants.forEach((v, vi) => {
+          const tag = `${s.id}#${vi + 1} ${s.name}(변형${vi + 1})`;
+          if (!v || typeof v !== "object") { E(`[${tag}] 변형 항목이 객체가 아님`); return; }
+          if (!v.lyrics || !String(v.lyrics).trim()) W(`[${tag}] 변형 가사(lyrics) 비어 있음`);
+          if (v.mv && parseYouTube(v.mv) === null) E(`[${tag}] 변형 MV 주소 파싱 불가: ${v.mv}`);
+          if (v.time && Number.isNaN(parseTime(v.time))) W(`[${tag}] 변형 시작 시간 파싱 불가: ${v.time}`);
+          if (v.lyrics && /[A-Za-z一-鿿぀-ヿ]/.test(v.lyrics) && !((v.read && String(v.read).trim()) || (c.read && String(c.read).trim())))
+            W(`[${tag}] 비한국어 변형인데 한글 독음(read) 없음`);
+        });
+      }
     }
 
     const a = album[s.id];

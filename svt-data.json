@@ -1,5 +1,5 @@
 {
-  "rev": 1785077830072,
+  "rev": 1785204165141,
   "songs": [
     {
       "id": "s2",
@@ -336,6 +336,36 @@
       "name": "STUPID IDIOT",
       "part": "벌스 · 호시X우지",
       "diff": "신곡"
+    },
+    {
+      "id": "s66",
+      "name": "Friend",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s67",
+      "name": "BEAT",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s68",
+      "name": "컬러링 (Coloring)",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s69",
+      "name": "8DM",
+      "part": "벌스 · 디에잇 솔로 · V8 신곡",
+      "diff": "신곡"
+    },
+    {
+      "id": "s70",
+      "name": "rat race",
+      "part": "벌스 · V8 · 버논X디에잇 신곡",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -618,6 +648,37 @@
       "lyrics": "오늘은 밤새 노세 가득 채우고 건배 건배",
       "mv": "https://youtu.be/hbZZmSb2I-s",
       "time": "0:10"
+    },
+    "s66": {
+      "lyrics": "내가 헛스윙해도 / You make me feel like I hit it home",
+      "mv": "https://youtu.be/ecVL81Jmqdk",
+      "time": "1:30",
+      "read": "내가 헛스윙해도 / 유 메익 미 필 라익 아이 힛 잇 홈"
+    },
+    "s67": {
+      "lyrics": "I bring the FX, you bring the beat / I just wanna put you on repeat",
+      "mv": "https://youtu.be/iOJsBt2alcU",
+      "time": "0:28",
+      "read": "아이 브링 더 에프엑스, 유 브링 더 비트 / 아이 저스트 워너 풋 유 온 리핏"
+    },
+    "s68": {
+      "lyrics": "Sorry, can we make up again 어제같이 / 123456, 다시 015B",
+      "mv": "https://youtu.be/SimiV3tJJOU",
+      "time": "1:14",
+      "read": "쏘리, 캔 위 메익 업 어게인 어제같이 / 123456, 다시 015B"
+    },
+    "s69": {
+      "lyrics": "我没有时间试探 / 我没有兴趣计算",
+      "mv": "https://youtu.be/dNimGCqZOI0",
+      "time": "1:00",
+      "lang": "zh",
+      "read": "워 메이요우 스지엔 스탄 / 워 메이요우 싱취 지쑤안"
+    },
+    "s70": {
+      "lyrics": "Tryna make a smash hit / ‘Til I’m in the casket",
+      "mv": "https://youtu.be/4dDKFQwRKmw",
+      "time": "0:42",
+      "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
     }
   },
   "album": {
@@ -844,6 +905,26 @@
     "s65": {
       "year": 2025,
       "type": "싱글"
+    },
+    "s66": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s67": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s68": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s69": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s70": {
+      "year": 2026,
+      "type": "미니"
     }
   },
   "config": {
@@ -861,6 +942,13 @@
     "autoInterval": 20,
     "onlineRoom": false,
     "fbUrl": "",
-    "quizOnly": false
+    "quizOnly": false,
+    "hideLyrics": false,
+    "sfx": true,
+    "stage": false,
+    "scope": {
+      "by": "test",
+      "val": "1"
+    }
   }
 }

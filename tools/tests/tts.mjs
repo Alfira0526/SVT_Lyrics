@@ -101,7 +101,7 @@ const fb=await pg.evaluate(async ()=>{
   return rec;
 });
 P(fb.length===1 && fb[0].lang==='ko-KR', `중국어 음성 없음 → 한글 독음을 ko-KR로 낭독 (${fb.map(r=>r.lang).join(',')})`);
-P(fb[0] && /워 메이여우/.test(fb[0].text), `독음 텍스트로 대체됨: "${(fb[0]||{}).text||''}"`);
+P(fb[0] && /워 메이요우/.test(fb[0].text), `독음 텍스트로 대체됨: "${(fb[0]||{}).text||''}"`);
 
 // 음성 준비 확인: 필요한 언어 산출 + 누락 경고(중국어 음성 없음 가정)
 const vc=await pg.evaluate(()=>{

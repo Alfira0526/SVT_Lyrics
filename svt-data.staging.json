@@ -1,5 +1,5 @@
 {
-  "rev": 1785203437647,
+  "rev": 1785204165141,
   "songs": [
     {
       "id": "s2",
@@ -653,7 +653,7 @@
       "lyrics": "내가 헛스윙해도 / You make me feel like I hit it home",
       "mv": "https://youtu.be/ecVL81Jmqdk",
       "time": "1:30",
-      "read": "내가 헛스윙해도 / 유 메이크 미 필 라이크 아이 힛 잇 홈"
+      "read": "내가 헛스윙해도 / 유 메익 미 필 라익 아이 힛 잇 홈"
     },
     "s67": {
       "lyrics": "I bring the FX, you bring the beat / I just wanna put you on repeat",
@@ -665,20 +665,20 @@
       "lyrics": "Sorry, can we make up again 어제같이 / 123456, 다시 015B",
       "mv": "https://youtu.be/SimiV3tJJOU",
       "time": "1:14",
-      "read": "쏘리, 캔 위 메이크 업 어게인 어제같이 / 123456, 다시 015B"
+      "read": "쏘리, 캔 위 메익 업 어게인 어제같이 / 123456, 다시 015B"
     },
     "s69": {
       "lyrics": "我没有时间试探 / 我没有兴趣计算",
       "mv": "https://youtu.be/dNimGCqZOI0",
       "time": "1:00",
       "lang": "zh",
-      "read": "워 메이여우 스지엔 스탄 / 워 메이여우 싱취 지쏸"
+      "read": "워 메이요우 스지엔 스탄 / 워 메이요우 싱취 지쑤안"
     },
     "s70": {
       "lyrics": "Tryna make a smash hit / ‘Til I’m in the casket",
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:42",
-      "read": "트라이나 메이크 어 스매시 힛 / 틸 아임 인 더 캐스킷"
+      "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
     }
   },
   "album": {
@@ -950,12 +950,5 @@
       "by": "test",
       "val": "1"
     }
-  },
-  "_test": [
-    "s66",
-    "s67",
-    "s68",
-    "s69",
-    "s70"
-  ]
+  }
 }

@@ -21,4 +21,8 @@ P(await pg.evaluate(()=>config.mode==='infinite' && config.teamMode===false), '�
 // 일반 복귀
 await pg.click('.mode-card[data-mode="normal"]'); await pg.waitForTimeout(150);
 P(await pg.evaluate(()=>config.mode==='normal'), '일반 복귀');
+
+// 텔레메트리: statsModeLabel이 모드를 반영(모드별 이용율)
+const lab=await pg.evaluate(()=>({ n:statsModeLabel({mode:'normal',mc:true}), b:statsModeLabel({mode:'battle',teamMode:true,mc:true}), i:statsModeLabel({mode:'infinite',mc:true}) }));
+P(lab.n.startsWith('일반') && lab.b.startsWith('대결') && lab.i.startsWith('무한'), `모드별 라벨: ${lab.n} / ${lab.b} / ${lab.i}`);
 console.log('done'); await b.close();

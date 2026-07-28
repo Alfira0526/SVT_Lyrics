@@ -1128,8 +1128,10 @@ function loadStats(){
 }
 function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 통계를 저장하지 못했어요"); } }
 function statsModeLabel(cfg){
-  if(cfg.onlineRoom) return "온라인 방";
-  let s = cfg.teamMode ? "팀전" : "솔로";
+  const M={normal:"일반", battle:"대결", infinite:"무한"};
+  let s = M[cfg.mode] || "일반";          // 모드별 이용율(QA 지표)을 위해 게임 모드를 맨 앞에
+  if(cfg.onlineRoom) return s+"·온라인 방";
+  s += cfg.teamMode ? "·팀전" : "·솔로";
   if(cfg.autoHost) s+="·자동";
   if(cfg.quizOnly) s+="·문제만";
   s += cfg.mc ? "·4지선다" : "·주관식";
@@ -2065,6 +2067,7 @@ function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
 // 무한(서바이벌) 게임오버: 연속 기록 표시·최고기록 경신·다시 도전.
 function infiniteGameOver(n){
   stopTimer(); stopTTS();
+  if(!gameRecorded && recordStats()) gameRecorded=true;   // 모드별 이용율·정답률 적재
   const missed=order.length?songById(order[pos]):null;
   if(els.video) els.video.innerHTML="";   // 배경 영상/소리 정지
   let best=0, isNew=false;
@@ -2097,6 +2100,7 @@ function battleVictory(){
     toast("🔥 동점! 서든데스 1문항"); if(pos>=order.length-1) refillInfinite(); pos++; renderGame(); return;
   }
   stopTTS(); stopTimer(); if(els.video) els.video.innerHTML="";
+  if(!gameRecorded && recordStats()) gameRecorded=true;   // 모드별 이용율·정답률 적재
   let ov=document.getElementById("battle-over");
   if(!ov){ ov=document.createElement("div"); ov.id="battle-over"; ov.className="io-overlay"; document.body.appendChild(ov); }
   const board=ranked.map((r,idx)=>`<div class="bv-row${idx===0&&!isTie?" win":""}"><span class="bv-rank">${idx===0&&!isTie?"🏆":(idx+1)}</span><span class="bv-nm">${escapeHtml(r.nm)}</span><span class="bv-sc">${r.score}</span></div>`).join("");

@@ -531,6 +531,11 @@
       <div class="setup-tip">켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개 제출</b> → 방장 화면 자동 채점.<br><b>원격(다른 공간)</b>도 지원: 참가자 폰이 가사·힌트·듣기·타이머·정답 MV를 모두 받습니다. 전송은 <b>같은 브라우저=즉시</b>, <b>다른 기기=공개 릴레이(베스트에포트)</b>.<br>🔒 <b>안정적 원격</b>이 필요하면 무료 <b>Firebase Realtime DB</b> 주소를 넣으세요(규칙 test 모드). 넣으면 그 경로로 확실히 동기화되고, 비우면 공개 릴레이로 동작합니다.</div>
     </div>
 
+    <div class="setup-card" id="voice-check-card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">🔊 음성(TTS) 준비 확인</div>
+      <div id="voice-check-body" style="font-size:13px;line-height:1.65;color:var(--muted)">확인 중…</div>
+    </div>
+
     <div class="setup-actions">
       <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
       <button class="intro-start" id="setup-start" style="flex:1;padding:15px">▶ 게임 시작</button>
@@ -1709,7 +1714,7 @@ function pickVoice(){
   zhVoice=vs.find(v=>v.lang==="zh-CN")||vs.find(v=>L(v).startsWith("zh"))||null;   // 중국어 가사용(예: 디에잇 솔로)
   jaVoice=vs.find(v=>v.lang==="ja-JP")||vs.find(v=>L(v).startsWith("ja"))||null;   // 일본어 가사용(향후 일본곡)
 }
-if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=()=>{ pickVoice(); try{ renderVoiceCheck(); }catch(e){} }; }
 const LANG_BCP={ ko:"ko-KR", en:"en-US", zh:"zh-CN", ja:"ja-JP" };
 // 가사 문자로 언어 판별: 가나→일본어, 한글→(영어 압도적이면 영어)한국어, 한자만→중국어, 그 외 라틴→영어.
 function detectLang(s){
@@ -1808,6 +1813,36 @@ function ttsDiag(){
     "· 중국어: "+pick(zhVoice),
     "· 일본어: "+pick(jaVoice),
   ].join("\n"));
+}
+// 현재 곡 데이터가 실제로 쓰는 언어 집합(가사 문자·lang override 기준).
+function neededLangs(){
+  const set=new Set();
+  for(const s of songs){
+    const c=content[s.id]; if(!c || !(c.lyrics||"").trim()) continue;
+    if(c.lang && LANG_BCP[c.lang]){ set.add(c.lang); continue; }
+    for(const seg of segmentByLang(c.lyrics)) set.add(seg.lang);
+  }
+  return set;
+}
+// 설정 화면: 시작 전 필요한 언어 음성이 이 기기에 있는지 안내(없으면 설치 방법).
+function renderVoiceCheck(){
+  const body=document.getElementById("voice-check-body"); if(!body) return;
+  if(!("speechSynthesis" in window)){ body.innerHTML="이 브라우저는 음성 낭독(TTS)을 지원하지 않습니다. Chrome/Edge를 권장해요."; return; }
+  pickVoice();
+  const NAMES={ko:"한국어",en:"영어",zh:"중국어",ja:"일본어"}, V={ko:koVoice,en:enVoice,zh:zhVoice,ja:jaVoice};
+  const need=["ko","en","zh","ja"].filter(l=>neededLangs().has(l));
+  if(!speechSynthesis.getVoices().length){ body.innerHTML="음성 목록을 불러오는 중… <span style='color:var(--muted)'>잠시 후 자동 갱신됩니다.</span>"; return; }
+  const rows=need.map(l=>(V[l]?"✅ ":"⚠️ ")+NAMES[l]);
+  const missing=need.filter(l=>!V[l]);
+  let html="이 문제 세트에 필요한 음성: <b>"+rows.join(" · ")+"</b>";
+  if(missing.length){
+    html+="<br><span style='color:var(--amber);font-weight:700'>⚠️ "+missing.map(l=>NAMES[l]).join("·")+" 음성이 이 기기에 없어요.</span> 해당 언어 가사는 제대로 낭독되지 않습니다(다른 음성으로 대체됨).";
+    html+="<br><b>Windows</b>: 설정 → <b>시간 및 언어</b> → <b>언어 및 지역</b> → <b>언어 추가</b>(중국어(간체)·일본어 등) → 추가한 언어의 <b>⋯ → 언어 옵션</b>에서 <b>음성</b> 설치 → <b>브라우저 재시작</b>.";
+    html+="<br><span style='color:var(--muted)'>설치 후 이 화면을 다시 열거나 새로고침하면 ✅로 바뀝니다. (한국어 가사만 쓰면 무시해도 됩니다.)</span>";
+  } else {
+    html+="<br>✅ 필요한 음성이 모두 준비됐어요.";
+  }
+  body.innerHTML=html;
 }
 function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
 function scheduleAutoTTS(){
@@ -2579,7 +2614,7 @@ const Room = (function(){
   document.getElementById("ic-plus").addEventListener("click",()=>setCount((parseInt(icNum.dataset.n,10)||5)+5));
   icNum.addEventListener("click",()=>setCount(parseInt(icNum.dataset.n,10)||5));
   icAll.addEventListener("click",()=>{ icAll.classList.add("on"); icNum.classList.remove("on"); });
-  function showSetup(){ renderSetup(); intro.classList.add("hide"); setup.style.display="flex"; setup.scrollTop=0; }
+  function showSetup(){ renderSetup(); renderVoiceCheck(); intro.classList.add("hide"); setup.style.display="flex"; setup.scrollTop=0; }
   function backToIntro(){ setup.style.display="none"; intro.classList.remove("hide"); }
   function startGame(){
     const sel=counts.querySelector("button.on");

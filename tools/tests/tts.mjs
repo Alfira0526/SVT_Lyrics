@@ -87,4 +87,15 @@ P(chain.every(r=>!r.text.includes('/')), '체인 각 구간에 슬래시 없음'
 await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });
 P(s69==='zh-CN', `s69 8DM(중국어) → ${s69}===zh-CN`);
+
+// 음성 준비 확인: 필요한 언어 산출 + 누락 경고(중국어 음성 없음 가정)
+const vc=await pg.evaluate(()=>{
+  const need=[...neededLangs()].sort();
+  speechSynthesis.getVoices=()=>[{lang:'ko-KR',name:'K',default:true},{lang:'en-US',name:'E'}];  // 한/영만 있음
+  renderVoiceCheck();
+  return { need, html:document.getElementById('voice-check-body').innerHTML };
+});
+P(['ko','en','zh'].every(l=>vc.need.includes(l)), `neededLangs 스테이징: [${vc.need}] (ko·en·zh 포함)`);
+P(/중국어/.test(vc.html) && /없어요/.test(vc.html), '중국어 음성 없을 때 시작 전 경고 표시');
+P(/Windows/.test(vc.html), 'Windows 음성 설치 안내 포함');
 console.log('done'); await b.close();

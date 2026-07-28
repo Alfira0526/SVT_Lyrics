@@ -45,6 +45,16 @@ for(const [txt,exp,label] of segCases){
   P(r.join===txt, `segmentByLang ${label}: 원문 보존(손실 없음)`);
 }
 
+// 슬래시/구분자는 낭독 텍스트에서 제거(쉼표로) — "슬래시"로 읽히지 않게
+const spk=await pg.evaluate(()=>{
+  const a=makeUtterance('내가 헛스윙해도 / You make me feel like I hit it home').text;
+  const b=makeUtterance('어제같이 / 123456 · 다시').text;
+  return {a,b,fs:forSpeech('가 / 나 | 다 · 라')};
+});
+P(!spk.a.includes('/'), '낭독 텍스트에 슬래시 없음(구간1)');
+P(!spk.b.includes('/') && !spk.b.includes('·'), '낭독 텍스트에 / · 없음');
+P(spk.fs==='가, 나, 다, 라', `forSpeech 구분자→쉼표: "${spk.fs}"`);
+
 // 실제 스테이징 데이터: s69 8DM은 lang=zh → zh-CN 로 낭독
 await pg.goto('http://localhost:8765/index.html?staging=1'); await pg.waitForTimeout(700);
 const s69=await pg.evaluate(()=>{ const c=getC('s69'); return c ? makeUtterance(c.lyrics, c.lang).lang : 'no-s69'; });

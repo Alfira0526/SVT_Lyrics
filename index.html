@@ -1723,8 +1723,15 @@ function detectLang(s){
   return "ko";
 }
 function voiceForLang(lang){ return lang==="en"?enVoice : lang==="zh"?zhVoice : lang==="ja"?jaVoice : koVoice; }
-// 낭독용 정리: 구분자(/ | · ・)는 화면엔 두되 음성에선 쉼표(쉼)로 — "슬래시" 등으로 읽히지 않게.
-function forSpeech(s){ return String(s||"").replace(/\s*[\/|·・]+\s*/g, ", ").replace(/\s{2,}/g," ").trim(); }
+// 낭독용 정리: (1) 구분자(/ | · ・)는 화면엔 두되 음성에선 쉼표(쉼)로 — "슬래시" 등으로 안 읽히게.
+// (2) 3자리 이상 숫자는 한 자리씩 띄어 읽기(예: 123456→"1 2 3 4 5 6", 015→"0 1 5"). 2자리(12월 등)는 유지.
+function forSpeech(s){
+  return String(s||"")
+    .replace(/\s*[\/|·・]+\s*/g, ", ")
+    .replace(/\d{3,}/g, m => m.split("").join(" "))
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 // override: content의 lang 필드('ko'|'en'|'zh'|'ja')가 있으면 자동판별보다 우선.
 function makeUtterance(text, override){
   const spoken=forSpeech(text);

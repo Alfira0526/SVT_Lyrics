@@ -61,6 +61,9 @@ export function validateData(data) {
       if (!c.lyrics || !String(c.lyrics).trim()) W(`[${s.id} ${s.name}] 가사(lyrics) 비어 있음`);
       if (c.mv && parseYouTube(c.mv) === null) E(`[${s.id} ${s.name}] MV 주소 파싱 불가: ${c.mv}`);
       if (c.time && Number.isNaN(parseTime(c.time))) W(`[${s.id} ${s.name}] 시작 시간 파싱 불가(0초부터 재생됨): ${c.time}`);
+      // 비한국어(영/중/일) 가사인데 한글 독음(read)이 없으면 경고 — 원어 음성 없는 기기에서 무음 위험.
+      if (c.lyrics && /[A-Za-z一-鿿぀-ヿ]/.test(c.lyrics) && !(c.read && String(c.read).trim()))
+        W(`[${s.id} ${s.name}] 비한국어 가사인데 한글 독음(read) 없음 — 원어 음성 없는 기기에서 낭독 안 됨(add-song --read)`);
     }
 
     const a = album[s.id];

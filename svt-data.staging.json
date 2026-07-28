@@ -1,5 +1,5 @@
 {
-  "rev": 1785204165141,
+  "rev": 1785204501354,
   "songs": [
     {
       "id": "s2",
@@ -392,7 +392,8 @@
     "s7": {
       "lyrics": "너 IN 뷰파인더 초점은 Auto 자연스러운 움직임 따라 널 따라가",
       "mv": "https://youtu.be/VqfiJCCbTjY",
-      "time": "1:27"
+      "time": "1:27",
+      "read": "너 인 뷰파인더 초점은 오토 자연스러운 움직임 따라 널 따라가"
     },
     "s8": {
       "lyrics": "맘속엔 어린아이가 있어",
@@ -417,7 +418,8 @@
     "s13": {
       "lyrics": "세상은 그저 내겐 놀이터 all day 새로운 느낌 그게 날 숨 쉬게 해",
       "mv": "https://youtu.be/2GTyTEvCoQI?si=FXKxMTlJpv7DCw1c",
-      "time": "4:19"
+      "time": "4:19",
+      "read": "세상은 그저 내겐 놀이터 올 데이 새로운 느낌 그게 날 숨 쉬게 해"
     },
     "s14": {
       "lyrics": "너의 아픔 나로 덮어도 돼",
@@ -487,7 +489,8 @@
     "s29": {
       "lyrics": "전 세계, ah 공통의 language",
       "mv": "https://youtu.be/zSQ48zyWZrY?si=QiT0ljLfZlkDAtpA",
-      "time": "0:38"
+      "time": "0:38",
+      "read": "전 세계, 아 공통의 랭귀지"
     },
     "s30": {
       "lyrics": "이런 빌어먹을 세상 나만 혼자 바보 됐어",
@@ -502,7 +505,8 @@
     "s33": {
       "lyrics": "시작하자, tuning 맞춰볼까?",
       "mv": "https://youtu.be/ThI0pBAbFnk",
-      "time": "0:27"
+      "time": "0:27",
+      "read": "시작하자, 튜닝 맞춰볼까?"
     },
     "s34": {
       "lyrics": "내가 네 말을 듣겠냐고 그렇게 할 일 없냐고",
@@ -522,7 +526,8 @@
     "s39": {
       "lyrics": "떨어져 flash 온몸이 crash 회로가 미쳐버렸어 제멋대로",
       "mv": "https://youtu.be/pS57UX6s-xw",
-      "time": "0:07"
+      "time": "0:07",
+      "read": "떨어져 플래시 온몸이 크래시 회로가 미쳐버렸어 제멋대로"
     },
     "s40": {
       "lyrics": "어쩌다 보니 처음으로 마주하는 오늘이라서",
@@ -607,22 +612,26 @@
     "s57": {
       "lyrics": "Where am I running to now, blinded by shining lights pulling me close",
       "mv": "https://youtu.be/gK43zTA7DWY?si=hnA5J5NWZXn2eI3G",
-      "time": "1:05"
+      "time": "1:05",
+      "read": "웨어 앰 아이 러닝 투 나우, 블라인디드 바이 샤이닝 라이츠 풀링 미 클로즈"
     },
     "s58": {
       "lyrics": "Running round the whole city for someone to look me in my eyes",
       "mv": "https://youtu.be/vPQasPdd6fI",
-      "time": "0:15"
+      "time": "0:15",
+      "read": "러닝 라운드 더 홀 시티 포 썸원 투 룩 미 인 마이 아이즈"
     },
     "s59": {
       "lyrics": "You make me heat up, trip up, act up, what'd you do?",
       "mv": "https://youtu.be/u89aNeJlyg0",
-      "time": "0:12"
+      "time": "0:12",
+      "read": "유 메익 미 히트 업, 트립 업, 액트 업, 왓 쥬 두?"
     },
     "s60": {
       "lyrics": "Let's kill the sunrise",
       "mv": "https://youtu.be/pBpr9TnhhkE",
-      "time": "1:10"
+      "time": "1:10",
+      "read": "렛츠 킬 더 선라이즈"
     },
     "s61": {
       "lyrics": "우린 정신을 좀 차려야 해",
@@ -632,7 +641,8 @@
     "s62": {
       "lyrics": "She can't get out of bed when she home",
       "mv": "https://youtu.be/pGxN5BYWssU",
-      "time": "0:20"
+      "time": "0:20",
+      "read": "쉬 캔트 겟 아웃 오브 베드 웬 쉬 홈"
     },
     "s63": {
       "lyrics": "하얗게 메마른 너의 그 표정에",
@@ -642,7 +652,8 @@
     "s64": {
       "lyrics": "You're my favorite homie, never leave me lonely",
       "mv": "https://youtu.be/Yly-1O7hMUA",
-      "time": "0:08"
+      "time": "0:08",
+      "read": "유어 마이 페이버릿 호미, 네버 리브 미 론리"
     },
     "s65": {
       "lyrics": "오늘은 밤새 노세 가득 채우고 건배 건배",

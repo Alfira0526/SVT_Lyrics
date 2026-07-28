@@ -1,0 +1,7 @@
+# 사이트 서빙에 불필요한 파일은 배포 자산에서 제외(gitignore 문법)
+tools/
+docs/
+*.md
+wrangler.toml
+.assetsignore
+.git/

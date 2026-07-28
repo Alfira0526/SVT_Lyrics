@@ -1,0 +1,7 @@
+# Cloudflare Workers 정적 자산 배포 (index.html 하나로 동작하는 정적 사이트)
+# 이 설정이 있으면 `npx wrangler deploy` 가 정적 파일을 그대로 서빙합니다.
+name = "svt-lyrics"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "."

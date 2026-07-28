@@ -62,6 +62,18 @@
 | `lyrics` | 낭독할 가사(1~2줄 권장, TTS 8~15초) | `너의 아픔 나로 덮어도 돼` |
 | `mv` | 유튜브 주소 | `youtu.be` / `watch?v=` / `/embed/` / `/shorts/` / 11자 ID |
 | `time` | MV 시작 시간 | `1:12` 또는 초 단위 `72` |
+| `lang` | (선택) TTS 언어 고정 | `ko`/`en`/`zh`/`ja` |
+| `read` | (선택) 한글 독음 — 원어 음성 없는 기기 대체 낭독 | `렛츠 킬 더 선라이즈` |
+| `variants` | (선택) **곡당 여러 문제** — 각 항목이 별도 문제(정답은 같은 곡) | `[{lyrics,time,mv?,read?,lang?}, …]` |
+
+> **variants(곡당 다문제)**: `content[id].variants`에 `{lyrics, time, mv?, read?, lang?}` 배열을 두면 한 곡에서 여러 문제가 출제됩니다(문항 키 `s60`·`s60#1`·`s60#2`…). 지정 안 한 필드(mv/lang 등)는 곡 기본값을 따릅니다. 도구: `node tools/add-variant.mjs --id s14 --lyrics "…" --time "0:40"`.
+
+## 게임 모드 (`config.mode`)
+| 값 | 모드 | 설명 |
+|---|---|---|
+| `normal` | 일반 | 범위 진행 → 결과·정답률(기본) |
+| `battle` | 대결 | 팀 동시전, 고정 라운드 후 최고점 승리(동점 서든데스) |
+| `infinite` | 무한 | 서바이벌(1오답 종료)·솔로·최고 연속기록 |
 
 ---
 

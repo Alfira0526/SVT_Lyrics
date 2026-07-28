@@ -1,0 +1,8 @@
+# Cloudflare Pages 헤더 규칙 (GitHub Pages는 이 파일을 무시하므로 양쪽 호스팅에 안전)
+# index.html·데이터 JSON은 항상 최신을 받도록 캐시 재검증 강제 → 배포 즉시 반영(옛 버전 캐시 방지)
+/index.html
+  Cache-Control: no-cache
+/svt-data.json
+  Cache-Control: no-cache
+/svt-data.staging.json
+  Cache-Control: no-cache

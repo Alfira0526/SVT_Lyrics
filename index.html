@@ -344,6 +344,14 @@
   .io-miss{font-size:13px;color:var(--muted);margin-top:10px}
   .io-btns{display:flex;gap:8px;margin-top:18px}
   .io-btns .btn{flex:1}
+  /* 대결 승리 스코어보드 */
+  .bv-board{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .bv-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--bg2);font-size:14px}
+  .bv-row.win{background:linear-gradient(90deg,#FFF1F7,#EAF2FF);border:1px solid var(--rose)}
+  .bv-rank{width:24px;text-align:center;font-weight:900;color:var(--muted)}
+  .bv-row.win .bv-rank{font-size:18px}
+  .bv-nm{flex:1;text-align:left;font-weight:800;color:var(--txt)}
+  .bv-sc{font-weight:900;color:var(--rose-ink);font-variant-numeric:tabular-nums}
   .setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:10px}
   .setup-tip{font-size:12.5px;line-height:1.6;color:#574F70;background:rgba(150,120,190,.08);border-radius:9px;padding:9px 12px;margin-top:11px}
   .setup-tip b{color:var(--rose-ink);font-weight:800}
@@ -2049,8 +2057,10 @@ function mark(kind){
 function goResult(){ if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }
 function next(){ stopTTS(); stopTimer();
   if(pos>=order.length-1 && isInfinite()){ refillInfinite(); }   // 무한: 끝에서 새 배치 이어붙임
-  if(pos<order.length-1){ pos++; renderGame(); } else { goResult(); }
-}   // 마지막 문항 다음 = (무한 아니면) 결과 화면
+  if(pos<order.length-1){ pos++; renderGame(); }
+  else if(isBattle()){ battleVictory(); }                        // 대결: 마지막 라운드 후 승리팀 연출
+  else { goResult(); }
+}   // 마지막 문항 다음 = (무한/대결 아니면) 결과 화면
 function prev(){ stopTTS(); stopTimer(); if(pos>0){ pos--; renderGame(); } }
 // 무한(서바이벌) 게임오버: 연속 기록 표시·최고기록 경신·다시 도전.
 function infiniteGameOver(n){
@@ -2077,6 +2087,31 @@ function infiniteGameOver(n){
   document.getElementById("io-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
 }
 function restartInfinite(){ stopTTS(); stopTimer(); startNewGame(true); renderGame(); }
+function isBattle(){ return config.mode==="battle"; }
+// 대결(동시전) 종료: 고정 라운드 후 최고점 승리팀 연출. 1위 동점(득점>0)이면 서든데스 1문항.
+function battleVictory(){
+  const names=config.teamNames||["팀 1","팀 2"];
+  const ranked=names.map((nm,i)=>({nm,score:teamScores[i]||0,i})).sort((a,b)=>b.score-a.score);
+  const isTie = ranked.length>1 && ranked[0].score===ranked[1].score;
+  if(isTie && ranked[0].score>0){   // 동점 → 서든데스 한 문항 더
+    toast("🔥 동점! 서든데스 1문항"); if(pos>=order.length-1) refillInfinite(); pos++; renderGame(); return;
+  }
+  stopTTS(); stopTimer(); if(els.video) els.video.innerHTML="";
+  let ov=document.getElementById("battle-over");
+  if(!ov){ ov=document.createElement("div"); ov.id="battle-over"; ov.className="io-overlay"; document.body.appendChild(ov); }
+  const board=ranked.map((r,idx)=>`<div class="bv-row${idx===0&&!isTie?" win":""}"><span class="bv-rank">${idx===0&&!isTie?"🏆":(idx+1)}</span><span class="bv-nm">${escapeHtml(r.nm)}</span><span class="bv-sc">${r.score}</span></div>`).join("");
+  ov.innerHTML=`<div class="io-card">
+    <div class="io-emoji">${isTie?"🤝":"🏆"}</div>
+    <div class="io-title">${isTie?"무승부!":(escapeHtml(ranked[0].nm)+" 승리!")}</div>
+    <div class="bv-board">${board}</div>
+    <div class="io-btns">
+      <button class="btn btn-play" id="bv-again">🔄 다시 대결</button>
+      <button class="btn btn-ghost" id="bv-quit">🏠 그만두기</button>
+    </div></div>`;
+  ov.style.display="flex"; if(!isTie){ sfxCorrect(); celebrateBurst(); }
+  document.getElementById("bv-again").onclick=()=>{ ov.style.display="none"; stopTTS(); stopTimer(); startNewGame(true); renderGame(); };
+  document.getElementById("bv-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
+}
 
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
 els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });

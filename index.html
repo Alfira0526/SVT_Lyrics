@@ -1744,7 +1744,7 @@ function makeUtterance(text, override){
   const lang=(override && LANG_BCP[override]) ? override : detectLang(spoken);
   const u=new SpeechSynthesisUtterance(spoken);
   u.lang=LANG_BCP[lang]||"ko-KR";
-  const v=voiceForLang(lang); if(v) u.voice=v;
+  const v=voiceForLang(lang); try{ if(v) u.voice=v; }catch(e){}   // 이상한 voice 객체로도 낭독이 멈추지 않게
   return u;
 }
 // 한 글자의 스크립트 분류(공백·숫자·문장부호는 null=중립).
@@ -1777,11 +1777,17 @@ function segmentByLang(text){
 // 가사 낭독: 명시 lang이 있으면 통째로, 없으면 언어 구간별로 각 음성으로 순차 재생(큐).
 let ttsToken=0;   // 정지·문항전환 시 진행 중 낭독 체인을 무효화하는 세대 토큰
 // 언어 구간을 한 번에 큐잉하지 않고 onend로 하나씩 이어 재생 — 크롬의 다중 큐 누락/취소 버그 회피.
-function speakLyric(text, override, rate){
+function speakLyric(text, override, rate, readFallback){
   if(!("speechSynthesis" in window)) return;
   if(!(koVoice||enVoice||zhVoice||jaVoice)) pickVoice();   // 음성 목록 지연 로딩 대비 재조회
-  const segs=((override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text))
-              .filter(s=>s.text && s.text.trim());
+  let segs=(override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text);
+  // 원어(영/중/일) 음성이 이 기기에 없으면 → 한글 독음(read)을 한국어 음성으로 대체 낭독.
+  // 음원이 아예 안 나오고 '팩 설치'만 요구하면 이탈하므로, 항상 소리는 나게 한다.
+  const missingVoice = segs.some(s=> s.lang!=="ko" && !voiceForLang(s.lang));
+  if(missingVoice && readFallback && String(readFallback).trim()){
+    segs=[{lang:"ko", text:String(readFallback)}];
+  }
+  segs=segs.filter(s=>s.text && s.text.trim());
   if(!segs.length) return;
   const gen=++ttsToken;   // 이 낭독의 세대(이전 체인 무효화)
   let i=0;
@@ -1834,13 +1840,12 @@ function renderVoiceCheck(){
   if(!speechSynthesis.getVoices().length){ body.innerHTML="음성 목록을 불러오는 중… <span style='color:var(--muted)'>잠시 후 자동 갱신됩니다.</span>"; return; }
   const rows=need.map(l=>(V[l]?"✅ ":"⚠️ ")+NAMES[l]);
   const missing=need.filter(l=>!V[l]);
-  let html="이 문제 세트에 필요한 음성: <b>"+rows.join(" · ")+"</b>";
+  let html="이 문제 세트 낭독 언어: <b>"+rows.join(" · ")+"</b>";
   if(missing.length){
-    html+="<br><span style='color:var(--amber);font-weight:700'>⚠️ "+missing.map(l=>NAMES[l]).join("·")+" 음성이 이 기기에 없어요.</span> 해당 언어 가사는 제대로 낭독되지 않습니다(다른 음성으로 대체됨).";
-    html+="<br><b>Windows</b>: 설정 → <b>시간 및 언어</b> → <b>언어 및 지역</b> → <b>언어 추가</b>(중국어(간체)·일본어 등) → 추가한 언어의 <b>⋯ → 언어 옵션</b>에서 <b>음성</b> 설치 → <b>브라우저 재시작</b>.";
-    html+="<br><span style='color:var(--muted)'>설치 후 이 화면을 다시 열거나 새로고침하면 ✅로 바뀝니다. (한국어 가사만 쓰면 무시해도 됩니다.)</span>";
+    html+="<br>ℹ️ <b>"+missing.map(l=>NAMES[l]).join("·")+"</b> 음성이 이 기기엔 없지만 <b>괜찮아요</b> — 자동으로 <b>한글 독음</b>으로 읽어줘요(소리는 정상적으로 납니다).";
+    html+="<br><span style='color:var(--muted)'>원어 발음 그대로 듣고 싶은 호스트만(선택) — <b>Windows</b>: 설정 → 시간 및 언어 → 언어 및 지역 → 언어 추가 → 언어 옵션에서 <b>음성</b> 설치 → 브라우저 재시작. 설치하면 원어로 읽어줘요.</span>";
   } else {
-    html+="<br>✅ 필요한 음성이 모두 준비됐어요.";
+    html+="<br>✅ 필요한 음성이 모두 준비됐어요(원어 발음으로 낭독).";
   }
   body.innerHTML=html;
 }
@@ -1862,7 +1867,7 @@ function speak(){
   const c=getC(order[pos]); const text=(c.lyrics||"").trim();
   if(!text){ toast("입력된 가사가 없습니다"); return; }
   stopTTS();
-  speakLyric(text, c.lang, parseFloat(els.speed.value));   // 한+영 등 혼합 가사는 구간별로 각 언어 음성으로 낭독
+  speakLyric(text, c.lang, parseFloat(els.speed.value), c.read);   // 혼합=구간별 낭독 / 원어 음성 없으면 한글 독음(read) 대체
 }
 
 /* ---- Timer ---- */
@@ -2441,7 +2446,7 @@ const Room = (function(){
     if(order.length===0) return null;
     const c=getC(order[pos]);
     return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
-      lyric:(c.lyrics||"").trim(), lang:c.lang||"",
+      lyric:(c.lyrics||"").trim(), lang:c.lang||"", read:c.read||"",
       options:mcOptions.map(o=>o.name),
       sec:(config.timerOn?config.timerSec:0),
       quizOnly:!!config.quizOnly,
@@ -2549,7 +2554,7 @@ const Room = (function(){
   function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
   function guestSpeak(){
     if(!("speechSynthesis" in window) || !guest.lyric) return;
-    try{ speechSynthesis.cancel(); speakLyric(guest.lyric, guest.lang, 1); }catch(e){}
+    try{ speechSynthesis.cancel(); speakLyric(guest.lyric, guest.lang, 1, guest.read); }catch(e){}
   }
   function guestCdStop(){ if(guest.cdI){ clearInterval(guest.cdI); guest.cdI=null; } }
   function guestCountdown(sec){
@@ -2563,7 +2568,7 @@ const Room = (function(){
     if(guest.revealedQid===m.qid) return;   // 이미 공개된 문항이면 재렌더 금지(중복 state 방지)
     const isNew = m.qid!==guest.qid;
     if(isNew){ guest.qid=m.qid; guest.answered=false; document.getElementById("rg-video").innerHTML=""; }
-    guest.lyric=m.lyric||""; guest.lang=m.lang||"";
+    guest.lyric=m.lyric||""; guest.lang=m.lang||""; guest.read=m.read||"";
     document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
     document.getElementById("rg-lyric").textContent=m.lyric||"";
     document.getElementById("rg-mc").style.display="grid";

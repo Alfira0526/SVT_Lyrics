@@ -325,6 +325,14 @@
   .setup-title{font-size:26px;font-weight:900;text-align:center;margin:0}
   .setup-sub{color:var(--muted);text-align:center;font-size:14px;margin:6px 0 22px}
   .setup-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;text-align:left}
+  .mode-cards{display:flex;gap:8px;margin-bottom:14px}
+  .mode-card{flex:1;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:13px 8px;text-align:center;cursor:pointer;transition:.15s}
+  .mode-card:hover{border-color:var(--lilac)}
+  .mode-card.sel{border-color:var(--rose-ink);background:linear-gradient(180deg,#fff,#FFF1F7);box-shadow:0 6px 16px rgba(214,51,126,.14)}
+  .mode-card .ic{font-size:23px;line-height:1}
+  .mode-card .nm{font-weight:800;font-size:14px;margin-top:5px;color:var(--txt)}
+  .mode-card.sel .nm{color:var(--rose-ink)}
+  .mode-card .ds{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
   .setup-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:10px}
   .setup-tip{font-size:12.5px;line-height:1.6;color:#574F70;background:rgba(150,120,190,.08);border-radius:9px;padding:9px 12px;margin-top:11px}
   .setup-tip b{color:var(--rose-ink);font-weight:800}
@@ -433,7 +441,13 @@
 <div class="intro" id="setup" style="display:none">
   <div class="setup-inner">
     <h2 class="setup-title">게임 설정</h2>
-    <p class="setup-sub">옵션을 정하고 게임을 시작하세요</p>
+    <p class="setup-sub">모드를 고르고 옵션을 정한 뒤 시작하세요</p>
+
+    <div class="mode-cards" id="mode-cards">
+      <div class="mode-card" data-mode="normal" tabindex="0" role="button" aria-pressed="true"><div class="ic">🎧</div><div class="nm">일반</div><div class="ds">편하게 듣고 맞히기</div></div>
+      <div class="mode-card" data-mode="battle" tabindex="0" role="button" aria-pressed="false"><div class="ic">⚔️</div><div class="nm">대결</div><div class="ds">팀 대결·승부</div></div>
+      <div class="mode-card" data-mode="infinite" tabindex="0" role="button" aria-pressed="false"><div class="ic">♾️</div><div class="nm">무한</div><div class="ds">서바이벌·최고기록</div></div>
+    </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
@@ -946,6 +960,7 @@ const DEFAULT_CONFIG = {
   hideLyrics:true,  // 듣기 전용(가사 가리기) — 기획의도 핵심, 기본 ON
   sfx:true,         // 효과음(정답·오답·카운트다운) 기본 ON
   stage:false,      // 무대 모드(프로젝터 대형 표시) — 기본 OFF, 진행 중 토글
+  mode:"normal",    // 게임 모드: normal(일반) · battle(대결) · infinite(무한 서바이벌)
   scope:{by:"all", val:""}   // 문제 범위(그룹): all | diff(난이도) | unit(구성)
 };
 
@@ -2350,6 +2365,19 @@ function renderSetup(){
   document.getElementById("c-quizonly").checked=!!config.quizOnly;
   renderTeamEditor();
   renderScopeSetup();
+  renderModeCards();
+}
+// 모드별 기본 토글(선택 시 적용 — 이후 개별 조정 가능)
+const MODE_DEFAULTS={ normal:{}, battle:{teamMode:true, mc:true}, infinite:{teamMode:false, mc:true, hideLyrics:true} };
+function selectMode(m){
+  if(!MODE_DEFAULTS[m]) m="normal";
+  config.mode=m; Object.assign(config, MODE_DEFAULTS[m]); saveState(); renderSetup();
+}
+function renderModeCards(){
+  const cur=config.mode||"normal";
+  document.querySelectorAll("#mode-cards .mode-card").forEach(el=>{
+    const on=el.dataset.mode===cur; el.classList.toggle("sel", on); el.setAttribute("aria-pressed", on?"true":"false");
+  });
 }
 function renderScopeSetup(){
   const sc=currentScope();
@@ -2685,6 +2713,10 @@ const Room = (function(){
   document.getElementById("intro-start").addEventListener("click",()=>{ unlockAudio(); showSetup(); });
   document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });
   document.getElementById("setup-back").addEventListener("click",backToIntro);
+  (function(){ const mc=document.getElementById("mode-cards"); if(!mc) return;
+    mc.addEventListener("click",e=>{ const card=e.target.closest(".mode-card"); if(card) selectMode(card.dataset.mode); });
+    mc.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ const card=e.target.closest(".mode-card"); if(card){ e.preventDefault(); selectMode(card.dataset.mode); } } });
+  })();
 
   // 참가자(온라인 방) 진입
   const guestView=document.getElementById("room-guest");

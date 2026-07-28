@@ -593,6 +593,7 @@
         <span>🐢 속도</span>
         <input type="range" id="g-speed" min="0.5" max="1.2" step="0.1" value="1.0" />
         <span class="speed-val" id="g-speedval">1.0×</span>
+        <button class="btn btn-ghost btn-sm" id="g-ttsdiag" style="display:none;margin-left:8px" title="TTS 음성 진단">🔎 음성</button>
       </div>
 
       <div class="toggle-row" id="g-hide-row">
@@ -1769,15 +1770,44 @@ function segmentByLang(text){
   return out;
 }
 // 가사 낭독: 명시 lang이 있으면 통째로, 없으면 언어 구간별로 각 음성으로 순차 재생(큐).
+let ttsToken=0;   // 정지·문항전환 시 진행 중 낭독 체인을 무효화하는 세대 토큰
+// 언어 구간을 한 번에 큐잉하지 않고 onend로 하나씩 이어 재생 — 크롬의 다중 큐 누락/취소 버그 회피.
 function speakLyric(text, override, rate){
   if(!("speechSynthesis" in window)) return;
-  const segs=(override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text);
+  if(!(koVoice||enVoice||zhVoice||jaVoice)) pickVoice();   // 음성 목록 지연 로딩 대비 재조회
+  const segs=((override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text))
+              .filter(s=>s.text && s.text.trim());
   if(!segs.length) return;
-  for(const s of segs){
+  const gen=++ttsToken;   // 이 낭독의 세대(이전 체인 무효화)
+  let i=0;
+  function step(){
+    if(gen!==ttsToken || i>=segs.length) return;   // 정지됐거나 모든 구간 끝
+    const s=segs[i++];
     const u=makeUtterance(s.text, s.lang);
     if(rate) u.rate=rate; u.pitch=1;
-    speechSynthesis.speak(u);   // 여러 개면 순차 재생됨
+    u.onend=()=>{ if(gen===ttsToken) step(); };      // 한 구간 끝나면 다음 언어 구간
+    u.onerror=()=>{ if(gen===ttsToken) step(); };
+    try{ speechSynthesis.speak(u); }catch(e){}
   }
+  setTimeout(()=>{ if(gen===ttsToken) step(); }, 60);   // cancel() 직후 speak 무시되는 크롬 버그 완화
+}
+// TTS 음성 진단(스테이징): 기기에 어떤 언어 음성이 있고 무엇이 선택되는지 표시.
+function ttsDiag(){
+  if(!("speechSynthesis" in window)){ alert("이 브라우저는 TTS 미지원"); return; }
+  pickVoice();
+  const vs=speechSynthesis.getVoices();
+  const langs=[...new Set(vs.map(v=>v.lang))].sort();
+  const pick=(v,ko)=> v? (v.name+" ["+v.lang+"]") : "❌ 없음 → u.lang만 지정(기본음성 대체됨)";
+  alert([
+    "총 음성: "+vs.length,
+    "보유 언어: "+(langs.join(", ")||"(없음)"),
+    "",
+    "선택되는 음성:",
+    "· 한국어: "+pick(koVoice),
+    "· 영어: "+pick(enVoice),
+    "· 중국어: "+pick(zhVoice),
+    "· 일본어: "+pick(jaVoice),
+  ].join("\n"));
 }
 function clearAutoTTS(){ if(autoTTSHandle){ clearTimeout(autoTTSHandle); autoTTSHandle=null; } }
 function scheduleAutoTTS(){
@@ -1790,7 +1820,7 @@ function scheduleAutoTTS(){
   const c=getC(order[pos]); if(!c || !(c.lyrics||"").trim()) return;   // 가사 있을 때만
   autoTTSHandle=setTimeout(()=>{ autoTTSHandle=null; speak(); }, 2000);
 }
-function stopTTS(){ clearAutoTTS(); if("speechSynthesis" in window) speechSynthesis.cancel(); }
+function stopTTS(){ clearAutoTTS(); ttsToken++; if("speechSynthesis" in window) speechSynthesis.cancel(); }
 function speak(){
   if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
   if(order.length===0) return;
@@ -2641,6 +2671,7 @@ els.speedval.textContent="1.0×";
   if(STAGING){
     document.body.classList.add("staging");
     document.body.insertAdjacentHTML("afterbegin", '<div id="staging-banner">🧪 스테이징(검수용) 모드 · 실제 게임 데이터가 아닙니다 · <a href="?">실서비스로</a></div>');
+    const dg=document.getElementById("g-ttsdiag"); if(dg){ dg.style.display=""; dg.addEventListener("click", ttsDiag); }
   }
   await loadState();
   if(STAGING && testIds.size>0){ config.scope={by:"test",val:"1"}; }   // 스테이징: 후보 곡이 있으면 테스트 문제만으로 시작

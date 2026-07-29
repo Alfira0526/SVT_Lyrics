@@ -40,7 +40,7 @@ await pg.waitForTimeout(80);
 P(await pg.evaluate(()=>config.scope.by==='diff' && order.every(id=>songById(id).diff==='상')), 'in-game 상 chip sets diff scope');
 await pg.evaluate(()=>{ [...document.querySelectorAll('#view-game .chip[data-filter]')].find(x=>x.dataset.filter==='all').click(); });
 await pg.waitForTimeout(60);
-P(await pg.evaluate(()=>config.scope.by==='all' && order.length===56), '전체 resets to all (56)');
+P(await pg.evaluate(()=>config.scope.by==='all' && order.length===songs.map(s=>s.id).flatMap(expandKeys).length), '전체 resets to all (=전체 문항 수)');
 
 P(errs.length===0, 'no page errors (errs='+errs.length+')');
 console.log('done');

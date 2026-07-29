@@ -38,4 +38,12 @@ const ord=await pg.evaluate(()=>{
 });
 P(ord.has, 'buildOrder가 곡을 변형 키로 확장(s61#1·#2 포함)');
 P(ord.len===ord.lenNoVar+2, `변형 2개면 문항 수 +2 (${ord.lenNoVar}→${ord.len})`);
+
+// 키 단위 검수: 테스트 스코프는 _test에 든 변형 키만 출제(base는 제외)
+const kv=await pg.evaluate(()=>{
+  getC('s60').variants=[{lyrics:'A',time:'0:20'},{lyrics:'B',time:'0:30'}];
+  testIds=new Set(['s60#1']); config.scope={by:'test',val:'1'}; quizCount=null; buildOrder(false);
+  const r={order:[...order]}; delete getC('s60').variants; return r;
+});
+P(kv.order.length===1 && kv.order[0]==='s60#1', `테스트 스코프=변형 키만 출제(base 제외): [${kv.order}]`);
 console.log('done'); await b.close();

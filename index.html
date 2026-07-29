@@ -2585,9 +2585,22 @@ function renderSetup(){
   renderTeamEditor();
   renderScopeSetup();
   renderModeCards();
+  // 모드별 필수 옵션 잠금: 대결=팀·4지선다·팀가리기 필수(ON 고정) · 무한=팀 OFF·4지선다 고정 · 일반=자유
+  const M=config.mode||"normal";
+  const lockCb=(id,locked)=>{ const el=document.getElementById(id); if(el) el.disabled=!!locked; };
+  lockCb("c-team", M!=="normal");       // 대결 ON고정 / 무한 OFF고정 / 일반 자유
+  lockCb("c-mc", M!=="normal");         // 대결·무한 4지선다 고정
+  lockCb("c-teamblind", M!=="battle");  // 팀 선택 가리기는 대결에서만 유효
 }
-// 모드별 기본 토글(선택 시 적용 — 이후 개별 조정 가능)
-const MODE_DEFAULTS={ normal:{}, battle:{teamMode:true, mc:true}, infinite:{teamMode:false, mc:true, hideLyrics:true} };
+// 모드별 추천 옵션 패키지(선택 시 적용). 각 모드가 팀·온라인 등을 '완전히' 지정해
+// 모드 전환 시 이전 모드의 잔여 설정(예: onlineRoom)이 남아 게임 화면 대신 방 로비로 새는 문제를 방지.
+//  · 일반/무한: 팀전 자동 OFF · 온라인 방 OFF
+//  · 대결: 팀전 ON + 4지선다 ON + 팀 선택 가리기 ON (필수). 온라인 여부는 온라인 토글로 별도 선택.
+const MODE_DEFAULTS={
+  normal:{ teamMode:false, onlineRoom:false },
+  battle:{ teamMode:true, mc:true, teamBlind:true },
+  infinite:{ teamMode:false, mc:true, hideLyrics:true, onlineRoom:false }
+};
 function selectMode(m){
   if(!MODE_DEFAULTS[m]) m="normal";
   config.mode=m; Object.assign(config, MODE_DEFAULTS[m]); saveState(); renderSetup();
@@ -2731,6 +2744,7 @@ const Room = (function(){
     const c=qc(order[pos]);
     return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
       lyric:(c.lyrics||"").trim(), lang:c.lang||"", read:c.read||"",
+      hideLyrics:!!config.hideLyrics,   // 방장의 가사 가리기 설정을 참가자 화면에도 반영(낭독은 유지, 텍스트만 가림)
       options:mcOptions.map(o=>o.name),
       sec:(config.timerOn?config.timerSec:0),
       quizOnly:!!config.quizOnly,
@@ -2852,9 +2866,10 @@ const Room = (function(){
     if(guest.revealedQid===m.qid) return;   // 이미 공개된 문항이면 재렌더 금지(중복 state 방지)
     const isNew = m.qid!==guest.qid;
     if(isNew){ guest.qid=m.qid; guest.answered=false; document.getElementById("rg-video").innerHTML=""; }
-    guest.lyric=m.lyric||""; guest.lang=m.lang||""; guest.read=m.read||"";
+    guest.lyric=m.lyric||""; guest.lang=m.lang||""; guest.read=m.read||"";   // 낭독(guestSpeak)용으로는 보관
     document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
-    document.getElementById("rg-lyric").textContent=m.lyric||"";
+    // 방장이 '가사 가리기'면 참가자 화면에도 텍스트를 감춤(듣기로만 맞히기) — 낭독은 그대로 재생
+    document.getElementById("rg-lyric").textContent=m.hideLyrics ? "🙈 가사 가리기 · ▶ 듣기로 맞혀보세요" : (m.lyric||"");
     document.getElementById("rg-mc").style.display="grid";
     if(isNew){ guestCountdown(m.sec||0); if(!m.quizOnly) guestSpeak(); document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독(문제만 맞추기 제외)+카운트다운, 힌트 초기화
     const box=document.getElementById("rg-mc"); box.style.display="grid"; box.innerHTML="";

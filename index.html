@@ -168,6 +168,12 @@
   #staging-gate input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;box-sizing:border-box}
   #staging-gate button{width:100%;padding:11px;margin-top:10px;border:0;border-radius:10px;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(180deg,var(--serene-deep),var(--serene-ink));cursor:pointer}
   #staging-gate .sg-err{color:var(--red-ink);font-size:12px;min-height:16px;margin-top:8px}
+  /* 온라인 방 진단 로그 화면 패널(?debug=1) — 폰·PC 모두 스크린샷으로 로그 공유 */
+  #room-debug{position:fixed;left:0;right:0;bottom:0;z-index:99998;background:rgba(24,12,32,.94);color:#7CFC9A;font:11px/1.45 ui-monospace,Menlo,Consolas,monospace;max-height:40vh;display:flex;flex-direction:column;border-top:2px solid #D6337E}
+  #room-debug .rd-head{background:#D6337E;color:#fff;padding:5px 9px;font-weight:800;cursor:pointer;flex:0 0 auto;display:flex;justify-content:space-between;font-family:system-ui,sans-serif}
+  #room-debug .rd-body{overflow:auto;padding:5px 9px;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+  #room-debug.rd-min .rd-body{display:none}
+  #room-debug .rd-body div{white-space:pre-wrap;word-break:break-all;border-bottom:1px solid rgba(255,255,255,.08);padding:2px 0}
   .chip-test{background:rgba(255,207,92,.16);border-color:var(--amber);color:var(--amber)}
   .chip-test.active{background:var(--amber);color:#3a2a00;border-color:transparent}
   .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene-ink)}
@@ -2640,7 +2646,28 @@ document.querySelectorAll('#scope-dims [data-dim]').forEach(btn=>btn.addEventLis
 // 온라인 방 진단 로그 — URL에 ?debug=1 (또는 localStorage svtq_debug=1)이면 콘솔에 [ROOM] 로그.
 // 실기기(폰+PC) 온라인 방 점수 디버깅용: 답 수신·라운드 일치·채점 결과를 추적.
 const ROOM_DEBUG = (function(){ try{ return /[?&]debug=1/.test(location.search) || localStorage.getItem("svtq_debug")==="1"; }catch(e){ return false; } })();
-function rlog(){ if(!ROOM_DEBUG) return; try{ console.log.apply(console, ["%c[ROOM]","color:#D6337E;font-weight:700"].concat([].slice.call(arguments))); }catch(e){} }
+function rlog(){ if(!ROOM_DEBUG) return;
+  const args=[].slice.call(arguments);
+  try{ console.log.apply(console, ["%c[ROOM]","color:#D6337E;font-weight:700"].concat(args)); }catch(e){}
+  try{ roomDebugPanel(args.map(a=>(a&&typeof a==="object")?JSON.stringify(a):String(a)).join(" ")); }catch(e){}
+}
+function roomDebugPanel(line){
+  let p=document.getElementById("room-debug");
+  if(!p){
+    p=document.createElement("div"); p.id="room-debug";
+    const h=document.createElement("div"); h.className="rd-head";
+    h.innerHTML='<span>🐞 ROOM 로그 · 스크린샷 찍어 공유</span><span>탭=접기</span>';
+    h.addEventListener("click",()=>p.classList.toggle("rd-min"));
+    const b=document.createElement("div"); b.className="rd-body";
+    p.appendChild(h); p.appendChild(b); document.body.appendChild(p);
+  }
+  const b=p.querySelector(".rd-body");
+  let ts=""; try{ ts=new Date().toLocaleTimeString("ko-KR",{hour12:false})+" "; }catch(e){}
+  const div=document.createElement("div"); div.textContent=ts+line; b.appendChild(div);
+  while(b.childElementCount>60) b.removeChild(b.firstChild);
+  b.scrollTop=b.scrollHeight;
+}
+if(ROOM_DEBUG){ try{ rlog("디버그 ON · 온라인 방을 진행하면 답 수신·채점 로그가 여기 쌓입니다 (이 화면 스크린샷을 공유하세요)"); }catch(e){} }
 const Room = (function(){
   let mqttTried=false;
   function loadMqtt(){

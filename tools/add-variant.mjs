@@ -26,7 +26,19 @@ const vi = c.variants.length;
 if (/[A-Za-z一-鿿぀-ヿ]/.test(v.lyrics) && !(v.read || c.read)) console.warn(`⚠️  경고: [${a.id}#${vi}] 비한국어 변형인데 한글 독음(read) 없음 — --read 권장(원어 음성 없는 기기 대비).`);
 if (!v.time) console.warn(`⚠️  경고: [${a.id}#${vi}] 추천 시작구간(--time) 없음.`);
 
+// 변형(문제)은 반드시 검수를 거치도록 '문항 키'를 _test·_review에 등록(add-song과 동일 흐름, 단 base는 그대로 라이브 유지).
+const key = a.id + "#" + vi;
+data._test = Array.from(new Set([...(data._test || []), key]));
+if (!a["no-review"]) {
+  data._review = data._review || {};
+  const need = [];
+  if (!v.time) need.push("time");
+  if (/[A-Za-z一-鿿぀-ヿ]/.test(v.lyrics) && !(v.read || c.read)) need.push("read");
+  data._review[key] = { reason: "신규 변형(문제) — 검수 필요", fields: need.length ? need : ["confirm"] };
+}
+
 data.rev = Math.max(data.rev || 0, Date.now()) + 1;   // 캐시 전파
 writeFileSync(FILE, JSON.stringify(data, null, 2) + "\n");
-console.log(`✅ 변형 추가: [${a.id}#${vi}] "${v.lyrics.slice(0, 30)}" → ${FILE} (이 곡 총 문제 ${1 + c.variants.length}개, rev ${data.rev})`);
+console.log(`✅ 변형 추가: [${key}] "${v.lyrics.slice(0, 30)}" → ${FILE} (이 곡 총 문제 ${1 + c.variants.length}개, rev ${data.rev})`);
+console.log(`   🧪 검수 대기(_test)에 등록됨 — ?staging=1 '테스트 문제만'에서 이 문제만 확인 후 promote.`);
 console.log(`   확인: node tools/validate.mjs ${FILE}`);

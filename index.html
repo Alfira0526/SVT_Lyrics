@@ -1582,16 +1582,20 @@ function songInScope(id){ const sc=currentScope(); return songMatchesScope(id, s
 function scopeCount(by, val){ return songs.reduce((n,s)=>n+(songMatchesScope(s.id, by, val)?1:0), 0); }
 function scopeSummary(){
   const sc=currentScope();
-  if(sc.by==="test") return "🧪 테스트 문제 "+testIds.size+"곡";
+  if(sc.by==="test") return "🧪 테스트 문제 "+testIds.size+"개";
   if(sc.by==="all"||!sc.val) return "전체 "+songs.length+"곡";
   let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
   if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
   return vlabel+" · "+scopeCount(sc.by, sc.val)+"곡";
 }
 
+// 현재 범위(scope)에 해당하는 '문항 키' 목록. 테스트(검수) 범위는 문항 키 단위로 필터(변형 개별 검수).
+function scopedKeys(){
+  if(currentScope().by==="test") return songs.map(s=>s.id).flatMap(expandKeys).filter(k=>testIds.has(k));
+  return songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
+}
 function buildOrder(shuffle, exclude){
-  // 범위 내 곡 → 문항 키로 확장(곡당 variants 개수만큼 문제) → 제외(이미 출제분) 필터
-  let list=songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
+  let list=scopedKeys();
   if(exclude && exclude.size) list=list.filter(k=>!exclude.has(k));
   if(list.length===0){ config.scope={by:"all",val:""}; list=songs.map(s=>s.id).flatMap(expandKeys); if(exclude&&exclude.size) list=list.filter(k=>!exclude.has(k)); }   // 범위가 비면 전체로 폴백
   const doShuffle = shuffle || (quizCount!=null) || config.mode==="infinite";   // 문제 수 제한·무한모드 시 항상 랜덤
@@ -1611,7 +1615,7 @@ function isInfinite(){ return config.mode==="infinite"; }
 // 무한모드: order 끝에서 새 배치를 이어붙임(직전 곡 연속 방지).
 function refillInfinite(){
   const last=order.length?idOf(order[order.length-1]):null;
-  let batch=songs.filter(s=>songInScope(s.id)).map(s=>s.id).flatMap(expandKeys);
+  let batch=scopedKeys();
   if(!batch.length) batch=songs.map(s=>s.id).flatMap(expandKeys);
   for(let i=batch.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [batch[i],batch[j]]=[batch[j],batch[i]]; }
   if(batch.length>1 && idOf(batch[0])===last){ [batch[0],batch[1]]=[batch[1],batch[0]]; }

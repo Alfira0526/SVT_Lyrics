@@ -96,7 +96,9 @@ export function validateData(data) {
   const rev = data._review || {};
   for (const id of Object.keys(rev)) {
     const r = rev[id] || {};
-    const nm = (songs.find((s) => s.id === id) || {}).name || "(없는 곡)";
+    const bid = String(id).split("#")[0];   // 변형 키(s60#1)면 곡 id 추출
+    const isVar = id.includes("#");
+    const nm = ((songs.find((s) => s.id === bid) || {}).name || "(없는 곡)") + (isVar ? " · 변형" : "");
     review.push({ id, name: nm, reason: r.reason || "확인 필요", fields: r.fields || [] });
   }
 

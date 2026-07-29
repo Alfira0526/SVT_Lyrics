@@ -68,7 +68,7 @@
   .counter{font-size:14px;color:var(--muted)}
   .counter b{color:var(--txt);font-size:15px}
   .badge{padding:4px 11px;border-radius:999px;font-size:13px;font-weight:800}
-  .b-상{background:rgba(240,96,155,.16);color:var(--rose-ink);border:1px solid rgba(240,96,155,.42)}
+  .b-상{background:rgba(240,96,155,.16);color:#BC2668;border:1px solid rgba(240,96,155,.42)}  /* 파스텔필 위 AA(4.9:1) 통과용 딥 로즈 */
   .b-중{background:rgba(184,146,230,.16);color:var(--lilac-ink);border:1px solid rgba(184,146,230,.42)}
   .b-신곡{background:rgba(138,162,242,.16);color:var(--serene-ink);border:1px solid rgba(138,162,242,.42)}
 
@@ -160,6 +160,14 @@
   #staging-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:repeating-linear-gradient(45deg,#3a2a00,#3a2a00 12px,#4a3600 12px,#4a3600 24px);color:#ffcf5c;font-size:13px;font-weight:800;text-align:center;padding:8px 12px;border-bottom:1px solid var(--amber)}
   #staging-banner a{color:#fff6e6;text-decoration:underline}
   body.staging{padding-top:38px}
+  /* 검수용 접속 비밀번호 게이트 */
+  #staging-gate{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  #staging-gate .sg-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 12px 34px rgba(80,50,110,.16)}
+  #staging-gate h2{font-size:18px;color:var(--txt);margin-bottom:6px}
+  #staging-gate p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.55}
+  #staging-gate input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;box-sizing:border-box}
+  #staging-gate button{width:100%;padding:11px;margin-top:10px;border:0;border-radius:10px;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(180deg,var(--serene-deep),var(--serene-ink));cursor:pointer}
+  #staging-gate .sg-err{color:var(--red-ink);font-size:12px;min-height:16px;margin-top:8px}
   .chip-test{background:rgba(255,207,92,.16);border-color:var(--amber);color:var(--amber)}
   .chip-test.active{background:var(--amber);color:#3a2a00;border-color:transparent}
   .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene-ink)}
@@ -239,6 +247,9 @@
   /* ---- 저장 슬롯 잠금 ---- */
   #slot-card.locked #slot-body{display:none}
   #slot-card:not(.locked) #slot-lock{display:none}
+  /* 문항·가사 편집기는 관리자 잠금 해제 후에만 노출(실서비스 일반 방문자엔 숨김) */
+  #editor-block{display:none}
+  body.admin-open #editor-block{display:block}
   .slot-lock{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
   .slot-lock .sl-emoji{font-size:18px;flex:none}
   .slot-lock input{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:15px;letter-spacing:3px;font-family:inherit}
@@ -395,7 +406,6 @@
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
     <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
-    <p class="intro-note">설정 탭에서 문항·가사를 편집할 수 있어요</p>
     <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;opacity:.9">비영리 팬 제작 도구 💎 · 가사는 짧은 발췌, MV는 공식 영상 임베드 · 음원·영상·가사의 권리는 각 권리자에게 있습니다</p>
   </div>
 </div>
@@ -715,7 +725,7 @@
     <div class="card locked" id="slot-card">
       <div class="set-head">
         <div>
-          <h2>저장 슬롯 <span style="font-size:12px;color:var(--muted);font-weight:600">여러 벌 저장 · 🔒 비밀번호</span></h2>
+          <h2>관리자 <span style="font-size:12px;color:var(--muted);font-weight:600">저장 슬롯 · 문항 편집 · 통계 · 🔒 비밀번호</span></h2>
           <div class="fill-count">저장된 구성 <b id="slot-count">0</b>개</div>
         </div>
       </div>
@@ -753,6 +763,7 @@
       </div>
     </div>
 
+    <div id="editor-block">
     <div class="card">
       <div class="set-head">
         <div>
@@ -778,6 +789,7 @@
     </div>
     <div id="s-list"></div>
     <button class="btn btn-ghost" id="s-add" style="width:100%">+ 곡 추가</button>
+    </div>
   </section>
 
   <!-- ================= RESULT ================= -->
@@ -2858,13 +2870,28 @@ const Room = (function(){
 // 로컬 저장 슬롯·통계 열람용이며 서버 보호가 아님(오프라인 단일 파일이라 진짜 접근제어는 불가).
 // 비밀번호 변경: 브라우저 콘솔에서 slotHash("새비밀번호") 실행 → 나온 숫자로 SLOT_PW_HASH 교체.
 function slotHash(s){ s=String(s); let x=5381; for(let i=0;i<s.length;i++){ x=((x<<5)+x+s.charCodeAt(i))>>>0; } return x; }
-const SLOT_PW_HASH=2097738970;
+const SLOT_PW_HASH=3726493666;
+
+// 검수용(?staging) 접속 비밀번호 게이트 — 일반 방문자 차단(캐주얼 보호, 서버 인증 아님).
+// 비밀번호 변경: 콘솔에서 slotHash("새비번") 실행 후 STAGING_PW_HASH 교체.
+const STAGING_PW_HASH=1565959202;   // 현재 비밀번호: caratreview
+function stagingGate(){
+  try{ if(sessionStorage.getItem("svt_staging_ok")==="1") return; }catch(e){}
+  const el=document.createElement("div"); el.id="staging-gate";
+  el.innerHTML='<div class="sg-card"><h2>🧪 검수용 페이지</h2><p>오픈 전 문제를 검수하는 공간입니다.<br>접속 비밀번호를 입력하세요.</p><input id="sg-input" type="password" placeholder="접속 비밀번호" autocomplete="off"/><button id="sg-go">확인</button><div class="sg-err" id="sg-err"></div></div>';
+  document.body.appendChild(el);
+  const inp=el.querySelector("#sg-input"), go=el.querySelector("#sg-go"), err=el.querySelector("#sg-err");
+  function tryPw(){ if(slotHash(inp.value)===STAGING_PW_HASH){ try{ sessionStorage.setItem("svt_staging_ok","1"); }catch(e){} el.remove(); } else { err.textContent="비밀번호가 올바르지 않습니다."; inp.value=""; inp.focus(); } }
+  go.addEventListener("click", tryPw);
+  inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); tryPw(); } });
+  setTimeout(()=>{ try{ inp.focus(); }catch(e){} }, 50);
+}
 (function(){
   const card=document.getElementById("slot-card");
   const pw=document.getElementById("slot-pw");
   const err=document.getElementById("slot-err");
   function tryUnlock(){
-    if(slotHash(pw.value)===SLOT_PW_HASH){ card.classList.remove("locked"); err.textContent=""; pw.value=""; renderStats(); }
+    if(slotHash(pw.value)===SLOT_PW_HASH){ card.classList.remove("locked"); document.body.classList.add("admin-open"); err.textContent=""; pw.value=""; renderStats(); }
     else{ err.textContent="비밀번호가 올바르지 않습니다."; pw.value=""; pw.focus(); }
   }
   document.getElementById("slot-ok").addEventListener("click",tryUnlock);
@@ -2883,6 +2910,7 @@ els.speedval.textContent="1.0×";
 (async ()=>{
   if(STAGING){
     document.body.classList.add("staging");
+    stagingGate();   // 접속 비밀번호 게이트(캐주얼 방문자 차단)
     // 검수용 페이지는 검색엔진 색인 제외(공개 URL이지만 검색 노출 방지)
     try{ document.head.insertAdjacentHTML("beforeend", '<meta name="robots" content="noindex, nofollow">'); }catch(e){}
     document.body.insertAdjacentHTML("afterbegin", '<div id="staging-banner">🧪 스테이징(검수용) 모드 · 실제 게임 데이터가 아닙니다 · <a href="?">실서비스로</a></div>');

@@ -2345,8 +2345,11 @@ document.getElementById("c-hide").addEventListener("change",e=>{ config.hideLyri
 document.getElementById("c-sfx").addEventListener("change",e=>{ config.sfx=e.target.checked; saveState(); if(config.sfx) audioCtx(); });
 document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
 document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
-document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); });
-document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); });
+// 팀전/4지선다를 게임 '도중' 바꾸면 이전(솔로 등) 정답 흔적(marks)과 팀 점수(teamScores)가 어긋나
+// "정답 N인데 팀 점수 0"처럼 보이는 문제가 생김 → 진행 중이면 새로 시작해 두 카운터 기준을 일치시킴.
+function modeToggleReset(){ if(gameActive && order.length){ startNewGame(true); renderGame(); toast("모드가 바뀌어 새로 시작합니다"); } }
+document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); modeToggleReset(); });
+document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); modeToggleReset(); });
 document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
 document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
 document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });

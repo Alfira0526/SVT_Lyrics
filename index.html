@@ -2590,7 +2590,7 @@ function renderSetup(){
   const lockCb=(id,locked)=>{ const el=document.getElementById(id); if(el) el.disabled=!!locked; };
   lockCb("c-team", M!=="normal");       // 대결 ON고정 / 무한 OFF고정 / 일반 자유
   lockCb("c-mc", M!=="normal");         // 대결·무한 4지선다 고정
-  lockCb("c-teamblind", M!=="battle");  // 팀 선택 가리기는 대결에서만 유효
+  lockCb("c-teamblind", true);          // 팀 선택 가리기: 대결에서 필수(ON 고정)·그 외 비활성
 }
 // 모드별 추천 옵션 패키지(선택 시 적용). 각 모드가 팀·온라인 등을 '완전히' 지정해
 // 모드 전환 시 이전 모드의 잔여 설정(예: onlineRoom)이 남아 게임 화면 대신 방 로비로 새는 문제를 방지.
@@ -2634,6 +2634,10 @@ document.querySelectorAll('#scope-dims [data-dim]').forEach(btn=>btn.addEventLis
    기획: 호스트 PC로 방을 열면 같은 공간의 참가자들이 모바일로 참가 → 각자 폰에서 답 선택 → 결과 취합.
    전송: 같은 브라우저는 BroadcastChannel(검증됨), 다른 기기는 공개 MQTT 릴레이(베스트에포트, 지연 로드·폴백).
    타입별 처리라 자기 메시지 에코는 무시. 상태/명단/결과는 retain 발행으로 늦게 들어온 참가자도 동기화. */
+// 온라인 방 진단 로그 — URL에 ?debug=1 (또는 localStorage svtq_debug=1)이면 콘솔에 [ROOM] 로그.
+// 실기기(폰+PC) 온라인 방 점수 디버깅용: 답 수신·라운드 일치·채점 결과를 추적.
+const ROOM_DEBUG = (function(){ try{ return /[?&]debug=1/.test(location.search) || localStorage.getItem("svtq_debug")==="1"; }catch(e){ return false; } })();
+function rlog(){ if(!ROOM_DEBUG) return; try{ console.log.apply(console, ["%c[ROOM]","color:#D6337E;font-weight:700"].concat([].slice.call(arguments))); }catch(e){} }
 const Room = (function(){
   let mqttTried=false;
   function loadMqtt(){
@@ -2700,7 +2704,12 @@ const Room = (function(){
     host.tx.onmsg(m=>{
       if(m.type==="hello"){ hostPushSlots(); hostSyncGuest(); }
       else if(m.type==="claim"){ hostClaim(m.dev, m.name); }
-      else if(m.type==="answer" && host.claims[m.name]){ if((m.round||0)!==(host.round||0)) return; (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid); }
+      else if(m.type==="answer"){
+        const claimed=!!host.claims[m.name], rmatch=(m.round||0)===(host.round||0);
+        rlog("answer recv:", "name="+m.name, "pick="+m.pick, "qid="+m.qid, "round="+(m.round||0), "hostRound="+(host.round||0), claimed?(rmatch?"→ ACCEPT":"→ DROP(round mismatch)"):"→ DROP(unclaimed name; claims="+Object.keys(host.claims).join(",")+")");
+        if(!claimed || !rmatch) return;
+        (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid);
+      }
     });
     document.getElementById("rl-code").textContent=host.code;
     document.getElementById("rhb-code").textContent=host.code;
@@ -2758,8 +2767,9 @@ const Room = (function(){
     if(!host.active||host.phase!=="playing") return;
     const ci=mcOptions.findIndex(o=>o.correct);
     const ans=host.answers[pos]||{};
+    rlog("reveal: correctIdx="+ci, "qid(pos)="+pos, "submitted="+JSON.stringify(ans), "roster(before)="+rosterArr().map(t=>t.name+":"+t.score).join(","));
     let any=false;
-    Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]) host.roster[tid].score+=1; any=true; } });
+    Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]){ host.roster[tid].score+=1; rlog("  +1 →", tid, "("+host.roster[tid].score+")"); } else rlog("  ⚠ roster에 없음:", tid); any=true; } else rlog("  ✗ 미정답", tid, "picked="+ans[tid], "correct="+ci); });
     marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
     updateCounters();
     const song=songById(order[pos]); const c=qc(order[pos]);
@@ -2880,7 +2890,7 @@ const Room = (function(){
     if(guest.answered) return; guest.answered=true;
     [...document.querySelectorAll("#rg-mc .mc-opt")].forEach((b,idx)=>{ b.disabled=true; if(idx===i) b.classList.add("picked"); });
     const qid=guest.qid, rnd=guest.round||0;   // 스냅샷 — 재전송이 다음 라운드(같은 qid)로 새지 않도록
-    const send=()=>guest.tx.send({type:"answer", qid:qid, round:rnd, name:guest.team, pick:i});
+    const send=()=>{ rlog("guest send answer:", "team="+guest.team, "pick="+i, "qid="+qid, "round="+rnd); guest.tx.send({type:"answer", qid:qid, round:rnd, name:guest.team, pick:i}); };
     send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 1200);
     document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
   }
@@ -2898,6 +2908,7 @@ const Room = (function(){
   }
   function guestRoster(m){
     if(!m.roster) return;
+    rlog("guest roster recv:", m.roster.map(t=>t.name+":"+t.score).join(","));
     const me=m.roster.find(t=>t.name===guest.team);
     const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");

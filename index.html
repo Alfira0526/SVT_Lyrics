@@ -250,6 +250,17 @@
   /* 문항·가사 편집기는 관리자 잠금 해제 후에만 노출(실서비스 일반 방문자엔 숨김) */
   #editor-block{display:none}
   body.admin-open #editor-block{display:block}
+  /* 결과 공유 버튼 */
+  .share-box{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+  .share-title{font-size:13px;font-weight:800;color:var(--txt);margin-bottom:9px;text-align:center}
+  .share-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .share-btn{padding:12px 10px;border-radius:12px;border:1px solid var(--line);font-size:14px;font-weight:800;cursor:pointer;transition:.15s;min-height:44px}
+  .share-btn:hover{transform:translateY(-1px)}
+  .share-btn:active{transform:translateY(0)}
+  .share-btn.sh-tw{background:#E8F3FE;border-color:#BFE0FB;color:#1573C6}
+  .share-btn.sh-ig{background:#FDEAF3;border-color:#F7C6DD;color:#C13584}
+  .share-btn.sh-kko{background:#FEF6D8;border-color:#F5E59A;color:#8A6A00}
+  .share-btn.sh-copy{background:var(--panel2);border-color:var(--line);color:var(--ink)}
   .slot-lock{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
   .slot-lock .sl-emoji{font-size:18px;flex:none}
   .slot-lock input{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:10px 12px;font-size:15px;letter-spacing:3px;font-family:inherit}
@@ -816,6 +827,15 @@
       </div>
       <div class="controls" style="margin-top:10px">
         <button class="btn btn-ghost" id="r-home" style="flex:1">🏠 처음으로</button>
+      </div>
+      <div class="share-box">
+        <div class="share-title">📣 결과 공유하기</div>
+        <div class="share-btns">
+          <button class="share-btn sh-tw" id="sh-tw" type="button">🐦 트위터</button>
+          <button class="share-btn sh-ig" id="sh-ig" type="button">📸 인스타 스토리</button>
+          <button class="share-btn sh-kko" id="sh-kko" type="button">💬 카카오톡</button>
+          <button class="share-btn sh-copy" id="sh-copy" type="button">🔗 문구·링크 복사</button>
+        </div>
       </div>
       <p class="hint" id="r-breakdown"></p>
       <p class="hint" id="r-recap" style="margin-top:2px;display:none"></p>
@@ -2388,6 +2408,7 @@ function renderRankRows(rank){
     return `<div class="r"><span class="rank-no">${rn}위</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`;
   }).join("");
 }
+let lastResult=null;   // 마지막 결과(공유용): {correct, answered, rate, gradeEmoji, gradeTitle}
 function renderResult(){
   let c=0,w=0; for(const k in marks){ if(marks[k]==="correct")c++; else if(marks[k]==="wrong")w++; }
   const answered=c+w, rate=answered?Math.round(c/answered*100):0;
@@ -2401,6 +2422,7 @@ function renderResult(){
   const g=grade(rate,answered);
   document.getElementById("r-grade").textContent=g.emoji+" "+g.title;
   document.getElementById("r-grade-desc").textContent=g.desc;
+  lastResult={correct:c, answered, rate, gradeEmoji:g.emoji, gradeTitle:g.title};   // 결과 공유용
 
   const by={상:{c:0,t:0},중:{c:0,t:0},신곡:{c:0,t:0}};
   for(const k in marks){ const s=songById(k); if(!s)continue; if(!by[s.diff])continue; by[s.diff].t++; if(marks[k]==="correct")by[s.diff].c++; }
@@ -2457,6 +2479,91 @@ document.getElementById("r-next-round").addEventListener("click",()=>{
   startNextRound();
   toast("🆕 새 문제로 이어갑니다");
 });
+
+/* ===================== 결과 공유 (트위터·인스타 스토리·카카오톡) ===================== */
+const SERVICE_URL="https://alfira0526.github.io/SVT_Lyrics/";   // 실서비스 링크(스테이징 아님)
+const SHARE_TAGS=["세븐틴","SEVENTEEN","세븐틴가사퀴즈","캐럿","CARAT"];
+function shareCaption(){
+  const r=lastResult||{correct:0,answered:0,rate:0,gradeEmoji:"🎧",gradeTitle:""};
+  const grade=r.gradeTitle?` — ${r.gradeEmoji} ${r.gradeTitle}`:"";
+  return r.answered
+    ? `세븐틴 가사 퀴즈 ${r.answered}문제 중 ${r.correct}개 정답! (정답률 ${r.rate}%)${grade}\n가사만 듣고 세븐틴 곡 맞히기, 당신도 도전해보세요 🎧`
+    : `가사만 듣고 세븐틴 곡 맞히기 — 세븐틴 가사 퀴즈 🎧 당신도 도전!`;
+}
+function shareHashline(){ return SHARE_TAGS.map(t=>"#"+t).join(" "); }
+function shareFull(){ return shareCaption()+"\n\n"+SERVICE_URL+"\n"+shareHashline(); }
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){ try{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand("copy"); ta.remove(); return ok; }catch(e2){ return false; } }
+}
+function shareTwitter(){
+  try{
+    const u="https://twitter.com/intent/tweet?text="+encodeURIComponent(shareCaption())
+      +"&url="+encodeURIComponent(SERVICE_URL)
+      +"&hashtags="+encodeURIComponent(SHARE_TAGS.join(","));
+    window.open(u,"_blank","noopener,noreferrer");
+  }catch(e){ copyText(shareFull()).then(()=>toast("📋 복사됨 · 트위터에 붙여넣으세요")); }
+}
+async function shareKakao(){
+  // 카카오 공식 공유는 JS SDK+앱키가 필요(단일 파일·무의존 원칙과 충돌)하므로
+  // 모바일은 네이티브 공유 시트(카카오톡 선택 가능), 데스크톱은 클립보드 복사로 대체.
+  const full=shareFull();
+  try{
+    if(navigator.share){ await navigator.share({title:"세븐틴 가사 퀴즈", text:shareCaption()+"\n\n"+shareHashline(), url:SERVICE_URL}); return; }
+  }catch(e){ if(e && e.name==="AbortError") return; }
+  const ok=await copyText(full);
+  toast(ok?"📋 문구+링크+해시태그 복사됨 · 카카오톡에 붙여넣어 공유하세요":"복사 실패 — 길게 눌러 복사하세요");
+}
+async function shareCopy(){
+  const ok=await copyText(shareFull());
+  toast(ok?"📋 결과 문구+링크+해시태그가 복사됐어요":"복사 실패 — 길게 눌러 복사하세요");
+}
+// 인스타 스토리용 결과 카드 이미지(1080×1920) 생성 — IG는 웹 인텐트가 없어 이미지 공유가 정석.
+function makeResultImage(cb){
+  try{
+    const W=1080,H=1920,cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+    const x=cv.getContext("2d");
+    const bg=x.createLinearGradient(0,0,W,H); bg.addColorStop(0,"#FFC8DD"); bg.addColorStop(.5,"#CDB4DB"); bg.addColorStop(1,"#A2D2FF");
+    x.fillStyle=bg; x.fillRect(0,0,W,H);
+    // 카드
+    const cx=90,cy=430,cw=W-180,ch=1060,rad=54;
+    x.fillStyle="rgba(255,255,255,.94)";
+    x.beginPath();
+    x.moveTo(cx+rad,cy); x.arcTo(cx+cw,cy,cx+cw,cy+ch,rad); x.arcTo(cx+cw,cy+ch,cx,cy+ch,rad); x.arcTo(cx,cy+ch,cx,cy,rad); x.arcTo(cx,cy,cx+cw,cy,rad); x.closePath(); x.fill();
+    const r=lastResult||{correct:0,answered:0,rate:0,gradeEmoji:"🎧",gradeTitle:"세븐틴 가사 퀴즈"};
+    x.textAlign="center";
+    x.fillStyle="#4A2E55"; x.font="800 66px sans-serif"; x.fillText("세븐틴 가사 퀴즈",W/2,600);
+    x.fillStyle="#7A46A6"; x.font="700 34px sans-serif"; x.fillText("SVT LYRICS QUIZ",W/2,655);
+    x.fillStyle="#D6337E"; x.font="900 210px sans-serif"; x.fillText(r.answered?`${r.correct}/${r.answered}`:"?",W/2,930);
+    x.fillStyle="#2B67CC"; x.font="800 62px sans-serif"; x.fillText(r.answered?`정답률 ${r.rate}%`:"지금 도전!",W/2,1030);
+    x.fillStyle="#4A2E55"; x.font="800 68px sans-serif"; x.fillText(`${r.gradeEmoji} ${r.gradeTitle||""}`.trim(),W/2,1200);
+    x.fillStyle="#6E6191"; x.font="600 38px sans-serif"; x.fillText("#세븐틴가사퀴즈  #SEVENTEEN  #캐럿",W/2,1360);
+    x.fillStyle="#4A2E55"; x.font="700 40px sans-serif"; x.fillText("alfira0526.github.io/SVT_Lyrics",W/2,1450);
+    x.fillStyle="#6E6191"; x.font="500 34px sans-serif"; x.fillText("가사만 듣고 세븐틴 곡 맞히기 · 지금 도전!",W/2,1510);
+    cv.toBlob(b=>cb(b), "image/png");
+  }catch(e){ cb(null); }
+}
+function shareInstagram(){
+  makeResultImage(async (blob)=>{
+    const cap=shareCaption()+"\n\n"+shareHashline()+"\n"+SERVICE_URL;
+    try{
+      if(blob && navigator.canShare){
+        const file=new File([blob],"svt-quiz-result.png",{type:"image/png"});
+        if(navigator.canShare({files:[file]})){
+          try{ await navigator.share({files:[file], text:cap}); return; }catch(e){ if(e && e.name==="AbortError") return; }
+        }
+      }
+    }catch(e){}
+    // 폴백: 이미지 저장 + 캡션 복사(스토리에 직접 업로드 안내)
+    try{ if(blob){ const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="svt-quiz-result.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); } }catch(e){}
+    await copyText(cap);
+    toast("📸 결과 이미지 저장 + 캡션 복사됨 · 인스타 스토리에 올려보세요!");
+  });
+}
+document.getElementById("sh-tw").addEventListener("click",shareTwitter);
+document.getElementById("sh-ig").addEventListener("click",shareInstagram);
+document.getElementById("sh-kko").addEventListener("click",shareKakao);
+document.getElementById("sh-copy").addEventListener("click",shareCopy);
 
 /* =====================  INIT  ===================== */
 // 시작 화면 → 기본 설정(게임 옵션) → 게임 시작

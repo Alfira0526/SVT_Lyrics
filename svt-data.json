@@ -1,5 +1,5 @@
 {
-  "rev": 1785204501354,
+  "rev": 1785316594805,
   "songs": [
     {
       "id": "s2",
@@ -406,7 +406,7 @@
       "time": "1:12"
     },
     "s11": {
-      "lyrics": "옆에 서 있을 때 위태로워 자연스러운 긴장이 좋은 나",
+      "lyrics": "널 뒤에서 안고 있을 때 난 뭐든 할 수 있을 것만 같아",
       "mv": "https://youtu.be/EECg4lPL_nE",
       "time": "0:17"
     },
@@ -954,12 +954,13 @@
     "onlineRoom": false,
     "fbUrl": "",
     "quizOnly": false,
-    "hideLyrics": false,
+    "hideLyrics": true,
     "sfx": true,
     "stage": false,
+    "mode": "normal",
     "scope": {
-      "by": "test",
-      "val": "1"
+      "by": "all",
+      "val": ""
     }
   }
 }

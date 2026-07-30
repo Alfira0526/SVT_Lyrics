@@ -3156,12 +3156,14 @@ const Room = (function(){
     }
     autoRun=!!config.autoHost;               // 오토 호스트면 자동 진행 시작
     startNewGame(true); renderGame();       // 자동 셔플 1회 + (타이머 켜짐 시) 타이머 시작
+    document.querySelector('nav.tabs button[data-view="game"]').click();   // 이전 판이 결과 화면에서 끝났어도 게임 화면으로 진입
     setup.style.display="none";
   }
   function startRoomPlay(){
     document.getElementById("room-lobby").style.display="none";
     Room.hostStartPlaying();
     renderGame();   // 첫 문항 표시 + 참가자에게 상태 전송
+    document.querySelector('nav.tabs button[data-view="game"]').click();   // 결과 화면 잔류 방지
   }
   document.getElementById("intro-start").addEventListener("click",()=>{ unlockAudio(); showSetup(); });
   document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });

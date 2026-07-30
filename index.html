@@ -428,6 +428,18 @@
   .intro-desc{color:var(--txt);font-size:16px;line-height:1.75;margin:0 0 22px}
   .intro-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:30px}
   .intro-chips span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--muted)}
+  #intro-rank-preview{margin-top:22px;width:100%;max-width:420px}
+  #intro-rank-preview .irp-title{font-size:13px;font-weight:800;color:var(--rose-ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;justify-content:center}
+  #intro-rank-preview .irp-live{width:7px;height:7px;border-radius:999px;background:#2ecc71;box-shadow:0 0 0 0 rgba(46,204,113,.6);animation:irpPulse 1.6s infinite}
+  @keyframes irpPulse{0%{box-shadow:0 0 0 0 rgba(46,204,113,.5)}70%{box-shadow:0 0 0 6px rgba(46,204,113,0)}100%{box-shadow:0 0 0 0 rgba(46,204,113,0)}}
+  #intro-rank-preview .irp-grid{display:flex;gap:10px}
+  #intro-rank-preview .irp-card{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-align:left}
+  #intro-rank-preview .irp-h{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:7px}
+  #intro-rank-preview .irp-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12.5px}
+  #intro-rank-preview .irp-no{flex:0 0 15px;color:var(--muted);font-weight:800;text-align:center}
+  #intro-rank-preview .irp-nick{flex:1;min-width:0;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #intro-rank-preview .irp-val{flex:0 0 auto;font-weight:900;color:var(--rose-ink)}
+  @media(max-width:360px){ #intro-rank-preview .irp-grid{flex-direction:column} }
   .intro-start{border:0;border-radius:14px;padding:16px 44px;font-size:18px;font-weight:900;color:var(--ink);cursor:pointer;background:linear-gradient(135deg,var(--rose),var(--serene));box-shadow:0 10px 30px rgba(240,96,155,.4);transition:.15s}
   .intro-start:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(240,96,155,.5)}
   .intro-start:active{transform:scale(.97)}
@@ -512,9 +524,9 @@
     <div class="intro-diamond"></div>
     <h1 class="intro-title">세븐틴 가사 퀴즈</h1>
     <p class="intro-sub">SVT LYRICS QUIZ</p>
-    <p class="intro-desc">세븐틴 가사를 듣고 원곡을 맞혀보세요.<br>사회자와 함께 즐기는 오프라인 팬 퀴즈쇼 🎤</p>
+    <p class="intro-desc">세븐틴 가사, <b style="color:var(--rose-ink)">눈으로 읽지 말고 귀로만</b> 맞혀요 🎧<br>혼자 도전부터 폰으로 즐기는 팀 대결까지</p>
     <div class="intro-chips">
-      <span>🔊 TTS 낭독</span><span>🙈 가사 가리기</span><span>👥 팀전</span><span>⏱️ 타이머</span>
+      <span>🔊 TTS 낭독</span><span>📱 온라인 대결</span><span>🖐 부저 배틀</span><span>🏆 글로벌 랭킹</span>
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
     <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
@@ -522,6 +534,7 @@
       <button class="btn btn-ghost btn-sm" id="intro-guide">❓ 게임 방법</button>
       <button class="btn btn-ghost btn-sm" id="intro-rank">🏆 랭킹</button>
     </div>
+    <div id="intro-rank-preview" style="display:none"></div>
     <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;opacity:.9">비영리 팬 제작 도구 💎 · 가사는 짧은 발췌, MV는 공식 영상 임베드 · 음원·영상·가사의 권리는 각 권리자에게 있습니다</p>
   </div>
 </div>
@@ -1383,6 +1396,27 @@ function rankRenderInto(board, el, unit){
       .catch(()=>{ el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; });
   } else { el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; }
 }
+// 메인(인트로) 실시간 랭킹 미리보기 — 보드별 데이터가 10개 이상 모이면 상위 5를 노출.
+const RANK_PREVIEW_MIN=10;
+function rankMiniRows(list){
+  const top=(list||[]).slice().sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,5);
+  return top.map((r,i)=>`<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${(parseInt(r.val,10)||0)}</span></div>`).join("");
+}
+function renderIntroRankPreview(){
+  const box=document.getElementById("intro-rank-preview"); if(!box) return;
+  if(!rankGlobalOn()){ box.style.display="none"; return; }   // 글로벌 연결이 있어야 '전 세계 실시간'이 의미 있음
+  Promise.all([rankFetchGlobal("solo"), rankFetchGlobal("infinite")]).then(([solo,infinite])=>{
+    solo=solo||[]; infinite=infinite||[];
+    const showSolo=solo.length>=RANK_PREVIEW_MIN, showInf=infinite.length>=RANK_PREVIEW_MIN;
+    if(!showSolo && !showInf){ box.style.display="none"; return; }   // 아직 10개 미만이면 숨김
+    let html='<div class="irp-title"><span class="irp-live"></span>🏆 실시간 랭킹</div><div class="irp-grid">';
+    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 정답 수</div>${rankMiniRows(solo)}</div>`;
+    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite)}</div>`;
+    html+='</div>';
+    box.innerHTML=html; box.style.display="";
+  }).catch(()=>{ /* 네트워크 실패 시 조용히 숨김(게임엔 영향 없음) */ });
+}
+
 // 닉네임 입력 + 등록 카드(결과 화면·무한 오버레이 공용). board:"solo"|"infinite", val:이번 기록.
 function renderRankSubmit(el, board, val, unit){
   if(!el) return; el.style.display=""; el.className="rk-submit";
@@ -3379,6 +3413,9 @@ const Room = (function(){
     rm.addEventListener("click",e=>{ if(e.target===rm) rm.style.display="none"; });
     document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.addEventListener("click",()=>{ board=t.dataset.board; draw(); }));
   })();
+  // 메인 실시간 랭킹 미리보기: 첫 로드 + 20초 주기 갱신(인트로 화면일 때만 폴링)
+  try{ renderIntroRankPreview(); }catch(e){}
+  setInterval(()=>{ try{ const intro=document.getElementById("intro"); if(intro && !intro.classList.contains("hide")) renderIntroRankPreview(); }catch(e){} }, 20000);
   document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });
   document.getElementById("setup-back").addEventListener("click",backToIntro);
   (function(){ const mc=document.getElementById("mode-cards"); if(!mc) return;

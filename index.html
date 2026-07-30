@@ -188,6 +188,15 @@
   .buzz-team .bz-name{flex:1;text-align:left;font-size:16px;color:var(--txt)}
   .buzz-team .bz-ok{flex:0 0 auto;font-size:14px;color:#fff;background:var(--green-ink);padding:6px 12px;border-radius:999px}
   .buzz-none{width:100%;padding:12px;margin-top:4px;border:1px dashed var(--line);border-radius:12px;background:var(--panel2);color:var(--muted);font-weight:700;cursor:pointer}
+  /* 고급 설정 접기 — 기본 설정 화면을 짧게 */
+  .setup-adv{margin:0 0 14px}
+  .setup-adv>summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;font-size:14px;color:var(--txt);background:var(--panel2);border:1px solid var(--line);border-radius:14px}
+  .setup-adv>summary::-webkit-details-marker{display:none}
+  .setup-adv>summary::after{content:"▾";color:var(--muted);float:right}
+  .setup-adv[open]>summary{border-radius:14px 14px 0 0}
+  .setup-adv[open]>summary::after{content:"▴"}
+  .setup-adv[open]{border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:12px 12px 4px;background:var(--panel)}
+  .setup-adv[open] .setup-card{margin-top:0;margin-bottom:12px}
   /* 참가자 본인 점수(상단 상시) */
   .rg-myscore{background:linear-gradient(180deg,#FFFFFF,#F3ECFA);border:1.5px solid var(--lilac);border-radius:12px;padding:9px 12px;margin:2px 0 8px;font-weight:800;color:var(--txt);text-align:center;font-size:15px}
   .rg-myscore b{color:var(--rose-ink)}
@@ -603,6 +612,8 @@
       <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
     </div>
 
+    <details class="setup-adv">
+      <summary>⚙️ 고급 설정 · 자동 진행 · 온라인 방 · 음성 확인</summary>
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-autohost" /><span class="slider"></span></label>
@@ -631,6 +642,7 @@
       <div style="font-size:14px;font-weight:700;margin-bottom:6px">🔊 음성(TTS) 준비 확인</div>
       <div id="voice-check-body" style="font-size:13px;line-height:1.65;color:var(--muted)">확인 중…</div>
     </div>
+    </details>
 
     <div class="setup-actions">
       <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
@@ -2637,12 +2649,9 @@ function renderSetup(){
   renderTeamEditor();
   renderScopeSetup();
   renderModeCards();
-  // 모드별 필수 옵션 잠금: 대결=팀·4지선다·팀가리기 필수(ON 고정) · 무한=팀 OFF·4지선다 고정 · 일반=자유
-  const M=config.mode||"normal";
-  const lockCb=(id,locked)=>{ const el=document.getElementById(id); if(el) el.disabled=!!locked; };
-  lockCb("c-team", M!=="normal");       // 대결 ON고정 / 무한 OFF고정 / 일반 자유
-  lockCb("c-mc", M!=="normal");         // 대결·무한 4지선다 고정
-  lockCb("c-teamblind", true);          // 팀 선택 가리기: 대결에서 필수(ON 고정)·그 외 비활성
+  // 모드 프리셋은 추천 기본값을 '설정'만 하고 잠그지 않는다(사용자가 개별 조정 가능).
+  // 하드 잠금은 팀 선택 가리기를 못 켜거나 대결에서 부저(4지선다 OFF)를 막는 문제가 있어 제거.
+  ["c-team","c-mc","c-teamblind"].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=false; });
 }
 // 모드별 추천 옵션 패키지(선택 시 적용). 각 모드가 팀·온라인 등을 '완전히' 지정해
 // 모드 전환 시 이전 모드의 잔여 설정(예: onlineRoom)이 남아 게임 화면 대신 방 로비로 새는 문제를 방지.

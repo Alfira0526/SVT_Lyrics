@@ -1338,7 +1338,7 @@ function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); 
 // 로컬 기록 우선 저장. RANK_URL(또는 방 릴레이 config.fbUrl)에 Firebase RTDB URL이 있으면 글로벌 순위표로 자동 전환.
 // RANK_URL 예: "https://내프로젝트-default-rtdb.firebaseio.com" (관리자가 설정하면 전 세계 공용 랭킹 활성화)
 const RANK_KEY="svt_lyrics_rank_v1";
-const RANK_URL="";   // ← Firebase Realtime Database base URL을 넣으면 글로벌 랭킹 ON (비우면 로컬 전용)
+const RANK_URL="https://svt-lyrics-quiz-default-rtdb.firebaseio.com";   // ← Firebase RTDB: 글로벌 랭킹 ON (비우면 로컬 전용)
 const RANK_MAX=50;   // 로컬 보관 상한
 function rankBase(){ try{ return (RANK_URL||config.fbUrl||"").replace(/\/+$/,""); }catch(e){ return ""; } }
 function rankGlobalOn(){ return !!rankBase(); }

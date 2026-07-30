@@ -174,6 +174,24 @@
   #room-debug .rd-body{overflow:auto;padding:5px 9px;flex:1 1 auto;-webkit-overflow-scrolling:touch}
   #room-debug.rd-min .rd-body{display:none}
   #room-debug .rd-body div{white-space:pre-wrap;word-break:break-all;border-bottom:1px solid rgba(255,255,255,.08);padding:2px 0}
+  /* 선착순 부저(4지선다 OFF · 온라인 방) */
+  .rg-buzz{width:100%;padding:34px 16px;border:0;border-radius:20px;font-size:26px;font-weight:900;color:#fff;background:linear-gradient(180deg,var(--rose-deep),var(--rose-ink));box-shadow:0 10px 26px rgba(214,51,126,.4);cursor:pointer;transition:.1s}
+  .rg-buzz:active{transform:scale(.97)}
+  .rg-buzz:disabled,.rg-buzz.buzzed{background:linear-gradient(180deg,#cbb8d6,#9d86ad);box-shadow:none;cursor:default}
+  .rg-buzz-order{margin-top:12px;font-size:15px;font-weight:700;color:var(--txt);line-height:1.7;text-align:center}
+  .buzz-team{display:flex;align-items:center;gap:10px;width:100%;padding:14px 14px;margin-bottom:8px;border:2px solid var(--line);border-radius:14px;background:var(--panel);cursor:pointer;font-weight:800;transition:.12s}
+  .buzz-team:hover{border-color:var(--serene-ink)}
+  .buzz-team.first{border-color:var(--rose-ink);background:linear-gradient(180deg,#fff,#FFF1F7)}
+  .buzz-team .bz-rank{flex:0 0 auto;width:26px;height:26px;border-radius:999px;background:var(--lilac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .buzz-team .bz-name{flex:1;text-align:left;font-size:16px;color:var(--txt)}
+  .buzz-team .bz-ok{flex:0 0 auto;font-size:14px;color:#fff;background:var(--green-ink);padding:6px 12px;border-radius:999px}
+  .buzz-none{width:100%;padding:12px;margin-top:4px;border:1px dashed var(--line);border-radius:12px;background:var(--panel2);color:var(--muted);font-weight:700;cursor:pointer}
+  /* 참가자 본인 점수(상단 상시) */
+  .rg-myscore{background:linear-gradient(180deg,#FFFFFF,#F3ECFA);border:1.5px solid var(--lilac);border-radius:12px;padding:9px 12px;margin:2px 0 8px;font-weight:800;color:var(--txt);text-align:center;font-size:15px}
+  .rg-myscore b{color:var(--rose-ink)}
+  /* 새 문항 시 '듣기' 버튼을 눈에 띄게(모바일 자동재생 제약 대비 — 탭 유도) */
+  #rg-speak.cue{animation:rgpulse 1s ease-in-out infinite}
+  @keyframes rgpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(214,51,126,.5)}50%{transform:scale(1.04);box-shadow:0 0 0 8px rgba(214,51,126,0)}}
   .chip-test{background:rgba(255,207,92,.16);border-color:var(--amber);color:var(--amber)}
   .chip-test.active{background:var(--amber);color:#3a2a00;border-color:transparent}
   .scope-line{margin-top:10px;font-size:12px;font-weight:700;color:var(--serene-ink)}
@@ -447,6 +465,7 @@
     </div>
     <div id="rg-play" style="display:none">
       <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
+      <div class="rg-myscore" id="rg-myscore" style="display:none"></div>
       <div class="rg-toprow" style="display:flex;gap:8px;align-items:center;margin:6px 0 10px">
         <button class="btn btn-play btn-sm" id="rg-speak">▶ 듣기</button>
         <span class="rg-timer" id="rg-timer"></span>
@@ -1226,6 +1245,10 @@ function sfxTick(){ if(!config.sfx) return; beep(880,0.05,"square",0.07,0); }
 function sfxWin(){ if(!config.sfx) return; [523,659,784,1047].forEach((f,i)=>beep(f,0.16,"triangle",0.15,i*0.085)); }
 // 사용자 제스처에서 오디오 컨텍스트 unlock(iOS 자동재생 제약 회피)
 function unlockAudio(){ if(config.sfx) audioCtx(); }
+// 모바일 TTS 잠금 해제: 모바일 브라우저는 사용자 제스처 없이 speechSynthesis를 막음.
+// 참가자 첫 탭(입장·팀 선택·듣기)에서 무음 발화를 한 번 재생해 이후 낭독이 나오게 함.
+let speechUnlocked=false;
+function unlockSpeech(){ try{ if(speechUnlocked||!("speechSynthesis" in window)) return; speechUnlocked=true; const u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u); }catch(e){} }
 /* 정답 시 짧은 ✨ 축하 버스트(모션 최소화 설정 존중) */
 function celebrateBurst(){
   try{
@@ -1526,7 +1549,10 @@ function renderMc(){
   const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
   if(!box) return;
   // 온라인 방: 참가자가 각자 폰에서 고름 → 방장 화면엔 보기 그리드 숨김(방장은 진행 화면)
-  if(config.onlineRoom && Room.host.active){ box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML="📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인"; } return; }
+  if(config.onlineRoom && Room.host.active){
+    if(!config.mc){ Room.hostRenderBuzz(); return; }   // 부저 모드(4지선다 OFF): 방장 부저 판정 패널
+    box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML="📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인"; } return;
+  }
   if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; if(turnEl) turnEl.style.display="none"; return; }
   box.style.display="grid"; box.innerHTML="";
   const keys=["A","B","C","D"];
@@ -2730,10 +2756,10 @@ const Room = (function(){
   function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
 
   /* ---- 호스트 ---- */
-  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0 };
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0, buzzes:{}, buzzWinner:null };
   async function hostOpen(){
     if(!config.fbUrl) await loadMqtt();
-    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0;
+    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0; host.buzzes={}; host.buzzWinner=null;
     host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
     host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
     host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
@@ -2746,6 +2772,7 @@ const Room = (function(){
         if(!claimed || !rmatch) return;
         (host.answers[m.qid]=host.answers[m.qid]||{})[m.name]=m.pick; hostBar(); maybeAutoReveal(m.qid);
       }
+      else if(m.type==="buzz"){ if(host.claims[m.name] && (m.round||0)===(host.round||0)) hostBuzz(m.name); }
     });
     document.getElementById("rl-code").textContent=host.code;
     document.getElementById("rhb-code").textContent=host.code;
@@ -2787,9 +2814,11 @@ const Room = (function(){
   function hostState(){
     if(order.length===0) return null;
     const c=qc(order[pos]);
+    host.buzzWinner=null;   // 새 문항: 부저 승자 초기화
     return { type:"state", qid:pos, round:host.round||0, index:pos+1, total:order.length,
       lyric:(c.lyrics||"").trim(), lang:c.lang||"", read:c.read||"",
       hideLyrics:!!config.hideLyrics,   // 방장의 가사 가리기 설정을 참가자 화면에도 반영(낭독은 유지, 텍스트만 가림)
+      buzzer:!config.mc,   // 4지선다 OFF면 부저 모드(참가자는 「정답!」 부저 버튼)
       options:mcOptions.map(o=>o.name),
       sec:(config.timerOn?config.timerSec:0),
       quizOnly:!!config.quizOnly,
@@ -2801,17 +2830,47 @@ const Room = (function(){
   function hostPushRoster(){ if(!host.active) return; host.tx.send({type:"roster", roster:rosterArr()}, true); }
   function hostReveal(){
     if(!host.active||host.phase!=="playing") return;
-    const ci=mcOptions.findIndex(o=>o.correct);
-    const ans=host.answers[pos]||{};
-    rlog("reveal: correctIdx="+ci, "qid(pos)="+pos, "submitted="+JSON.stringify(ans), "roster(before)="+rosterArr().map(t=>t.name+":"+t.score).join(","));
-    let any=false;
-    Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]){ host.roster[tid].score+=1; rlog("  +1 →", tid, "("+host.roster[tid].score+")"); } else rlog("  ⚠ roster에 없음:", tid); any=true; } else rlog("  ✗ 미정답", tid, "picked="+ans[tid], "correct="+ci); });
-    marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
+    let ci=-1, any=false;
+    if(!config.mc){   // 부저 모드: 방장이 판정한 승리팀에게만 득점
+      const w=host.buzzWinner;
+      if(w && host.roster[w]){ host.roster[w].score+=1; any=true; }
+      marks[order[pos]]=any?"correct":"wrong";
+      rlog("buzz reveal: winner="+(w||"(없음)"));
+    } else {
+      ci=mcOptions.findIndex(o=>o.correct);
+      const ans=host.answers[pos]||{};
+      rlog("reveal: correctIdx="+ci, "qid(pos)="+pos, "submitted="+JSON.stringify(ans), "roster(before)="+rosterArr().map(t=>t.name+":"+t.score).join(","));
+      Object.keys(ans).forEach(tid=>{ if(ans[tid]===ci){ if(host.roster[tid]){ host.roster[tid].score+=1; rlog("  +1 →", tid, "("+host.roster[tid].score+")"); } else rlog("  ⚠ roster에 없음:", tid); any=true; } else rlog("  ✗ 미정답", tid, "picked="+ans[tid], "correct="+ci); });
+      marks[order[pos]]=any?"correct":"wrong";   // 진행/결과 집계 반영(팀 중 정답자 있으면 정답 처리)
+    }
     updateCounters();
     const song=songById(order[pos]); const c=qc(order[pos]);
-    host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
+    host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr(), winner:(!config.mc?(host.buzzWinner||""):"")}, true);
     hostBar();
     if(config.teamMode){ try{ renderTeamBoard(); }catch(e){} }   // 방장 팀 점수판을 roster 값으로 즉시 갱신
+  }
+  // 부저(선착순) — 참가자가 「정답!」을 누르면 순서 기록·전파, 방장이 구두 판정 후 득점.
+  function hostBuzz(name){
+    if(!host.active||host.phase!=="playing"||answerShown()) return;
+    host.buzzes[pos]=host.buzzes[pos]||[];
+    if(host.buzzes[pos].indexOf(name)<0) host.buzzes[pos].push(name);
+    host.tx.send({type:"buzzlock", qid:pos, round:host.round||0, order:host.buzzes[pos].slice()}, true);
+    rlog("buzz:", name, "→ 순서="+host.buzzes[pos].join(","));
+    hostRenderBuzz();
+  }
+  function hostBuzzPick(winner){ host.buzzWinner=winner||null; try{ showAnswer(); }catch(e){} }   // 방장 판정 → 공개(정답이면 그 팀 득점)
+  function hostRenderBuzz(){
+    const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
+    if(!box) return;
+    const ord=host.buzzes[pos]||[];
+    if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn";
+      turnEl.innerHTML = ord.length ? `🖐 <b>${escapeHtml(ord[0])}</b> 먼저! · 구두로 답을 듣고 아래에서 판정하세요` : "🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요"; }
+    box.style.display="block"; box.innerHTML="";
+    ord.forEach((nm,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="buzz-team"+(i===0?" first":"");
+      b.innerHTML=`<span class="bz-rank">${i+1}</span><span class="bz-name">${escapeHtml(nm)}${i===0?" ⚡":""}</span><span class="bz-ok">정답 ✓</span>`;
+      b.addEventListener("click",()=>hostBuzzPick(nm)); box.appendChild(b); });
+    const none=document.createElement("button"); none.type="button"; none.className="buzz-none"; none.textContent="정답 공개 (아무도 못 맞힘)";
+    none.addEventListener("click",()=>hostBuzzPick(null)); box.appendChild(none);
   }
   function hostBar(){
     if(!host.active) return;
@@ -2827,7 +2886,7 @@ const Room = (function(){
   }
   function hostNextRound(){   // 새 라운드 시작: 라운드 번호 증가·답안 초기화 → renderGame이 새 상태 전송
     if(!host.active) return;
-    host.round=(host.round||0)+1; host.answers={}; host.phase="playing";
+    host.round=(host.round||0)+1; host.answers={}; host.buzzes={}; host.buzzWinner=null; host.phase="playing";
   }
   function hostEnd(){ if(host.active){ try{ host.tx.send({type:"ended", roster:rosterArr()}, true); }catch(e){} } hostClose(); }
   function hostClose(){ if(host.tx){ try{ host.tx.clear(); }catch(e){} host.tx.close(); } host.active=false; host.phase="lobby"; document.getElementById("room-host-bar").style.display="none"; document.getElementById("rl-video").innerHTML=""; }
@@ -2848,6 +2907,7 @@ const Room = (function(){
       else if(m.type==="claimno"){ if(m.dev===guest.teamId){ const e=document.getElementById("rg-pick-err"); if(e) e.textContent="이미 선택된 팀이에요. 다른 팀을 골라주세요."; } }
       else if(m.type==="state"){ if(guest.team) guestState(m); }
       else if(m.type==="reveal"){ if(guest.team) guestReveal(m); }
+      else if(m.type==="buzzlock"){ if(m.qid===guest.qid){ const od=document.getElementById("rg-buzz-order"); if(od) od.innerHTML="🖐 "+(m.order||[]).map((nm,i)=>`${i+1}. ${escapeHtml(nm)}${nm===guest.team?" (나)":""}${i===0?" ⚡먼저":""}`).join("<br>"); } }
       else if(m.type==="roster") guestRoster(m);
       else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
@@ -2917,11 +2977,27 @@ const Room = (function(){
     document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
     // 방장이 '가사 가리기'면 참가자 화면에도 텍스트를 감춤(듣기로만 맞히기) — 낭독은 그대로 재생
     document.getElementById("rg-lyric").textContent=m.hideLyrics ? "🙈 가사 가리기 · ▶ 듣기로 맞혀보세요" : (m.lyric||"");
-    document.getElementById("rg-mc").style.display="grid";
-    if(isNew){ guestCountdown(m.sec||0); if(!m.quizOnly) guestSpeak(); document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독(문제만 맞추기 제외)+카운트다운, 힌트 초기화
-    const box=document.getElementById("rg-mc"); box.style.display="grid"; box.innerHTML="";
-    const keys=["A","B","C","D"];
-    (m.options||[]).forEach((nm,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(nm)}</span>`; b.disabled=guest.answered; b.addEventListener("click",()=>guestAnswer(i)); box.appendChild(b); });
+    if(isNew){ guest.buzzed=false; guestCountdown(m.sec||0); if(!m.quizOnly){ guestSpeak(); const sp=document.getElementById("rg-speak"); if(sp) sp.classList.add("cue"); } document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독 시도(모바일 제약 대비 ▶듣기 버튼 강조)+카운트다운, 힌트 초기화
+    const box=document.getElementById("rg-mc"); box.innerHTML="";
+    if(m.buzzer){   // 부저 모드(4지선다 OFF): 큰 「정답!」 버튼 → 선착순
+      box.style.display="block";
+      document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 먼저 「정답!」을 누르세요`;
+      const b=document.createElement("button"); b.id="rg-buzz"; b.className="rg-buzz"; b.type="button"; b.textContent="🖐 정답!"; b.disabled=!!guest.buzzed;
+      b.addEventListener("click",guestBuzz); box.appendChild(b);
+      const od=document.createElement("div"); od.id="rg-buzz-order"; od.className="rg-buzz-order"; box.appendChild(od);
+    } else {
+      box.style.display="grid";
+      const keys=["A","B","C","D"];
+      (m.options||[]).forEach((nm,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(nm)}</span>`; b.disabled=guest.answered; b.addEventListener("click",()=>guestAnswer(i)); box.appendChild(b); });
+    }
+  }
+  function guestBuzz(){
+    if(guest.buzzed) return; guest.buzzed=true;
+    const b=document.getElementById("rg-buzz"); if(b){ b.disabled=true; b.classList.add("buzzed"); b.textContent="🖐 제출 완료!"; }
+    const qid=guest.qid, rnd=guest.round||0;
+    const send=()=>{ rlog("guest buzz:", "team="+guest.team, "qid="+qid, "round="+rnd); if(guest.tx) guest.tx.send({type:"buzz", qid:qid, round:rnd, name:guest.team}); };
+    send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 900);
+    document.getElementById("rg-status").textContent="🖐 제출! 방장 판정을 기다리는 중…";
   }
   function guestAnswer(i){
     if(guest.answered) return; guest.answered=true;
@@ -2939,7 +3015,7 @@ const Room = (function(){
     guestCdStop(); document.getElementById("rg-timer").textContent="";
     const btns=[...document.querySelectorAll("#rg-mc .mc-opt")];
     btns.forEach((b,idx)=>{ b.disabled=true; if(idx===m.correctIdx) b.classList.add("correct"); });
-    document.getElementById("rg-status").textContent=`정답: ${m.answer}`+(m.part?` · ${m.part}`:"");
+    document.getElementById("rg-status").textContent=`정답: ${m.answer}`+(m.part?` · ${m.part}`:"")+(m.winner?` · 🏆 ${m.winner}`:"");
     if(m.mv){ const id=parseYouTube(m.mv); if(id){ const st=parseTime(m.time)||0; document.getElementById("rg-video").innerHTML=`<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}?start=${st}&autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; } }
     guestRoster(m);
   }
@@ -2948,10 +3024,13 @@ const Room = (function(){
     rlog("guest roster recv:", m.roster.map(t=>t.name+":"+t.score).join(","));
     const me=m.roster.find(t=>t.name===guest.team);
     const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
+    // 참가자 본인 점수·순위를 상단에 크게 상시 표시
+    const myEl=document.getElementById("rg-myscore");
+    if(myEl && me){ const myRank=rank.findIndex(t=>t.name===me.name)+1; myEl.style.display="block"; myEl.innerHTML=`⭐ 우리 팀 <b>${escapeHtml(me.name)}</b> · <b>${me.score}점</b>${rank.length>1?` · ${myRank}위/${rank.length}팀`:""}`; }
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
   }
 
-  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
+  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, hostRenderBuzz, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
 })();
 
 (function(){
@@ -3008,15 +3087,15 @@ const Room = (function(){
     const code=(document.getElementById("rg-code").value||"").trim().toUpperCase();
     const err=document.getElementById("rg-err");
     if(code.length<4){ err.textContent="방 코드를 확인하세요."; return; }
-    err.textContent=""; Room.guestConnect(code);
+    err.textContent=""; unlockSpeech(); Room.guestConnect(code);
   });
-  document.getElementById("rg-claim").addEventListener("click",()=>Room.guestClaim());
+  document.getElementById("rg-claim").addEventListener("click",()=>{ unlockSpeech(); Room.guestClaim(); });
   document.getElementById("rg-pick-back").addEventListener("click",()=>{
     Room.guestLeave();
     document.getElementById("rg-pick").style.display="none";
     document.getElementById("rg-join").style.display="block";
   });
-  document.getElementById("rg-speak").addEventListener("click",()=>Room.guestSpeak());
+  document.getElementById("rg-speak").addEventListener("click",()=>{ unlockSpeech(); const sp=document.getElementById("rg-speak"); if(sp) sp.classList.remove("cue"); Room.guestSpeak(); });
   document.getElementById("rg-leave").addEventListener("click",()=>{
     Room.guestLeave();
     document.getElementById("rg-play").style.display="none";

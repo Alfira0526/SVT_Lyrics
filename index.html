@@ -191,6 +191,24 @@
   .buzz-answer{background:linear-gradient(180deg,#FFF7DC,#FCEEBE);border:1px solid #F0D98A;border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:16px;color:#5A4A1E;font-weight:700}
   .buzz-answer b{color:#7A5500;font-size:18px}
   .buzz-answer span{color:#9A8A5A;font-size:12px;font-weight:500}
+  .buzz-front{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 12px;margin-bottom:8px;border:2px solid var(--rose-ink);border-radius:14px;background:linear-gradient(180deg,#fff,#FFF1F7)}
+  .buzz-front .bz-rank{flex:0 0 auto;font-size:18px}
+  .buzz-front .bz-name{flex:1;min-width:80px;text-align:left;font-size:17px;font-weight:800;color:var(--txt)}
+  .buzz-front .buzz-ok{flex:0 0 auto;border:0;font-size:14px;font-weight:800;color:#fff;background:var(--green-ink);padding:9px 13px;border-radius:999px;cursor:pointer}
+  .buzz-front .buzz-no{flex:0 0 auto;border:0;font-size:14px;font-weight:800;color:#fff;background:var(--red-ink);padding:9px 13px;border-radius:999px;cursor:pointer}
+  .buzz-queue{font-size:13px;color:var(--muted);font-weight:700;margin:2px 2px 10px}
+  .buzz-wrong-list{font-size:13px;color:var(--red-ink);font-weight:700;margin:2px 2px 10px}
+  /* 게임 방법 가이드 팝업 */
+  #guide-modal{position:fixed;inset:0;z-index:100000;background:rgba(40,24,54,.5);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+  #guide-modal .guide-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 18px 46px rgba(80,50,110,.28)}
+  #guide-modal .guide-x{position:absolute;top:12px;right:12px;border:0;background:var(--panel2);width:32px;height:32px;border-radius:999px;font-size:15px;color:var(--muted);cursor:pointer}
+  #guide-modal .guide-title{font-size:20px;color:var(--txt);margin-bottom:14px}
+  #guide-modal .guide-sec{margin-bottom:14px}
+  #guide-modal .guide-h{font-size:15px;font-weight:800;color:var(--rose-ink);margin-bottom:5px}
+  #guide-modal .guide-body p{font-size:14px;color:var(--txt);line-height:1.6}
+  #guide-modal .guide-body ul{margin:4px 0 0;padding-left:2px;list-style:none}
+  #guide-modal .guide-body li{font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:6px}
+  #guide-modal .guide-body b{color:var(--txt)}
   /* 세그먼트 선택버튼(설정을 토글 대신 버튼으로) */
   .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
   .seg-btn{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.12s;min-height:44px}
@@ -478,7 +496,40 @@
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
     <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
+    <button class="btn btn-ghost btn-sm" id="intro-guide" style="margin-top:8px">❓ 게임 방법</button>
     <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;opacity:.9">비영리 팬 제작 도구 💎 · 가사는 짧은 발췌, MV는 공식 영상 임베드 · 음원·영상·가사의 권리는 각 권리자에게 있습니다</p>
+  </div>
+</div>
+
+<!-- ================= 게임 방법 가이드 팝업 ================= -->
+<div id="guide-modal" style="display:none">
+  <div class="guide-card">
+    <button type="button" id="guide-close" class="guide-x" aria-label="닫기">✕</button>
+    <h2 class="guide-title">❓ 게임 방법</h2>
+    <div class="guide-body">
+      <div class="guide-sec">
+        <div class="guide-h">🎧 핵심 — 듣고 맞히기</div>
+        <p>세븐틴 가사를 <b>TTS로 낭독</b>해줘요. 화면의 가사는 기본적으로 <b>가려져</b> 있고, <b>듣기만으로</b> 원곡을 맞히는 게 이 게임의 핵심이에요. (필요하면 <b>가사 가리기</b>를 꺼서 함께 보며 즐길 수도 있어요.)</p>
+      </div>
+      <div class="guide-sec">
+        <div class="guide-h">🕹️ 모드 고르기</div>
+        <ul>
+          <li><b>🎧 혼자·가볍게</b> — 한 명이 듣고 4지선다로 맞혀요. 최고기록에 도전!</li>
+          <li><b>♾️ 무한 도전</b> — 틀리면 끝. 몇 곡 연속으로 맞히는지 <b>서바이벌</b>.</li>
+          <li><b>📱 온라인 4지선다</b> — 각자 <b>폰으로 접속</b>해 팀별로 보기를 골라요.</li>
+          <li><b>🖐 온라인 부저 대결</b> — 폰으로 <b>먼저 누른 팀</b>이 구두로 답해요. 사회자가 정답/오답을 판정 — 맞으면 다음 곡, 틀리면 <b>다음 팀</b>에게 기회.</li>
+        </ul>
+      </div>
+      <div class="guide-sec">
+        <div class="guide-h">📲 온라인으로 함께 하기</div>
+        <p>사회자가 온라인 모드로 시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면의 <b>🔗 방 참가</b>에서 코드를 입력하고 팀을 골라 들어와요. 사회자 화면(큰 화면·TV)엔 문제가, 각자 폰엔 <b>보기·부저</b>가 나와요.</p>
+      </div>
+      <div class="guide-sec">
+        <div class="guide-h">🏆 점수</div>
+        <p>정답 1곡 = <b>1점</b>. 혼자·무한 모드에선 <b>남은 시간이 보너스</b>로 붙고 <b>랭킹</b>에 도전할 수 있어요.</p>
+      </div>
+    </div>
+    <button type="button" id="guide-ok" class="intro-start" style="width:100%;margin-top:6px">알겠어요 · 시작하기</button>
   </div>
 </div>
 
@@ -2727,10 +2778,9 @@ function renderModeCards(){
 // patch는 관련 필드를 전부 명시(이전 설정 누수 방지). 부저=온라인+4지선다 OFF를 한 버튼으로 노출.
 const SCENARIOS=[
   { id:"solo",   ic:"🎧", nm:"혼자·가볍게",   ds:"한 명이 듣고 맞히기",         patch:{mode:"normal", teamMode:false, mc:true,  onlineRoom:false, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} },
-  { id:"team",   ic:"⚔️", nm:"같은 화면 팀대결", ds:"한 화면 앞에서 팀 승부",       patch:{mode:"battle", teamMode:true,  mc:true,  onlineRoom:false, teamBlind:true, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} },
+  { id:"infinite", ic:"♾️", nm:"무한 도전",   ds:"틀리면 끝·최고기록 도전",     patch:{mode:"infinite", teamMode:false, mc:true, onlineRoom:false, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} },
   { id:"online", ic:"📱", nm:"온라인 4지선다",  ds:"각자 폰으로 보기 선택",        patch:{mode:"battle", teamMode:true,  mc:true,  onlineRoom:true,  teamBlind:true, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} },
-  { id:"buzz",   ic:"🖐", nm:"온라인 부저 대결", ds:"폰으로 먼저 누르기 승부",       patch:{mode:"battle", teamMode:true,  mc:false, onlineRoom:true,  teamBlind:true, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} },
-  { id:"stage",  ic:"🎦", nm:"무대·자동진행",  ds:"진행자 없이 스크린 자동",       patch:{mode:"normal", teamMode:false, mc:true,  onlineRoom:false, quizOnly:false, hideLyrics:true, autoHost:true,  autoHideControls:true} }
+  { id:"buzz",   ic:"🖐", nm:"온라인 부저 대결", ds:"폰으로 먼저 누르기 승부",       patch:{mode:"battle", teamMode:true,  mc:false, onlineRoom:true,  teamBlind:true, quizOnly:false, hideLyrics:true, autoHost:false, autoHideControls:false} }
 ];
 function renderScenarios(){
   const g=document.getElementById("scenario-grid"); if(!g) return;
@@ -2842,10 +2892,10 @@ const Room = (function(){
   function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
 
   /* ---- 호스트 ---- */
-  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0, buzzes:{}, buzzWinner:null };
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0, buzzes:{}, buzzWinner:null, buzzWrong:{} };
   async function hostOpen(){
     if(!config.fbUrl) await loadMqtt();
-    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0; host.buzzes={}; host.buzzWinner=null;
+    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0; host.buzzes={}; host.buzzWinner=null; host.buzzWrong={};
     host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
     host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
     host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
@@ -2938,28 +2988,48 @@ const Room = (function(){
   // 부저(선착순) — 참가자가 「정답!」을 누르면 순서 기록·전파, 방장이 구두 판정 후 득점.
   function hostBuzz(name){
     if(!host.active||host.phase!=="playing"||answerShown()) return;
+    if((host.buzzWrong[pos]||[]).indexOf(name)>=0) return;   // 이미 오답 판정받은 팀은 이 문항에서 재부저 불가
     host.buzzes[pos]=host.buzzes[pos]||[];
     if(host.buzzes[pos].indexOf(name)<0) host.buzzes[pos].push(name);
     host.tx.send({type:"buzzlock", qid:pos, round:host.round||0, order:host.buzzes[pos].slice()}, true);
     rlog("buzz:", name, "→ 순서="+host.buzzes[pos].join(","));
     hostRenderBuzz();
   }
-  function hostBuzzPick(winner){ host.buzzWinner=winner||null; try{ showAnswer(); }catch(e){} }   // 방장 판정 → 공개(정답이면 그 팀 득점)
+  function hostBuzzPick(winner){ host.buzzWinner=winner||null; try{ showAnswer(); }catch(e){} }   // 방장 판정 → 공개(정답이면 그 팀 득점·다음 곡)
+  // 오답 판정: 선착 팀의 기회를 소진시키고 큐에서 제거 → 다음 팀에게 순차로 기회가 넘어감(공개 안 함).
+  function hostBuzzWrong(name){
+    const arr=host.buzzes[pos]||[]; const idx=arr.indexOf(name); if(idx>=0) arr.splice(idx,1);
+    (host.buzzWrong[pos]=host.buzzWrong[pos]||[]).push(name);
+    host.tx.send({type:"buzzwrong", qid:pos, round:host.round||0, name:name, order:arr.slice()}, true);   // 해당 팀 폰 부저 비활성 + 남은 순서 갱신
+    rlog("buzz-wrong:", name, "→ 남은 순서="+arr.join(","));
+    hostRenderBuzz();
+  }
   function hostRenderBuzz(){
     const box=document.getElementById("g-mc"); const turnEl=document.getElementById("g-mc-turn");
     if(!box) return;
-    const ord=host.buzzes[pos]||[];
+    const ord=host.buzzes[pos]||[]; const wrong=host.buzzWrong[pos]||[];
     if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn";
-      turnEl.innerHTML = ord.length ? `🖐 <b>${escapeHtml(ord[0])}</b> 먼저! · 구두로 답을 듣고 아래에서 판정하세요` : "🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요"; }
+      turnEl.innerHTML = ord.length ? `🖐 <b>${escapeHtml(ord[0])}</b> 먼저! · 구두로 답을 듣고 아래에서 <b>정답/오답</b>을 눌러요` : (wrong.length? "🖐 다음 팀 대기중 · 아직 못 누른 팀이 「정답!」을 누르면 순서가 떠요" : "🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요"); }
     box.style.display="block"; box.innerHTML="";
     // 방장(사회자) 전용 정답 표시 — 참가자가 구두로 부른 답이 맞는지 판정하는 데 사용(참가자 폰엔 안 보임).
     const song=songById(order[pos]);
     if(song){ const ans=document.createElement("div"); ans.className="buzz-answer";
       ans.innerHTML=`🎵 정답 <b>${escapeHtml(song.name)}</b>${song.part?` <span>· ${escapeHtml(song.part)}</span>`:""}<br><span>사회자 전용 · 팀이 부른 답과 비교해 정답/오답 판정</span>`;
       box.appendChild(ans); }
-    ord.forEach((nm,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="buzz-team"+(i===0?" first":"");
-      b.innerHTML=`<span class="bz-rank">${i+1}</span><span class="bz-name">${escapeHtml(nm)}${i===0?" ⚡":""}</span><span class="bz-ok">정답 ✓</span>`;
-      b.addEventListener("click",()=>hostBuzzPick(nm)); box.appendChild(b); });
+    // 선착(맨 앞) 팀만 판정 대상 — 정답(득점·다음곡) / 오답(다음 팀에게)
+    if(ord.length){
+      const nm=ord[0];
+      const row=document.createElement("div"); row.className="buzz-front";
+      row.innerHTML=`<span class="bz-rank">⚡</span><span class="bz-name">${escapeHtml(nm)}</span>`;
+      const ok=document.createElement("button"); ok.type="button"; ok.className="buzz-ok"; ok.textContent="정답 ✓ · 다음 곡";
+      ok.addEventListener("click",()=>hostBuzzPick(nm)); row.appendChild(ok);
+      const no=document.createElement("button"); no.type="button"; no.className="buzz-no"; no.textContent="오답 ✗ · 다음 팀";
+      no.addEventListener("click",()=>hostBuzzWrong(nm)); row.appendChild(no);
+      box.appendChild(row);
+      const rest=ord.slice(1);
+      if(rest.length){ const q=document.createElement("div"); q.className="buzz-queue"; q.innerHTML="대기: "+rest.map((n,i)=>`${i+2}. ${escapeHtml(n)}`).join(" · "); box.appendChild(q); }
+    }
+    if(wrong.length){ const w=document.createElement("div"); w.className="buzz-wrong-list"; w.innerHTML="✗ 오답: "+wrong.map(n=>escapeHtml(n)).join(" · "); box.appendChild(w); }
     const none=document.createElement("button"); none.type="button"; none.className="buzz-none"; none.textContent="정답 공개 (아무도 못 맞힘)";
     none.addEventListener("click",()=>hostBuzzPick(null)); box.appendChild(none);
   }
@@ -2977,7 +3047,7 @@ const Room = (function(){
   }
   function hostNextRound(){   // 새 라운드 시작: 라운드 번호 증가·답안 초기화 → renderGame이 새 상태 전송
     if(!host.active) return;
-    host.round=(host.round||0)+1; host.answers={}; host.buzzes={}; host.buzzWinner=null; host.phase="playing";
+    host.round=(host.round||0)+1; host.answers={}; host.buzzes={}; host.buzzWinner=null; host.buzzWrong={}; host.phase="playing";
   }
   function hostEnd(){ if(host.active){ try{ host.tx.send({type:"ended", roster:rosterArr()}, true); }catch(e){} } hostClose(); }
   function hostClose(){ if(host.tx){ try{ host.tx.clear(); }catch(e){} host.tx.close(); } host.active=false; host.phase="lobby"; document.getElementById("room-host-bar").style.display="none"; document.getElementById("rl-video").innerHTML=""; }
@@ -2999,6 +3069,11 @@ const Room = (function(){
       else if(m.type==="state"){ if(guest.team) guestState(m); }
       else if(m.type==="reveal"){ if(guest.team) guestReveal(m); }
       else if(m.type==="buzzlock"){ if(m.qid===guest.qid){ const od=document.getElementById("rg-buzz-order"); if(od) od.innerHTML="🖐 "+(m.order||[]).map((nm,i)=>`${i+1}. ${escapeHtml(nm)}${nm===guest.team?" (나)":""}${i===0?" ⚡먼저":""}`).join("<br>"); } }
+      else if(m.type==="buzzwrong"){ if(m.qid===guest.qid){
+        const od=document.getElementById("rg-buzz-order"); if(od) od.innerHTML="🖐 "+(m.order||[]).map((nm,i)=>`${i+1}. ${escapeHtml(nm)}${nm===guest.team?" (나)":""}${i===0?" ⚡먼저":""}`).join("<br>");
+        if(m.name===guest.team){ guest.buzzed=true; const bz=document.getElementById("rg-buzz"); if(bz){ bz.disabled=true; bz.classList.add("buzzed"); bz.textContent="✗ 오답 · 다음 문제 대기"; } document.getElementById("rg-status").textContent="✗ 오답 · 다음 문제를 기다려요"; }
+        else { document.getElementById("rg-status").textContent="다음 팀에게 기회가 넘어왔어요 · 먼저 누른 팀부터!"; }
+      } }
       else if(m.type==="roster") guestRoster(m);
       else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
@@ -3166,6 +3241,14 @@ const Room = (function(){
     document.querySelector('nav.tabs button[data-view="game"]').click();   // 결과 화면 잔류 방지
   }
   document.getElementById("intro-start").addEventListener("click",()=>{ unlockAudio(); showSetup(); });
+  (function(){   // 게임 방법 가이드 팝업
+    const gm=document.getElementById("guide-modal"); if(!gm) return;
+    const open=()=>{ gm.style.display="flex"; }; const close=()=>{ gm.style.display="none"; };
+    const gb=document.getElementById("intro-guide"); if(gb) gb.addEventListener("click",open);
+    const gx=document.getElementById("guide-close"); if(gx) gx.addEventListener("click",close);
+    const gok=document.getElementById("guide-ok"); if(gok) gok.addEventListener("click",()=>{ close(); unlockAudio(); showSetup(); });
+    gm.addEventListener("click",e=>{ if(e.target===gm) close(); });   // 배경 탭 → 닫기
+  })();
   document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });
   document.getElementById("setup-back").addEventListener("click",backToIntro);
   (function(){ const mc=document.getElementById("mode-cards"); if(!mc) return;

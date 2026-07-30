@@ -9,6 +9,7 @@ await pg.evaluate(()=>{ try{ localStorage.clear(); }catch(e){} });
 await pg.reload(); await pg.waitForTimeout(400);
 
 await pg.click('#intro-start'); await pg.waitForTimeout(250);
+await pg.evaluate(()=>{ const d=document.querySelector('details.setup-detail'); if(d) d.open=true; }); await pg.waitForTimeout(80);
 await pg.click('.mode-card[data-mode="infinite"]'); await pg.waitForTimeout(120);
 await pg.click('#setup-start'); await pg.waitForTimeout(700);
 P(await pg.evaluate(()=>config.mode==='infinite'), '무한모드로 시작');

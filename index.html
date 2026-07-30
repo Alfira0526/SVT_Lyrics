@@ -454,7 +454,8 @@
   .scn-btn .scn-ic{font-size:30px;line-height:1}
   .scn-btn .scn-nm{font-weight:900;font-size:15px;color:var(--txt);margin-top:6px}
   .scn-btn .scn-ds{font-size:11.5px;color:var(--muted);line-height:1.3}
-  .scn-btn[data-scn="buzz"]{border-color:var(--rose);background:linear-gradient(180deg,#fff,#FFF1F7)}
+  .scn-btn.sel{border-color:var(--rose-ink);background:linear-gradient(180deg,#fff,#FFF1F7);box-shadow:0 0 0 3px rgba(240,96,155,.18)}
+  .scn-btn.sel .scn-nm::after{content:" ✓";color:var(--rose-ink)}
   @media(max-width:360px){ .scn-btn .scn-nm{font-size:14px} .scn-btn .scn-ds{font-size:11px} }
   /* 무한(서바이벌) 게임오버 오버레이 */
   .io-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(60,40,80,.5);backdrop-filter:blur(4px)}
@@ -636,7 +637,7 @@
     <h2 class="setup-title">게임 설정</h2>
     <p class="setup-sub">모드를 고르고 옵션을 정한 뒤 시작하세요</p>
 
-    <div class="setup-label" style="margin-bottom:8px">어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 바로 시작</span></div>
+    <div class="setup-label" style="margin-bottom:8px">어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 옵션이 맞춰져요 · 아래에서 조절 후 시작</span></div>
     <div class="scenario-grid" id="scenario-grid"></div>
 
     <div class="setup-card" id="teamcount-card">
@@ -2894,8 +2895,12 @@ const SCENARIOS=[
 ];
 function renderScenarios(){
   const g=document.getElementById("scenario-grid"); if(!g) return;
-  if(g.childElementCount) return;   // 1회만 렌더(정적)
-  g.innerHTML=SCENARIOS.map(s=>`<button type="button" class="scn-btn" data-scn="${s.id}"><span class="scn-ic">${s.ic}</span><span class="scn-nm">${escapeHtml(s.nm)}</span><span class="scn-ds">${escapeHtml(s.ds)}</span></button>`).join("");
+  if(!g.childElementCount){   // 버튼은 1회만 생성(정적)
+    g.innerHTML=SCENARIOS.map(s=>`<button type="button" class="scn-btn" data-scn="${s.id}"><span class="scn-ic">${s.ic}</span><span class="scn-nm">${escapeHtml(s.nm)}</span><span class="scn-ds">${escapeHtml(s.ds)}</span></button>`).join("");
+  }
+  const cur=config._scn||"";   // 선택된 시나리오 하이라이트(렌더마다 갱신)
+  g.querySelectorAll("[data-scn]").forEach(b=>b.classList.toggle("sel", b.dataset.scn===cur));
+  return;
 }
 function renderScopeSetup(){
   const sc=currentScope();
@@ -3381,7 +3386,12 @@ const Room = (function(){
     mc.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ const card=e.target.closest(".mode-card"); if(card){ e.preventDefault(); selectMode(card.dataset.mode); } } });
   })();
   // 원터치 시나리오: 탭 → config 통째 적용 → 바로 시작(온라인 계열은 startGame이 방 로비 표시).
-  function applyScenario(id){ const s=SCENARIOS.find(x=>x.id===id); if(!s) return; Object.assign(config, s.patch); saveState(); renderSetup(); unlockAudio(); unlockSpeech(); startGame(); }
+  // 시나리오 탭 = 옵션 프리셋 적용 + 선택 표시 + 아래 옵션으로 이동(바로 시작하지 않음 — 하단 '게임 시작'으로 시작).
+  function applyScenario(id){ const s=SCENARIOS.find(x=>x.id===id); if(!s) return;
+    Object.assign(config, s.patch); config._scn=id; saveState(); renderSetup(); unlockAudio(); unlockSpeech();
+    const nx=document.getElementById("teamcount-card")||document.querySelector("#setup .setup-card");
+    if(nx) try{ nx.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){}
+  }
   (function(){ const g=document.getElementById("scenario-grid"); if(!g) return;
     g.addEventListener("click",e=>{ const b=e.target.closest("[data-scn]"); if(b) applyScenario(b.dataset.scn); });
   })();

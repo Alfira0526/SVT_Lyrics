@@ -1721,6 +1721,10 @@ function renderGame(){
 function renderTeamBoard(){
   const board=document.getElementById("team-board");
   board.innerHTML="";
+  // 온라인 방: 점수는 참가자 제출로 roster에 자동 적립됨 → 방장 팀 점수판을 roster 값으로 동기화(표시 일치).
+  // 수동 +/- 은 온라인에선 의미가 없어(자동 채점) 숨김.
+  const online = !!(config.onlineRoom && Room.host && Room.host.active);
+  if(online){ const r=Room.host.roster||{}; (config.teamNames||[]).forEach((nm,i)=>{ teamScores[i]=(r[nm]&&r[nm].score)||0; }); }
   // 4지선다 팀전 진행 중엔 지금 선택할 팀을 하이라이트
   const activeTeam=(config.mc && !teamRoundDone && pickingOrder.length) ? pickingOrder[pickIdx] : turn;
   (config.teamNames||[]).forEach((nm,i)=>{
@@ -1729,11 +1733,13 @@ function renderTeamBoard(){
     d.innerHTML=`<span class="turn-tag">▶ 차례</span>
       <div class="tn">${escapeHtml(nm)}</div>
       <div class="ts">${teamScores[i]||0}</div>
-      <div class="team-btns"><button data-dt="${i}">−</button><button data-it="${i}">+</button></div>`;
+      ${online?"":`<div class="team-btns"><button data-dt="${i}">−</button><button data-it="${i}">+</button></div>`}`;
     board.appendChild(d);
   });
-  board.querySelectorAll("[data-it]").forEach(b=>b.addEventListener("click",()=>{ teamScores[b.dataset.it]=(teamScores[b.dataset.it]||0)+1; renderTeamBoard(); }));
-  board.querySelectorAll("[data-dt]").forEach(b=>b.addEventListener("click",()=>{ teamScores[b.dataset.dt]=Math.max(0,(teamScores[b.dataset.dt]||0)-1); renderTeamBoard(); }));
+  if(!online){
+    board.querySelectorAll("[data-it]").forEach(b=>b.addEventListener("click",()=>{ teamScores[b.dataset.it]=(teamScores[b.dataset.it]||0)+1; renderTeamBoard(); }));
+    board.querySelectorAll("[data-dt]").forEach(b=>b.addEventListener("click",()=>{ teamScores[b.dataset.dt]=Math.max(0,(teamScores[b.dataset.dt]||0)-1); renderTeamBoard(); }));
+  }
 }
 
 function applyHide(){
@@ -2805,6 +2811,7 @@ const Room = (function(){
     const song=songById(order[pos]); const c=qc(order[pos]);
     host.tx.send({type:"reveal", qid:pos, round:host.round||0, correctIdx:ci, answer:song.name, part:song.part, mv:config.quizOnly?"":(c.mv||""), time:c.time||"", roster:rosterArr()}, true);
     hostBar();
+    if(config.teamMode){ try{ renderTeamBoard(); }catch(e){} }   // 방장 팀 점수판을 roster 값으로 즉시 갱신
   }
   function hostBar(){
     if(!host.active) return;

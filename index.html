@@ -188,6 +188,10 @@
   .buzz-team .bz-name{flex:1;text-align:left;font-size:16px;color:var(--txt)}
   .buzz-team .bz-ok{flex:0 0 auto;font-size:14px;color:#fff;background:var(--green-ink);padding:6px 12px;border-radius:999px}
   .buzz-none{width:100%;padding:12px;margin-top:4px;border:1px dashed var(--line);border-radius:12px;background:var(--panel2);color:var(--muted);font-weight:700;cursor:pointer}
+  /* 세그먼트 선택버튼(설정을 토글 대신 버튼으로) */
+  .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .seg-btn{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.12s;min-height:44px}
+  .seg-btn.on{background:linear-gradient(180deg,var(--rose),var(--serene));color:var(--ink);box-shadow:0 3px 10px rgba(214,51,126,.2)}
   /* 고급 설정 접기 — 기본 설정 화면을 짧게 */
   .setup-adv{margin:0 0 14px}
   .setup-adv>summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;font-size:14px;color:var(--txt);background:var(--panel2);border:1px solid var(--line);border-radius:14px}
@@ -568,13 +572,14 @@
     </div>
 
     <div class="setup-card">
-      <div class="toggle-row" style="margin-top:0">
-        <label class="switch"><input type="checkbox" id="c-timer" /><span class="slider"></span></label>
-        <span style="font-size:14px">타이머 사용 <span style="color:var(--muted)">(시작 시 카운트다운)</span></span>
+      <div class="setup-label">⏱️ 제한 시간 <span style="color:var(--muted);font-weight:400;font-size:12px">· 문항별 카운트다운</span></div>
+      <div class="seg" id="timer-seg">
+        <button type="button" class="seg-btn" data-sec="0">끄기</button>
+        <button type="button" class="seg-btn" data-sec="10">10초</button>
+        <button type="button" class="seg-btn" data-sec="20">20초</button>
+        <button type="button" class="seg-btn" data-sec="30">30초</button>
       </div>
-      <label class="hint" style="display:block;margin:10px 0 4px">문항별 제한 시간(초)</label>
-      <input class="num-input" type="number" id="c-timersec" min="5" max="120" value="20" />
-      <div class="setup-tip"><b>20초</b>면 충분해요! 곡을 떠올리고 손들기 딱 좋은 길이예요 ⏱️<br>더 쫄깃하게 즐기고 싶다면 <b>10초</b>에 도전해보세요.</div>
+      <div class="setup-tip"><b>20초</b>면 충분해요 ⏱️ 더 쫄깃하게는 <b>10초</b>. 끄면 제한 없이 진행돼요.</div>
     </div>
 
     <div class="setup-card">
@@ -2404,8 +2409,7 @@ document.getElementById("c-team-random").addEventListener("click",()=>{
 });
 document.getElementById("c-hide").addEventListener("change",e=>{ config.hideLyrics=e.target.checked; saveState(); });
 document.getElementById("c-sfx").addEventListener("change",e=>{ config.sfx=e.target.checked; saveState(); if(config.sfx) audioCtx(); });
-document.getElementById("c-timer").addEventListener("change",e=>{ config.timerOn=e.target.checked; saveState(); });
-document.getElementById("c-timersec").addEventListener("input",e=>{ config.timerSec=Math.max(5,Math.min(120,parseInt(e.target.value,10)||15)); saveState(); });
+document.getElementById("timer-seg").addEventListener("click",e=>{ const b=e.target.closest(".seg-btn"); if(!b) return; const s=parseInt(b.dataset.sec,10)||0; if(s<=0){ config.timerOn=false; } else { config.timerOn=true; config.timerSec=s; } saveState(); renderTimerSeg(); });
 // 팀전/4지선다를 게임 '도중' 바꾸면 이전(솔로 등) 정답 흔적(marks)과 팀 점수(teamScores)가 어긋나
 // "정답 N인데 팀 점수 0"처럼 보이는 문제가 생김 → 진행 중이면 새로 시작해 두 카운터 기준을 일치시킴.
 function modeToggleReset(){ if(gameActive && order.length){ startNewGame(true); renderGame(); toast("모드가 바뀌어 새로 시작합니다"); } }
@@ -2632,11 +2636,15 @@ document.getElementById("sh-copy").addEventListener("click",shareCopy);
 /* =====================  INIT  ===================== */
 // 시작 화면 → 기본 설정(게임 옵션) → 게임 시작
 let gameActive=false;
+function renderTimerSeg(){
+  const seg=document.getElementById("timer-seg"); if(!seg) return;
+  const cur = config.timerOn ? (config.timerSec||20) : 0;
+  seg.querySelectorAll(".seg-btn").forEach(b=>{ const s=parseInt(b.dataset.sec,10)||0; b.classList.toggle("on", s===cur); });
+}
 function renderSetup(){
   document.getElementById("c-hide").checked=config.hideLyrics!==false;
   document.getElementById("c-sfx").checked=config.sfx!==false;
-  document.getElementById("c-timer").checked=!!config.timerOn;
-  document.getElementById("c-timersec").value=config.timerSec;
+  renderTimerSeg();
   document.getElementById("c-team").checked=!!config.teamMode;
   document.getElementById("c-mc").checked=!!config.mc;
   document.getElementById("c-teamblind").checked=config.teamBlind!==false;

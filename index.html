@@ -209,6 +209,27 @@
   #guide-modal .guide-body ul{margin:4px 0 0;padding-left:2px;list-style:none}
   #guide-modal .guide-body li{font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:6px}
   #guide-modal .guide-body b{color:var(--txt)}
+  /* 랭킹 팝업 */
+  #rank-modal{position:fixed;inset:0;z-index:100000;background:rgba(40,24,54,.5);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+  #rank-modal .guide-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 18px 46px rgba(80,50,110,.28)}
+  .rk-tabs{display:flex;gap:8px;margin-bottom:8px}
+  .rk-tab{flex:1;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:9px 6px;font-size:13px;font-weight:800;color:var(--muted);cursor:pointer}
+  .rk-tab.active{background:linear-gradient(180deg,var(--rose),var(--serene));color:var(--ink);border-color:transparent}
+  .rk-scope{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px;text-align:center}
+  .rk-list{min-height:60px}
+  .rk-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid var(--line)}
+  .rk-row .rk-no{flex:0 0 24px;font-weight:800;color:var(--muted);text-align:center}
+  .rk-row .rk-medal{flex:0 0 auto;font-size:16px;min-width:18px}
+  .rk-row .rk-nick{flex:1;font-weight:800;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rk-row .rk-val{flex:0 0 auto;font-weight:900;color:var(--rose-ink)}
+  .rk-empty,.rk-loading{padding:22px 8px;text-align:center;color:var(--muted);font-size:14px;font-weight:700}
+  /* 결과·무한 오버레이 랭킹 등록 */
+  .rk-submit{margin-top:12px;padding:12px;border:1px dashed var(--serene-ink);border-radius:12px;background:var(--panel2)}
+  .rk-submit .rk-sub-h{font-size:13px;font-weight:800;color:var(--serene-ink);margin-bottom:7px}
+  .rk-submit .rk-sub-row{display:flex;gap:7px}
+  .rk-submit input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;box-sizing:border-box}
+  .rk-submit button{flex:0 0 auto;border:0;border-radius:9px;padding:9px 14px;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(180deg,var(--serene-deep),var(--serene-ink));cursor:pointer}
+  .rk-submit .rk-done{font-size:13px;color:var(--green-ink);font-weight:800;text-align:center;padding:4px}
   /* 세그먼트 선택버튼(설정을 토글 대신 버튼으로) */
   .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
   .seg-btn{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.12s;min-height:44px}
@@ -496,7 +517,10 @@
     </div>
     <button class="intro-start" id="intro-start">▶ 시작하기</button>
     <button class="btn btn-ghost btn-sm" id="intro-join" style="margin-top:10px">🔗 방 참가(참가자)</button>
-    <button class="btn btn-ghost btn-sm" id="intro-guide" style="margin-top:8px">❓ 게임 방법</button>
+    <div style="display:flex;gap:8px;margin-top:8px;justify-content:center">
+      <button class="btn btn-ghost btn-sm" id="intro-guide">❓ 게임 방법</button>
+      <button class="btn btn-ghost btn-sm" id="intro-rank">🏆 랭킹</button>
+    </div>
     <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;opacity:.9">비영리 팬 제작 도구 💎 · 가사는 짧은 발췌, MV는 공식 영상 임베드 · 음원·영상·가사의 권리는 각 권리자에게 있습니다</p>
   </div>
 </div>
@@ -530,6 +554,20 @@
       </div>
     </div>
     <button type="button" id="guide-ok" class="intro-start" style="width:100%;margin-top:6px">알겠어요 · 시작하기</button>
+  </div>
+</div>
+
+<!-- ================= 랭킹 팝업 (개인·무한) ================= -->
+<div id="rank-modal" style="display:none">
+  <div class="guide-card">
+    <button type="button" id="rank-close" class="guide-x" aria-label="닫기">✕</button>
+    <h2 class="guide-title">🏆 랭킹</h2>
+    <div class="rk-tabs">
+      <button type="button" class="rk-tab active" data-board="solo">🎧 혼자 (정답 수)</button>
+      <button type="button" class="rk-tab" data-board="infinite">♾️ 무한 (연속)</button>
+    </div>
+    <div class="rk-scope" id="rank-scope"></div>
+    <div class="rk-list" id="rank-list"></div>
   </div>
 </div>
 
@@ -972,6 +1010,7 @@
       <p class="hint" id="r-breakdown"></p>
       <p class="hint" id="r-recap" style="margin-top:2px;display:none"></p>
       <p class="hint" id="r-best" style="margin-top:2px;display:none"></p>
+      <div id="r-rank-submit" style="display:none"></div>
       <p class="hint" id="r-next-note" style="margin-top:2px">🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).</p>
     </div>
   </section>
@@ -1294,6 +1333,68 @@ function loadStats(){
   return {v:1, sessions:[], modeCounts:{}, songStats:{}, best:{rate:0, streak:0}};
 }
 function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 통계를 저장하지 못했어요"); } }
+
+/* ===================== 랭킹 (개인·무한 전용) ===================== */
+// 로컬 기록 우선 저장. RANK_URL(또는 방 릴레이 config.fbUrl)에 Firebase RTDB URL이 있으면 글로벌 순위표로 자동 전환.
+// RANK_URL 예: "https://내프로젝트-default-rtdb.firebaseio.com" (관리자가 설정하면 전 세계 공용 랭킹 활성화)
+const RANK_KEY="svt_lyrics_rank_v1";
+const RANK_URL="";   // ← Firebase Realtime Database base URL을 넣으면 글로벌 랭킹 ON (비우면 로컬 전용)
+const RANK_MAX=50;   // 로컬 보관 상한
+function rankBase(){ try{ return (RANK_URL||config.fbUrl||"").replace(/\/+$/,""); }catch(e){ return ""; } }
+function rankGlobalOn(){ return !!rankBase(); }
+function loadRank(){
+  try{ const o=JSON.parse(localStorage.getItem(RANK_KEY)||"{}"); return {nick:o.nick||"", solo:Array.isArray(o.solo)?o.solo:[], infinite:Array.isArray(o.infinite)?o.infinite:[]}; }
+  catch(e){ return {nick:"", solo:[], infinite:[]}; }
+}
+function saveRank(o){ try{ localStorage.setItem(RANK_KEY, JSON.stringify(o)); }catch(e){} }
+function rankCleanNick(s){ return (String(s||"").replace(/[<>]/g,"").trim().slice(0,12)) || "익명캐럿"; }
+// 글로벌 제출/조회(Firebase RTDB REST). 실패해도 게임엔 영향 없음(로컬은 이미 저장됨).
+function rankSubmitGlobal(board, entry){
+  const base=rankBase(); if(!base) return Promise.resolve(false);
+  return fetch(base+"/svtq_rank/"+board+".json",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(entry)}).then(()=>true).catch(()=>false);
+}
+function rankFetchGlobal(board){
+  const base=rankBase(); if(!base) return Promise.resolve(null);
+  return fetch(base+"/svtq_rank/"+board+".json").then(r=>r.json()).then(o=>o?Object.values(o):[]).catch(()=>null);
+}
+// board: "solo"(정답 수) | "infinite"(연속 수). val은 클수록 상위.
+function rankRegister(board, val, nick){
+  nick=rankCleanNick(nick); val=Math.max(0, Math.min(999, parseInt(val,10)||0));
+  const entry={nick, val, ts:Date.now()};
+  const r=loadRank(); r.nick=nick;
+  r[board]=(r[board]||[]).concat([entry]).sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,RANK_MAX);
+  saveRank(r);
+  rankSubmitGlobal(board, entry);   // 가능하면 글로벌로도(비동기·실패 무시)
+  return entry;
+}
+function rankRowsHTML(list, unit){
+  const medals=["🥇","🥈","🥉"];
+  const top=(list||[]).slice().sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,20);
+  if(!top.length) return '<div class="rk-empty">아직 기록이 없어요 · 첫 주인공이 되어보세요!</div>';
+  return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="rk-val">${(parseInt(r.val,10)||0)}${unit}</span></div>`).join("");
+}
+function rankRenderInto(board, el, unit){
+  if(!el) return;
+  const local=loadRank()[board]||[];
+  el.innerHTML='<div class="rk-loading">불러오는 중…</div>';
+  if(rankGlobalOn()){
+    rankFetchGlobal(board).then(g=>{ if(g){ el.innerHTML=rankRowsHTML(g, unit); el.dataset.src="global"; } else { el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; } })
+      .catch(()=>{ el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; });
+  } else { el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; }
+}
+// 닉네임 입력 + 등록 카드(결과 화면·무한 오버레이 공용). board:"solo"|"infinite", val:이번 기록.
+function renderRankSubmit(el, board, val, unit){
+  if(!el) return; el.style.display=""; el.className="rk-submit";
+  const nick=(loadRank().nick||"");
+  el.innerHTML=`<div class="rk-sub-h">🏆 이번 기록 <b>${val}${unit}</b> · 랭킹 등록</div>
+    <div class="rk-sub-row"><input id="rk-nick-in" maxlength="12" placeholder="닉네임(최대 12자)" value="${escapeHtml(nick)}"/><button type="button" id="rk-sub-go">등록</button></div>`;
+  const go=el.querySelector("#rk-sub-go"); const inp=el.querySelector("#rk-nick-in");
+  const submit=()=>{ const nm=rankCleanNick(inp.value); rankRegister(board, val, nm);
+    el.innerHTML=`<div class="rk-done">✅ <b>${escapeHtml(nm)}</b> · ${val}${unit} 등록! <button type="button" class="btn btn-ghost btn-sm" id="rk-view" style="margin-left:6px">랭킹 보기</button></div>`;
+    const v=el.querySelector("#rk-view"); if(v) v.addEventListener("click",()=>{ if(window.openRankModal) window.openRankModal(board); }); };
+  if(go) go.addEventListener("click",submit);
+  if(inp) inp.addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
+}
 function statsModeLabel(cfg){
   const M={normal:"일반", battle:"대결", infinite:"무한"};
   let s = M[cfg.mode] || "일반";          // 모드별 이용율(QA 지표)을 위해 게임 모드를 맨 앞에
@@ -2263,11 +2364,13 @@ function infiniteGameOver(n){
     <div class="io-score">${n}<span>곡 연속</span></div>
     <div class="io-best">🏆 최고기록 ${best}곡</div>
     <div class="io-miss">${missed?("정답: <b>"+escapeHtml(missed.name)+"</b>"):""}</div>
+    <div id="io-rank-submit" style="display:none"></div>
     <div class="io-btns">
       <button class="btn btn-play" id="io-retry">🔄 다시 도전</button>
       <button class="btn btn-ghost" id="io-quit">🏠 그만두기</button>
     </div></div>`;
   ov.style.display="flex";
+  if(n>0){ try{ renderRankSubmit(document.getElementById("io-rank-submit"), "infinite", n, "곡 연속"); }catch(e){} }   // 무한 랭킹 등록
   document.getElementById("io-retry").onclick=()=>{ ov.style.display="none"; restartInfinite(); };
   document.getElementById("io-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
 }
@@ -2603,6 +2706,13 @@ function renderResult(){
     bestEl.innerHTML=`${newBestFlag?"🎉 <b>최고 기록 갱신!</b> · ":"🏆 "}최고 정답률 <b>${best.rate||0}%</b> · 최다 연속 <b>${best.streak||0}</b>`;
   } else bestEl.style.display="none";
   if(newBestFlag){ sfxWin(); toast("🎉 최고 기록 갱신!"); }
+
+  // 개인(혼자) 랭킹 등록 — 팀·온라인·무한이 아닌 솔로 플레이에서 정답이 1곡 이상일 때
+  const rs=document.getElementById("r-rank-submit");
+  if(rs){
+    if(!config.teamMode && !config.onlineRoom && config.mode!=="infinite" && c>0){ renderRankSubmit(rs, "solo", c, "곡"); }
+    else { rs.style.display="none"; rs.innerHTML=""; }
+  }
 
   // team ranking
   const tb=document.getElementById("r-team-block");
@@ -3248,6 +3358,21 @@ const Room = (function(){
     const gx=document.getElementById("guide-close"); if(gx) gx.addEventListener("click",close);
     const gok=document.getElementById("guide-ok"); if(gok) gok.addEventListener("click",()=>{ close(); unlockAudio(); showSetup(); });
     gm.addEventListener("click",e=>{ if(e.target===gm) close(); });   // 배경 탭 → 닫기
+  })();
+  (function(){   // 랭킹 팝업
+    const rm=document.getElementById("rank-modal"); if(!rm) return;
+    let board="solo";
+    const scopeEl=document.getElementById("rank-scope"); const listEl=document.getElementById("rank-list");
+    function draw(){
+      document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.classList.toggle("active", t.dataset.board===board));
+      scopeEl.textContent = rankGlobalOn() ? "🌐 전 세계 랭킹 · 상위 20" : "💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)";
+      rankRenderInto(board, listEl, board==="solo"?"곡":"곡 연속");
+    }
+    window.openRankModal=function(b){ board=b||"solo"; rm.style.display="flex"; draw(); };
+    document.getElementById("intro-rank").addEventListener("click",()=>window.openRankModal("solo"));
+    document.getElementById("rank-close").addEventListener("click",()=>{ rm.style.display="none"; });
+    rm.addEventListener("click",e=>{ if(e.target===rm) rm.style.display="none"; });
+    document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.addEventListener("click",()=>{ board=t.dataset.board; draw(); }));
   })();
   document.getElementById("setup-start").addEventListener("click",()=>{ unlockAudio(); startGame(); });
   document.getElementById("setup-back").addEventListener("click",backToIntro);

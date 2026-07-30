@@ -209,6 +209,24 @@
   #guide-modal .guide-body ul{margin:4px 0 0;padding-left:2px;list-style:none}
   #guide-modal .guide-body li{font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:6px}
   #guide-modal .guide-body b{color:var(--txt)}
+  /* 게임 방법 — 초등학생용 박스 레이아웃 */
+  #guide-modal .g-lead{font-size:15px;font-weight:800;color:var(--txt);line-height:1.6;margin:0 2px 14px}
+  #guide-modal .g-lead b{color:var(--rose-ink)}
+  #guide-modal .g-box{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:12px}
+  #guide-modal .g-box-h{font-size:15px;font-weight:900;color:var(--rose-ink);margin-bottom:10px}
+  #guide-modal .g-steps{display:flex;flex-direction:column;gap:9px}
+  #guide-modal .g-step{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5;color:var(--txt)}
+  #guide-modal .g-step .g-num{flex:0 0 23px;height:23px;border-radius:999px;background:linear-gradient(180deg,var(--rose),var(--serene));color:var(--ink);font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  #guide-modal .g-step b,#guide-modal .g-mode b,#guide-modal .g-list b{color:var(--rose-ink)}
+  #guide-modal .g-modes{display:flex;flex-direction:column;gap:8px}
+  #guide-modal .g-mode{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:14px;line-height:1.5;color:var(--txt)}
+  #guide-modal .g-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+  #guide-modal .g-list li{font-size:14px;line-height:1.5;color:var(--txt);padding-left:19px;position:relative}
+  #guide-modal .g-list li::before{content:"•";position:absolute;left:5px;color:var(--rose-ink);font-weight:900}
+  #guide-modal .g-tip{font-size:13.5px;color:var(--txt);background:linear-gradient(180deg,#FFF7FB,#FFF1F7);border:1px dashed var(--rose);border-radius:11px;padding:11px 13px;line-height:1.55;margin:0 0 12px}
+  #guide-modal .g-tip b{color:var(--rose-ink)}
+  #guide-modal .g-optout{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:0 2px 10px;cursor:pointer;user-select:none}
+  #guide-modal .g-optout input{width:17px;height:17px;flex:0 0 auto}
   /* 랭킹 팝업 */
   #rank-modal{position:fixed;inset:0;z-index:100000;background:rgba(40,24,54,.5);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
   #rank-modal .guide-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 18px 46px rgba(80,50,110,.28)}
@@ -544,29 +562,49 @@
   <div class="guide-card">
     <button type="button" id="guide-close" class="guide-x" aria-label="닫기">✕</button>
     <h2 class="guide-title">❓ 게임 방법</h2>
+    <p class="g-lead">가사를 <b>보지 않고</b>, <b>귀로만</b> 듣고 세븐틴 노래 제목을 맞히는 게임이에요! 🎧</p>
     <div class="guide-body">
-      <div class="guide-sec">
-        <div class="guide-h">🎧 핵심 — 듣고 맞히기</div>
-        <p>세븐틴 가사를 <b>TTS로 낭독</b>해줘요. 화면의 가사는 기본적으로 <b>가려져</b> 있고, <b>듣기만으로</b> 원곡을 맞히는 게 이 게임의 핵심이에요. (필요하면 <b>가사 가리기</b>를 꺼서 함께 보며 즐길 수도 있어요.)</p>
+
+      <div class="g-box">
+        <div class="g-box-h">🎯 이렇게 해요</div>
+        <div class="g-steps">
+          <div class="g-step"><span class="g-num">1</span><span>🔊 노래 가사를 <b>소리로 읽어줘요.</b> ▶ 버튼을 누르면 들려요.</span></div>
+          <div class="g-step"><span class="g-num">2</span><span>🙈 화면의 가사는 <b>가려져 있어요.</b> 눈이 아니라 <b>귀로</b> 들어요!</span></div>
+          <div class="g-step"><span class="g-num">3</span><span>✅ 아래 <b>4개</b> 중에서 <b>맞는 노래</b>를 골라요.</span></div>
+        </div>
       </div>
-      <div class="guide-sec">
-        <div class="guide-h">🕹️ 모드 고르기</div>
-        <ul>
-          <li><b>🎧 혼자·가볍게</b> — 한 명이 듣고 4지선다로 맞혀요. 최고기록에 도전!</li>
-          <li><b>♾️ 무한 도전</b> — 틀리면 끝. 몇 곡 연속으로 맞히는지 <b>서바이벌</b>.</li>
-          <li><b>📱 온라인 4지선다</b> — 각자 <b>폰으로 접속</b>해 팀별로 보기를 골라요.</li>
-          <li><b>🖐 온라인 부저 대결</b> — 폰으로 <b>먼저 누른 팀</b>이 구두로 답해요. 사회자가 정답/오답을 판정 — 맞으면 다음 곡, 틀리면 <b>다음 팀</b>에게 기회.</li>
+
+      <div class="g-box">
+        <div class="g-box-h">🎮 놀이 방법 4가지</div>
+        <div class="g-modes">
+          <div class="g-mode"><b>🎧 혼자 하기</b> — 나 혼자 듣고 맞혀요.</div>
+          <div class="g-mode"><b>♾️ 무한 도전</b> — 틀리면 끝! 몇 개를 <b>연속으로</b> 맞힐 수 있을까?</div>
+          <div class="g-mode"><b>📱 폰으로 팀 대결</b> — 친구들이 <b>각자 폰</b>으로 정답을 골라요.</div>
+          <div class="g-mode"><b>🖐 부저 대결</b> — <b>먼저 누른 팀</b>이 입으로 답해요. 맞으면 다음 문제, 틀리면 <b>다른 팀</b>에게 기회!</div>
+        </div>
+      </div>
+
+      <div class="g-box">
+        <div class="g-box-h">👫 친구랑 같이 하려면</div>
+        <ul class="g-list">
+          <li>진행하는 사람이 시작하면 <b>방 번호</b>가 나와요.</li>
+          <li>친구들은 첫 화면에서 <b>🔗 방 참가</b>를 누르고 번호를 넣어요.</li>
+          <li>큰 화면엔 <b>문제</b>가, 내 폰엔 <b>정답 버튼</b>이 나와요.</li>
         </ul>
       </div>
-      <div class="guide-sec">
-        <div class="guide-h">📲 온라인으로 함께 하기</div>
-        <p>사회자가 온라인 모드로 시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면의 <b>🔗 방 참가</b>에서 코드를 입력하고 팀을 골라 들어와요. 사회자 화면(큰 화면·TV)엔 문제가, 각자 폰엔 <b>보기·부저</b>가 나와요.</p>
+
+      <div class="g-box">
+        <div class="g-box-h">⭐ 점수는요</div>
+        <ul class="g-list">
+          <li>정답 1개 = <b>1점</b>!</li>
+          <li><b>빨리</b> 맞히면 남은 시간이 <b>보너스 점수</b>로 쌓여요.</li>
+          <li>잘하면 🏆 <b>전 세계 랭킹</b>에 내 이름을 올릴 수 있어요.</li>
+        </ul>
       </div>
-      <div class="guide-sec">
-        <div class="guide-h">🏆 점수</div>
-        <p>정답 1곡 = <b>1점</b>. 혼자·무한 모드에선 <b>남은 시간이 보너스</b>로 붙고 <b>랭킹</b>에 도전할 수 있어요.</p>
-      </div>
+
+      <p class="g-tip">💡 가사를 <b>같이 보고</b> 싶으면 <b>‘가사 가리기’</b>를 꺼도 돼요. 처음이라면 <b>켜 두는 걸</b> 추천해요!</p>
     </div>
+    <label class="g-optout"><input type="checkbox" id="guide-noauto" /><span>이제 안 볼게요 (새로운 게 생기면 다시 알려줄게요)</span></label>
     <button type="button" id="guide-ok" class="intro-start" style="width:100%;margin-top:6px">알겠어요 · 시작하기</button>
   </div>
 </div>
@@ -3389,14 +3427,35 @@ const Room = (function(){
     renderGame();   // 첫 문항 표시 + 참가자에게 상태 전송
     document.querySelector('nav.tabs button[data-view="game"]').click();   // 결과 화면 잔류 방지
   }
-  document.getElementById("intro-start").addEventListener("click",()=>{ unlockAudio(); showSetup(); });
-  (function(){   // 게임 방법 가이드 팝업
+  // ── 게임 방법 자동 노출 정책 (페르소나 토의 결론) ──────────────────
+  // 최초 '시작하기' 클릭 시 1회 · 이후 (내용 버전 상승) 또는 (마지막 열람 후 14일) 이면 재노출
+  // · 랜딩 ❓ 버튼은 상시 수동 · "이제 안 볼게요"는 시간 재노출만 끄고 신기능(버전)은 계속 안내
+  const GUIDE_VERSION="2026-07-30";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출
+  const GUIDE_REPEAT_DAYS=14;
+  function guideSeenV(){ try{ return localStorage.getItem("svtq_guide_v"); }catch(e){ return null; } }
+  function guideSeenTs(){ try{ return +localStorage.getItem("svtq_guide_ts")||0; }catch(e){ return 0; } }
+  function guideNoAuto(){ try{ return localStorage.getItem("svtq_guide_noauto")==="1"; }catch(e){ return false; } }
+  function markGuideSeen(){ try{ localStorage.setItem("svtq_guide_v",GUIDE_VERSION); localStorage.setItem("svtq_guide_ts",String(Date.now())); }catch(e){} }
+  function shouldAutoShowGuide(){
+    const v=guideSeenV();
+    if(v==null) return true;                 // 최초 시작
+    if(v!==GUIDE_VERSION) return true;        // 새 버전(신기능) — 옵트아웃과 무관하게 1회 안내
+    if(guideNoAuto()) return false;           // "이제 안 볼게요" → 시간 재노출 끔
+    return (Date.now()-guideSeenTs()) > GUIDE_REPEAT_DAYS*864e5;   // 14일 경과 시 재노출
+  }
+  (function(){   // 게임 방법 가이드 팝업 + 최초/주기 자동 노출
     const gm=document.getElementById("guide-modal"); if(!gm) return;
-    const open=()=>{ gm.style.display="flex"; }; const close=()=>{ gm.style.display="none"; };
+    const noauto=document.getElementById("guide-noauto");
+    const open=()=>{ if(noauto) noauto.checked=guideNoAuto(); gm.style.display="flex"; gm.scrollTop=0; markGuideSeen(); };
+    const close=()=>{ gm.style.display="none"; };
+    if(noauto) noauto.addEventListener("change",()=>{ try{ if(noauto.checked) localStorage.setItem("svtq_guide_noauto","1"); else localStorage.removeItem("svtq_guide_noauto"); }catch(e){} });
     const gb=document.getElementById("intro-guide"); if(gb) gb.addEventListener("click",open);
     const gx=document.getElementById("guide-close"); if(gx) gx.addEventListener("click",close);
     const gok=document.getElementById("guide-ok"); if(gok) gok.addEventListener("click",()=>{ close(); unlockAudio(); showSetup(); });
-    gm.addEventListener("click",e=>{ if(e.target===gm) close(); });   // 배경 탭 → 닫기
+    gm.addEventListener("click",e=>{ if(e.target===gm) close(); });   // 배경 탭 → 닫기(랜딩 유지)
+    // '시작하기' → 필요하면 가이드 먼저 자동 노출. 알겠어요=설정으로, X·배경=랜딩 유지(이미 '열람'으로 기록돼 다음엔 바로 설정)
+    const startBtn=document.getElementById("intro-start");
+    if(startBtn) startBtn.addEventListener("click",()=>{ unlockAudio(); if(shouldAutoShowGuide()) open(); else showSetup(); });
   })();
   (function(){   // 랭킹 팝업
     const rm=document.getElementById("rank-modal"); if(!rm) return;

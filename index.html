@@ -596,9 +596,9 @@
       <div class="g-box">
         <div class="g-box-h">⭐ 점수는요</div>
         <ul class="g-list">
-          <li>정답 1개 = <b>1점</b>!</li>
-          <li><b>빨리</b> 맞히면 남은 시간이 <b>보너스 점수</b>로 쌓여요.</li>
-          <li>잘하면 🏆 <b>전 세계 랭킹</b>에 내 이름을 올릴 수 있어요.</li>
+          <li><b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.</li>
+          <li>🎧 <b>혼자</b>는 <b>맞힌 곡 수</b>, ♾️ <b>무한</b>은 <b>연속으로 맞힌 수</b>가 기록돼요.</li>
+          <li>기록이 좋으면 🏆 <b>전 세계 랭킹</b>에 내 이름을 올릴 수 있어요.</li>
         </ul>
       </div>
 
@@ -761,12 +761,12 @@
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-team" /><span class="slider"></span></label>
-        <span style="font-size:14px">팀전 모드 <span style="color:var(--muted)">(타이머 시 시간 보너스)</span></span>
+        <span style="font-size:14px">팀전 모드 <span style="color:var(--muted)">(팀별 점수 대결)</span></span>
       </div>
       <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
       <div class="team-editor" id="c-team-editor"></div>
       <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px">🎲 랜덤 이름</button>
-      <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 빨리 맞힐수록 <b>남은 시간이 보너스 점수</b>로 쌓여요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
+      <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 각 팀이 맞히면 <b>1문제 = 1점</b>씩 쌓여 <b>팀별 점수</b>로 순위를 매겨요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
     </div>
 
     <div class="setup-card">
@@ -3430,7 +3430,7 @@ const Room = (function(){
   // ── 게임 방법 자동 노출 정책 (페르소나 토의 결론) ──────────────────
   // 최초 '시작하기' 클릭 시 1회 · 이후 (내용 버전 상승) 또는 (마지막 열람 후 14일) 이면 재노출
   // · 랜딩 ❓ 버튼은 상시 수동 · "이제 안 볼게요"는 시간 재노출만 끄고 신기능(버전)은 계속 안내
-  const GUIDE_VERSION="2026-07-30";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출
+  const GUIDE_VERSION="2026-07-30b";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출 (b: 점수 안내 정정 — 1개=1점, 보너스 없음)
   const GUIDE_REPEAT_DAYS=14;
   function guideSeenV(){ try{ return localStorage.getItem("svtq_guide_v"); }catch(e){ return null; } }
   function guideSeenTs(){ try{ return +localStorage.getItem("svtq_guide_ts")||0; }catch(e){ return 0; } }

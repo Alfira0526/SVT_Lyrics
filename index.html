@@ -550,6 +550,16 @@
     <div class="setup-label" style="margin-bottom:8px">어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 바로 시작</span></div>
     <div class="scenario-grid" id="scenario-grid"></div>
 
+    <div class="setup-card" id="teamcount-card">
+      <div class="setup-label">👥 팀 수 <span style="color:var(--muted);font-weight:400;font-size:12px">· 팀 대결·온라인 대결을 이 수로 나눠요</span></div>
+      <div class="intro-counts" id="teamcount-counts">
+        <button type="button" class="ic-step" id="tc-minus" aria-label="팀 1개 줄이기">−</button>
+        <button type="button" class="ic-num on" id="tc-num">2</button>
+        <button type="button" class="ic-step" id="tc-plus" aria-label="팀 1개 늘리기">+</button>
+      </div>
+      <div class="setup-tip"><b>2~8팀</b>까지 정할 수 있어요. 팀 대결·온라인 대결을 고르면 이 팀 수로 시작해요 🙌<br>팀 <b>이름</b>을 직접 바꾸려면 아래 <b>세부 설정 · 팀</b>에서 편집하세요.</div>
+    </div>
+
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-hide" checked /><span class="slider"></span></label>
@@ -2404,6 +2414,19 @@ document.getElementById("s-reset").addEventListener("click",()=>{
 });
 
 /* ---- team editor ---- */
+// 팀 수: 설정 화면의 간단 스테퍼(2~8)로 조정. 세부 설정의 이름 편집기와 같은 config.teamNames를 공유.
+const TEAM_MIN=2, TEAM_MAX=8;
+function setTeamCount(n){
+  n=Math.max(TEAM_MIN, Math.min(TEAM_MAX, n));
+  const cur=(config.teamNames||[]).slice();
+  if(n<cur.length){ config.teamNames=cur.slice(0,n); }              // 줄이면 뒤 팀부터 제거(입력한 이름 보존)
+  else { for(let i=cur.length;i<n;i++) cur.push("팀 "+(i+1)); config.teamNames=cur; }
+  saveState(); renderTeamCount(); renderTeamEditor();
+}
+function renderTeamCount(){
+  const el=document.getElementById("tc-num"); if(!el) return;
+  el.textContent=(config.teamNames||[]).length||TEAM_MIN;
+}
 function renderTeamEditor(){
   const ed=document.getElementById("c-team-editor"); ed.innerHTML="";
   (config.teamNames||[]).forEach((nm,i)=>{
@@ -2416,7 +2439,10 @@ function renderTeamEditor(){
     if(config.teamNames.length<=1){ toast("최소 1개 팀이 필요합니다"); return; }
     config.teamNames.splice(b.dataset.teamdel,1); saveState(); renderTeamEditor();
   }));
+  renderTeamCount();   // 이름 편집기 변경(추가/삭제) 시 팀 수 스테퍼도 동기화
 }
+document.getElementById("tc-minus").addEventListener("click",()=>setTeamCount(((config.teamNames||[]).length||TEAM_MIN)-1));
+document.getElementById("tc-plus").addEventListener("click",()=>setTeamCount(((config.teamNames||[]).length||TEAM_MIN)+1));
 document.getElementById("c-team-add").addEventListener("click",()=>{ config.teamNames.push("팀 "+(config.teamNames.length+1)); saveState(); renderTeamEditor(); });
 document.getElementById("c-team-random").addEventListener("click",()=>{
   const pool=TEAM_NAME_POOL.slice(); shuffleArr(pool);

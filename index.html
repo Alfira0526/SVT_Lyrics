@@ -188,6 +188,9 @@
   .buzz-team .bz-name{flex:1;text-align:left;font-size:16px;color:var(--txt)}
   .buzz-team .bz-ok{flex:0 0 auto;font-size:14px;color:#fff;background:var(--green-ink);padding:6px 12px;border-radius:999px}
   .buzz-none{width:100%;padding:12px;margin-top:4px;border:1px dashed var(--line);border-radius:12px;background:var(--panel2);color:var(--muted);font-weight:700;cursor:pointer}
+  .buzz-answer{background:linear-gradient(180deg,#FFF7DC,#FCEEBE);border:1px solid #F0D98A;border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:16px;color:#5A4A1E;font-weight:700}
+  .buzz-answer b{color:#7A5500;font-size:18px}
+  .buzz-answer span{color:#9A8A5A;font-size:12px;font-weight:500}
   /* 세그먼트 선택버튼(설정을 토글 대신 버튼으로) */
   .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
   .seg-btn{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.12s;min-height:44px}
@@ -1656,12 +1659,11 @@ function finalizeTeamRound(){
   teamRoundDone=true; stopTimer();
   const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
   const ci=mcOptions.findIndex(o=>o.correct);
-  const bonus=config.timerOn? Math.max(0,Math.ceil(timerLeft/5)):0;
   btns.forEach((b,idx)=>{ b.disabled=true; if(idx===ci) b.classList.add("correct"); });
   let anyCorrect=false;
   teamPicks.forEach((p,t)=>{
     if(p==null) return;
-    if(p===ci){ teamScores[t]=(teamScores[t]||0)+(1+bonus); anyCorrect=true; }
+    if(p===ci){ teamScores[t]=(teamScores[t]||0)+1; anyCorrect=true; }   // 팀전: 1문제 = 1점 고정(시간 보너스 없음)
     else if(btns[p]) btns[p].classList.add("wrong");
   });
   marks[order[pos]]=anyCorrect?"correct":"wrong";
@@ -1872,10 +1874,9 @@ function showAnswer(){
 
 function renderAwardRow(){
   const row=document.getElementById("g-award-row");
-  const bonus=config.timerOn? Math.max(0, Math.ceil(timerLeft/5)) : 0;
   row.innerHTML="";
   (config.teamNames||[]).forEach((nm,i)=>{
-    const pts=1+bonus;
+    const pts=1;   // 팀전: 1문제 = 1점 고정
     const b=document.createElement("button");
     b.innerHTML=`✔ ${escapeHtml(nm)} <span style="opacity:.85">+${pts}</span>`;
     b.addEventListener("click",()=>awardTeam(i,pts));
@@ -2925,6 +2926,11 @@ const Room = (function(){
     if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn";
       turnEl.innerHTML = ord.length ? `🖐 <b>${escapeHtml(ord[0])}</b> 먼저! · 구두로 답을 듣고 아래에서 판정하세요` : "🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요"; }
     box.style.display="block"; box.innerHTML="";
+    // 방장(사회자) 전용 정답 표시 — 참가자가 구두로 부른 답이 맞는지 판정하는 데 사용(참가자 폰엔 안 보임).
+    const song=songById(order[pos]);
+    if(song){ const ans=document.createElement("div"); ans.className="buzz-answer";
+      ans.innerHTML=`🎵 정답 <b>${escapeHtml(song.name)}</b>${song.part?` <span>· ${escapeHtml(song.part)}</span>`:""}<br><span>사회자 전용 · 팀이 부른 답과 비교해 정답/오답 판정</span>`;
+      box.appendChild(ans); }
     ord.forEach((nm,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="buzz-team"+(i===0?" first":"");
       b.innerHTML=`<span class="bz-rank">${i+1}</span><span class="bz-name">${escapeHtml(nm)}${i===0?" ⚡":""}</span><span class="bz-ok">정답 ✓</span>`;
       b.addEventListener("click",()=>hostBuzzPick(nm)); box.appendChild(b); });

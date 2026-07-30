@@ -3113,8 +3113,9 @@ const Room = (function(){
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
     if(config.onlineRoom){
-      // 온라인 방: 4지선다 강제, 자동 진행(제출 완료·시간초과 시 공개→다음), 로비에서 대기 후 시작
-      config.mc=true; autoRun=true;
+      // 온라인 방: 자동 진행(제출 완료·시간초과 시 공개→다음), 로비에서 대기 후 시작.
+      // mc는 강제하지 않음 — 4지선다 OFF면 부저(선착순) 모드로 동작.
+      autoRun=true;
       startNewGame(true);
       Room.hostOpen();
       setup.style.display="none";

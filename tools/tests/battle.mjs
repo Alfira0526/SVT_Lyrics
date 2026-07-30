@@ -7,6 +7,7 @@ await pg.goto('http://localhost:8765/index.html'); await pg.waitForTimeout(400);
 await pg.evaluate(()=>{ try{ localStorage.clear(); }catch(e){} }); await pg.reload(); await pg.waitForTimeout(300);
 
 await pg.click('#intro-start'); await pg.waitForTimeout(200);
+await pg.evaluate(()=>{ const d=document.querySelector('details.setup-detail'); if(d) d.open=true; }); await pg.waitForTimeout(80);
 await pg.click('.mode-card[data-mode="battle"]'); await pg.waitForTimeout(120);
 await pg.click('#setup-start'); await pg.waitForTimeout(600);
 P(await pg.evaluate(()=>config.mode==='battle' && config.teamMode===true), '대결모드=팀전 ON으로 시작');

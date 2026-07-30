@@ -4,6 +4,8 @@ const b=await chromium.launch(); const pg=await b.newPage();
 function P(c,n){ console.log((c?'PASS':'FAIL')+' — '+n); if(!c) process.exitCode=1; }
 await pg.goto('http://localhost:8765/index.html'); await pg.waitForTimeout(500);
 await pg.click('#intro-start'); await pg.waitForTimeout(300);
+// 모드 카드는 이제 '세부 설정' 접이식 안에 있음 → 클릭 위해 펼침
+await pg.evaluate(()=>{ const d=document.querySelector('details.setup-detail'); if(d) d.open=true; }); await pg.waitForTimeout(80);
 
 P(await pg.evaluate(()=>document.querySelectorAll('#mode-cards .mode-card').length===3), '모드 카드 3개');
 P(await pg.evaluate(()=>config.mode==='normal'), '기본 모드=normal');

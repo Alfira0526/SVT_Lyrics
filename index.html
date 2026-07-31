@@ -1414,7 +1414,7 @@ Object.assign(I18N.ko, {
   ms_s_omc:"참가자가 각자 폰으로 접속해 보기를 골라요.", ms_s_obz:"먼저 부저를 누른 팀이 답하고 진행자가 판정해요.",
   ms_f_fmt:"문제 형식", ms_o_mc:"4지선다", ms_o_subj:"주관식", ms_f_timer:"제한시간", ms_o_off:"끄기", ms_o_20s:"20초", ms_o_20s_over:"20초(초과=오답)",
   ms_f_lyric:"가사", ms_o_hide:"가리기(권장)", ms_o_show:"보이기", ms_note_inf:"무한 모드는 <b>4지선다</b>로 진행돼요.",
-  ms_f_comp:"참가 구성", ms_o_team:"팀 대항", ms_o_solo:"개인전",
+  ms_f_comp:"참가 구성", ms_o_team:"팀 대항", ms_o_solo:"개인전", ms_f_teams:"팀 수", ms_teams_note:"팀 이름은 🎲 자동으로 랜덤 지정돼요.",
   ms_note_omc:'시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장 → 각자 폰에서 보기 선택.',
   ms_note_obz:'시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장 → 먼저 누른 팀이 답, 진행자가 정답/오답 판정.'
 });
@@ -1428,7 +1428,7 @@ Object.assign(I18N.en, {
   ms_s_omc:"Players join on their phones and pick answers.", ms_s_obz:"First team to buzz answers; the host judges.",
   ms_f_fmt:"Question type", ms_o_mc:"Multiple choice", ms_o_subj:"Open (host scores)", ms_f_timer:"Time limit", ms_o_off:"Off", ms_o_20s:"20s", ms_o_20s_over:"20s (timeout=miss)",
   ms_f_lyric:"Lyrics", ms_o_hide:"Hidden (rec.)", ms_o_show:"Shown", ms_note_inf:"Endless mode uses <b>multiple choice</b>.",
-  ms_f_comp:"Format", ms_o_team:"Teams", ms_o_solo:"Individual",
+  ms_f_comp:"Format", ms_o_team:"Teams", ms_o_solo:"Individual", ms_f_teams:"Number of teams", ms_teams_note:"Team names are assigned randomly 🎲.",
   ms_note_omc:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> on the home screen → pick answers on their phones.',
   ms_note_obz:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> → first team to buzz answers, the host judges.'
 });
@@ -2873,6 +2873,8 @@ function setTeamCount(n){
   else { for(let i=cur.length;i<n;i++) cur.push("팀 "+(i+1)); config.teamNames=cur; }
   saveState(); renderTeamCount(); renderTeamEditor();
 }
+// 팀 이름을 랜덤 풀에서 자동 지정(온라인 팀 대결 시작 시 등)
+function randomizeTeamNames(){ const pool=TEAM_NAME_POOL.slice(); shuffleArr(pool); config.teamNames=(config.teamNames||[]).map((_,i)=>pool[i]||("팀 "+(i+1))); saveState(); try{ renderTeamEditor(); }catch(e){} }
 function renderTeamCount(){
   const el=document.getElementById("tc-num"); if(!el) return;
   el.textContent=(config.teamNames||[]).length||TEAM_MIN;
@@ -3716,10 +3718,16 @@ const Room = (function(){
       html+='<div class="ms-note">'+i18nT("ms_note_inf")+'</div>';
     } else if(m==="online-mc" || m==="online-buzzer"){
       html+=seg("comp",i18nT("ms_f_comp"),[{v:"team",t:i18nT("ms_o_team")},{v:"solo",t:i18nT("ms_o_solo")}],"team");
+      msSel.teams=2;
+      html+=`<div class="ms-field" id="ms-teamcount-field"><div class="ms-flabel">${i18nT("ms_f_teams")}</div><div class="ms-stepper"><button type="button" id="ms-team-minus" aria-label="팀 줄이기">−</button><span class="ms-num" id="ms-team-n">2</span><button type="button" id="ms-team-plus" aria-label="팀 늘리기">+</button></div><div class="ms-note" style="margin-top:8px">${i18nT("ms_teams_note")}</div></div>`;
       html+='<div class="ms-note">'+i18nT(m==="online-buzzer"?"ms_note_obz":"ms_note_omc")+'</div>';
     }
     const f=document.getElementById("ms-form"); f.innerHTML=html;
-    f.querySelectorAll(".ms-seg").forEach(sg=>{ sg.addEventListener("click",e=>{ const btn=e.target.closest("button[data-v]"); if(!btn) return; sg.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn)); let v=btn.dataset.v; if(v==="0"||v==="1") v=+v; msSel[sg.dataset.key]=v; }); });
+    f.querySelectorAll(".ms-seg").forEach(sg=>{ sg.addEventListener("click",e=>{ const btn=e.target.closest("button[data-v]"); if(!btn) return; sg.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn)); let v=btn.dataset.v; if(v==="0"||v==="1") v=+v; msSel[sg.dataset.key]=v;
+      if(sg.dataset.key==="comp"){ const tc=document.getElementById("ms-teamcount-field"); if(tc) tc.style.display=(v==="team")?"":"none"; } }); });
+    const nEl=document.getElementById("ms-team-n");
+    if(nEl){ document.getElementById("ms-team-minus").addEventListener("click",()=>{ msSel.teams=Math.max(2,(msSel.teams||2)-1); nEl.textContent=msSel.teams; });
+      document.getElementById("ms-team-plus").addEventListener("click",()=>{ msSel.teams=Math.min(8,(msSel.teams||2)+1); nEl.textContent=msSel.teams; }); }
   }
   function selectMsMode(m){ msMode=m; renderMsForm(m); msStep1.style.display="none"; msStep2.style.display=""; msModal.scrollTop=0; }
   function applyMsAndStart(){
@@ -3727,8 +3735,8 @@ const Room = (function(){
     config.onlineRoom=false; config.teamMode=false; config.autoHost=false;
     if(m==="solo"){ config.mode="normal"; config.mc=true; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }   // 혼자=4지선다 고정
     else if(m==="infinite"){ config.mode="infinite"; config.mc=true; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }
-    else if(m==="online-mc"){ config.mode="normal"; config.onlineRoom=true; config.mc=true; config.autoHost=true; config.teamMode=(s.comp!=="solo"); config.teamBlind=true; }
-    else if(m==="online-buzzer"){ config.mode="normal"; config.onlineRoom=true; config.mc=false; config.autoHost=true; config.teamMode=(s.comp!=="solo"); }
+    else if(m==="online-mc"){ config.mode="normal"; config.onlineRoom=true; config.mc=true; config.autoHost=true; config.teamMode=(s.comp!=="solo"); config.teamBlind=true; if(config.teamMode){ setTeamCount(s.teams||2); randomizeTeamNames(); } }
+    else if(m==="online-buzzer"){ config.mode="normal"; config.onlineRoom=true; config.mc=false; config.autoHost=true; config.teamMode=(s.comp!=="solo"); if(config.teamMode){ setTeamCount(s.teams||2); randomizeTeamNames(); } }
     saveState();
     closeModeStart();
     intro.classList.add("hide");   // ★ 랜딩 숨김(정상 흐름의 showSetup 역할) — 안 하면 게임 화면이 랜딩 뒤에 가려짐

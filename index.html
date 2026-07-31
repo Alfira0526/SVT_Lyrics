@@ -992,7 +992,10 @@
         <div class="song-name" id="g-answer-name"></div>
         <div class="part-label" id="g-answer-part"></div>
         <div class="video-wrap" id="g-video"></div>
-        <button class="btn btn-ghost btn-sm" id="g-video-reload" style="margin-top:10px;width:100%">🔄 영상 다시 불러오기</button>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-ghost btn-sm" id="g-video-reload" style="flex:1">🔄 다시 불러오기</button>
+          <a id="g-video-open" class="btn btn-ghost btn-sm" target="_blank" rel="noopener" style="flex:1;display:none;align-items:center;justify-content:center">▶ YouTube에서 보기</a>
+        </div>
 
         <!-- solo scoring -->
         <div class="controls" id="g-solo-score">
@@ -2235,14 +2238,18 @@ function renderVideo(){
   const c=qc(order[pos]);
   const vid=parseYouTube(c.mv);
   const reloadBtn=document.getElementById("g-video-reload");
+  const openA=document.getElementById("g-video-open");
   if(vid){
     const start=parseTime(c.time);
     // cache-busting param forces the iframe to reload even on the same video
-    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&rel=0&_=${videoReloadNonce}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    els.video.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?start=${start}&autoplay=1&playsinline=1&rel=0&_=${videoReloadNonce}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
     if(reloadBtn) reloadBtn.style.display="inline-flex";
+    // 자동재생 차단·임베드 비허용 등으로 화면이 검게 나오는 경우의 안전망 — 항상 여는 링크
+    if(openA){ openA.href="https://www.youtube.com/watch?v="+vid+(start?("&t="+start+"s"):""); openA.style.display="inline-flex"; }
   }else{
     els.video.innerHTML=`<div class="no-video">🎬 등록된 MV 주소가 없습니다.<br>설정 탭에서 유튜브 주소를 입력하면 재생됩니다.</div>`;
     if(reloadBtn) reloadBtn.style.display="none";
+    if(openA) openA.style.display="none";
   }
 }
 let videoReloadNonce=0;
@@ -2594,9 +2601,10 @@ function autoSkip(){ if(!answerShown()) autoReveal(); else autoAdvance(); }
 /* ---- 채점 / 이동 ---- */
 function mark(kind){
   if(order.length===0) return;
-  if(answerShown()) return;   // 이미 공개/채점된 문항 재채점 방지
+  if(marks[order[pos]]) return;   // 이미 채점된 문항만 차단(정답 공개 후 '첫' 채점은 허용 — 주관식은 공개→채점 흐름)
   const ok=kind==="correct";
   marks[order[pos]]=kind; updateCounters();
+  if(soloStartMs && !soloEndMs && Object.keys(marks).length>=order.length) soloEndMs=Date.now();   // 솔로 주관식 소요시간 종료 기록(4지선다와 동일)
   const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
   toast(ok?"✔ 정답 처리":"✘ 오답 처리");

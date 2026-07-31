@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1785456716419,
   "songs": [
     {
       "id": "s2",
@@ -611,7 +611,7 @@
     },
     "s57": {
       "lyrics": "Where am I running to now, blinded by shining lights pulling me close",
-      "mv": "https://youtu.be/gK43zTA7DWY?si=hnA5J5NWZXn2eI3G",
+      "mv": "https://youtu.be/oV_2853N4n4",
       "time": "1:05",
       "read": "웨어 앰 아이 러닝 투 나우, 블라인디드 바이 샤이닝 라이츠 풀링 미 클로즈"
     },
@@ -961,6 +961,15 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_review": {
+    "s57": {
+      "reason": "MV를 우지 'Ruby' 공식 MV(https://youtu.be/oV_2853N4n4)로 교체함(기존은 콘서트 직캠 gK43zTA7DWY로 파이프라인 우선순위 위반). 영상이 바뀌어 기존 time(1:05) 시작 지점이 새 영상 기준으로도 맞는지 재확인 필요.",
+      "fields": [
+        "mv",
+        "time"
+      ]
     }
   }
 }

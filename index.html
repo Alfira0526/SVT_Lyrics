@@ -3638,6 +3638,7 @@ const Room = (function(){
     if(config.mode==="infinite"){ quizCount=null; }                                 // 무한: 무제한
     else if(!config.teamMode && !config.onlineRoom){ quizCount=SOLO_FIXED_COUNT; }   // 솔로(개인): 20문제 고정
     else { quizCount = n>0 ? n : null; }                                            // 팀전·온라인: 선택 문제 수
+    if(!config.teamMode && !config.onlineRoom) config.mc=true;                       // 혼자·무한은 4지선다 고정(주관식 불가)
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
     if(config.onlineRoom){
@@ -3707,7 +3708,6 @@ const Room = (function(){
     const seg=(key,label,opts,def)=>{ msSel[key]=def; return `<div class="ms-field"><div class="ms-flabel">${label}</div><div class="ms-seg" data-key="${key}">`+opts.map(o=>`<button type="button" data-v="${o.v}" class="${o.v===def?"on":""}">${o.t}</button>`).join("")+`</div></div>`; };
     let html="";
     if(m==="solo"){
-      html+=seg("fmt",i18nT("ms_f_fmt"),[{v:"mc",t:i18nT("ms_o_mc")},{v:"subj",t:i18nT("ms_o_subj")}],"mc");
       html+=seg("timer",i18nT("ms_f_timer"),[{v:0,t:i18nT("ms_o_off")},{v:1,t:i18nT("ms_o_20s")}],0);
       html+=seg("hide",i18nT("ms_f_lyric"),[{v:1,t:i18nT("ms_o_hide")},{v:0,t:i18nT("ms_o_show")}],1);
     } else if(m==="infinite"){
@@ -3725,7 +3725,7 @@ const Room = (function(){
   function applyMsAndStart(){
     const m=msMode, s=msSel;
     config.onlineRoom=false; config.teamMode=false; config.autoHost=false;
-    if(m==="solo"){ config.mode="normal"; config.mc=(s.fmt!=="subj"); config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }
+    if(m==="solo"){ config.mode="normal"; config.mc=true; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }   // 혼자=4지선다 고정
     else if(m==="infinite"){ config.mode="infinite"; config.mc=true; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }
     else if(m==="online-mc"){ config.mode="normal"; config.onlineRoom=true; config.mc=true; config.autoHost=true; config.teamMode=(s.comp!=="solo"); config.teamBlind=true; }
     else if(m==="online-buzzer"){ config.mode="normal"; config.onlineRoom=true; config.mc=false; config.autoHost=true; config.teamMode=(s.comp!=="solo"); }

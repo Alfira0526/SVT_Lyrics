@@ -594,11 +594,11 @@
       </div>
 
       <div class="g-box">
-        <div class="g-box-h">⭐ 점수는요</div>
+        <div class="g-box-h">⭐ 점수·랭킹은요</div>
         <ul class="g-list">
           <li><b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.</li>
-          <li>🎧 <b>혼자</b>는 <b>맞힌 곡 수</b>, ♾️ <b>무한</b>은 <b>연속으로 맞힌 수</b>가 기록돼요.</li>
-          <li>기록이 좋으면 🏆 <b>전 세계 랭킹</b>에 내 이름을 올릴 수 있어요.</li>
+          <li>🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. <b>전부 맞히면</b>(20/20) 🏆 <b>최속 랭킹</b> 도전 — <b>빨리 끝낼수록</b> 높은 등수!</li>
+          <li>♾️ <b>무한</b>은 틀리기 전까지 <b>연속으로 많이</b> 맞힐수록 랭킹 위로 올라가요.</li>
         </ul>
       </div>
 
@@ -615,7 +615,7 @@
     <button type="button" id="rank-close" class="guide-x" aria-label="닫기">✕</button>
     <h2 class="guide-title">🏆 랭킹</h2>
     <div class="rk-tabs">
-      <button type="button" class="rk-tab active" data-board="solo">🎧 혼자 (정답 수)</button>
+      <button type="button" class="rk-tab active" data-board="solo_speed">🎧 혼자 (20문제 최속)</button>
       <button type="button" class="rk-tab" data-board="infinite">♾️ 무한 (연속)</button>
     </div>
     <div class="rk-scope" id="rank-scope"></div>
@@ -709,8 +709,8 @@
       <div class="setup-tip">이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).</div>
     </div>
 
-    <div class="setup-card">
-      <div class="setup-label">문제 수</div>
+    <div class="setup-card" id="qcount-card">
+      <div class="setup-label">문제 수 <span style="color:var(--muted);font-size:12px;font-weight:700">· 팀전·온라인 전용 (개인은 20문제 고정)</span></div>
       <div class="intro-counts" id="intro-counts">
         <button type="button" class="ic-step" id="ic-minus" aria-label="5개 줄이기">−</button>
         <button type="button" class="ic-num" id="ic-num" data-n="15">15</button>
@@ -1304,6 +1304,8 @@ let timerHandle = null, timerLeft = 0;
 let autoTTSHandle = null;   // 카드 전환 후 자동 낭독 예약 핸들
 let quizCount = null;        // 출제 문제 수 (null = 전체)
 let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
+const SOLO_FIXED_COUNT = 20; // 개인(솔로) 모드는 20문제 고정 · 20/20 만점 시 '최속' 랭킹 등록
+let soloStartMs = 0, soloEndMs = 0;   // 솔로 총 소요시간(게임 시작~마지막 정답) 측정
 
 /* ---- 저장/로드 ---- */
 async function loadState(){
@@ -1395,9 +1397,12 @@ const RANK_MAX=50;   // 로컬 보관 상한
 function rankBase(){ try{ return (RANK_URL||config.fbUrl||"").replace(/\/+$/,""); }catch(e){ return ""; } }
 function rankGlobalOn(){ return !!rankBase(); }
 function loadRank(){
-  try{ const o=JSON.parse(localStorage.getItem(RANK_KEY)||"{}"); return {nick:o.nick||"", solo:Array.isArray(o.solo)?o.solo:[], infinite:Array.isArray(o.infinite)?o.infinite:[]}; }
-  catch(e){ return {nick:"", solo:[], infinite:[]}; }
+  try{ const o=JSON.parse(localStorage.getItem(RANK_KEY)||"{}"); o.nick=o.nick||""; o.solo=Array.isArray(o.solo)?o.solo:[]; o.infinite=Array.isArray(o.infinite)?o.infinite:[]; o.solo_speed=Array.isArray(o.solo_speed)?o.solo_speed:[]; return o; }
+  catch(e){ return {nick:"", solo:[], infinite:[], solo_speed:[]}; }
 }
+// 보드 방향: solo_speed(초)는 작을수록 상위(오름차순), 나머지(정답 수·연속)는 클수록 상위.
+function rankAsc(board){ return board==="solo_speed"; }
+function rankCmp(board){ return rankAsc(board) ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0)); }
 function saveRank(o){ try{ localStorage.setItem(RANK_KEY, JSON.stringify(o)); }catch(e){} }
 function rankCleanNick(s){ return (String(s||"").replace(/[<>]/g,"").trim().slice(0,12)) || "익명캐럿"; }
 // 글로벌 제출/조회(Firebase RTDB REST). 실패해도 게임엔 영향 없음(로컬은 이미 저장됨).
@@ -1409,47 +1414,50 @@ function rankFetchGlobal(board){
   const base=rankBase(); if(!base) return Promise.resolve(null);
   return fetch(base+"/svtq_rank/"+board+".json").then(r=>r.json()).then(o=>o?Object.values(o):[]).catch(()=>null);
 }
-// board: "solo"(정답 수) | "infinite"(연속 수). val은 클수록 상위.
+// board: "solo_speed"(20만점 총 소요초·작을수록 상위) | "infinite"(연속 수·클수록 상위).
 function rankRegister(board, val, nick){
-  nick=rankCleanNick(nick); val=Math.max(0, Math.min(999, parseInt(val,10)||0));
+  nick=rankCleanNick(nick); const cap=rankAsc(board)?99999:999; val=Math.max(0, Math.min(cap, parseInt(val,10)||0));
   const entry={nick, val, ts:Date.now()};
   const r=loadRank(); r.nick=nick;
-  r[board]=(r[board]||[]).concat([entry]).sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,RANK_MAX);
+  r[board]=(r[board]||[]).concat([entry]).sort(rankCmp(board)).slice(0,RANK_MAX);
   saveRank(r);
   rankSubmitGlobal(board, entry);   // 가능하면 글로벌로도(비동기·실패 무시)
   return entry;
 }
-function rankRowsHTML(list, unit){
+function rankRowsHTML(list, unit, asc){
   const medals=["🥇","🥈","🥉"];
-  const top=(list||[]).slice().sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,20);
+  const cmp = asc ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0));
+  const top=(list||[]).slice().sort(cmp).slice(0,20);
   if(!top.length) return '<div class="rk-empty">아직 기록이 없어요 · 첫 주인공이 되어보세요!</div>';
   return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="rk-val">${(parseInt(r.val,10)||0)}${unit}</span></div>`).join("");
 }
 function rankRenderInto(board, el, unit){
   if(!el) return;
+  const asc=rankAsc(board);
   const local=loadRank()[board]||[];
   el.innerHTML='<div class="rk-loading">불러오는 중…</div>';
   if(rankGlobalOn()){
-    rankFetchGlobal(board).then(g=>{ if(g){ el.innerHTML=rankRowsHTML(g, unit); el.dataset.src="global"; } else { el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; } })
-      .catch(()=>{ el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; });
-  } else { el.innerHTML=rankRowsHTML(local, unit); el.dataset.src="local"; }
+    rankFetchGlobal(board).then(g=>{ if(g){ el.innerHTML=rankRowsHTML(g, unit, asc); el.dataset.src="global"; } else { el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; } })
+      .catch(()=>{ el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; });
+  } else { el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; }
 }
 // 메인(인트로) 실시간 랭킹 미리보기 — 보드별 데이터가 10개 이상 모이면 상위 5를 노출.
 const RANK_PREVIEW_MIN=10;
-function rankMiniRows(list){
-  const top=(list||[]).slice().sort((a,b)=>b.val-a.val||(a.ts||0)-(b.ts||0)).slice(0,5);
-  return top.map((r,i)=>`<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${(parseInt(r.val,10)||0)}</span></div>`).join("");
+function rankMiniRows(list, asc, unit){
+  const cmp = asc ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0));
+  const top=(list||[]).slice().sort(cmp).slice(0,5);
+  return top.map((r,i)=>`<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${(parseInt(r.val,10)||0)}${unit||""}</span></div>`).join("");
 }
 function renderIntroRankPreview(){
   const box=document.getElementById("intro-rank-preview"); if(!box) return;
   if(!rankGlobalOn()){ box.style.display="none"; return; }   // 글로벌 연결이 있어야 '전 세계 실시간'이 의미 있음
-  Promise.all([rankFetchGlobal("solo"), rankFetchGlobal("infinite")]).then(([solo,infinite])=>{
+  Promise.all([rankFetchGlobal("solo_speed"), rankFetchGlobal("infinite")]).then(([solo,infinite])=>{
     solo=solo||[]; infinite=infinite||[];
     const showSolo=solo.length>=RANK_PREVIEW_MIN, showInf=infinite.length>=RANK_PREVIEW_MIN;
     if(!showSolo && !showInf){ box.style.display="none"; return; }   // 아직 10개 미만이면 숨김
     let html='<div class="irp-title"><span class="irp-live"></span>🏆 실시간 랭킹</div><div class="irp-grid">';
-    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 정답 수</div>${rankMiniRows(solo)}</div>`;
-    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite)}</div>`;
+    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 20문제 최속</div>${rankMiniRows(solo, true, "초")}</div>`;
+    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite, false, "")}</div>`;
     html+='</div>';
     box.innerHTML=html; box.style.display="";
   }).catch(()=>{ /* 네트워크 실패 시 조용히 숨김(게임엔 영향 없음) */ });
@@ -1855,6 +1863,7 @@ function pickMc(i){
   btns[i].classList.add(ok?"correct":"wrong");
   marks[order[pos]]=ok?"correct":"wrong";   // 혼자 플레이: 고른 즉시 정답/오답 자동 집계
   updateCounters();
+  if(soloStartMs && !soloEndMs && Object.keys(marks).length>=order.length) soloEndMs=Date.now();   // 마지막 문항 응답 시각(솔로 소요시간)
   const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
   toast(ok?"✔ 정답!":"✘ 오답");
@@ -1972,6 +1981,9 @@ function startNewGame(shuffle){
   marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
   if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
   buildOrder(!!shuffle);
+  // 솔로 총 소요시간 측정 시작(개인 모드에서만) — 게임 시작 시각 기록
+  soloStartMs = (!config.teamMode && !config.onlineRoom && config.mode!=="infinite") ? Date.now() : 0;
+  soloEndMs = 0;
 }
 /* 새 문제로 이어가기 — 지금까지 출제된 문항 제외하고 새로 뽑기(점수는 유지) */
 function startNextRound(){
@@ -2682,13 +2694,13 @@ document.getElementById("timer-seg").addEventListener("click",e=>{ const b=e.tar
 // 팀전/4지선다를 게임 '도중' 바꾸면 이전(솔로 등) 정답 흔적(marks)과 팀 점수(teamScores)가 어긋나
 // "정답 N인데 팀 점수 0"처럼 보이는 문제가 생김 → 진행 중이면 새로 시작해 두 카운터 기준을 일치시킴.
 function modeToggleReset(){ if(gameActive && order.length){ startNewGame(true); renderGame(); toast("모드가 바뀌어 새로 시작합니다"); } }
-document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); modeToggleReset(); });
+document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); modeToggleReset(); renderSetup(); });
 document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); modeToggleReset(); });
 document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
 document.getElementById("c-autohost").addEventListener("change",e=>{ config.autoHost=e.target.checked; saveState(); });
 document.getElementById("c-autohide").addEventListener("change",e=>{ config.autoHideControls=e.target.checked; saveState(); });
 document.getElementById("c-autointerval").addEventListener("input",e=>{ config.autoInterval=Math.max(2,Math.min(60,parseInt(e.target.value,10)||20)); saveState(); });
-document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); });
+document.getElementById("c-online").addEventListener("change",e=>{ config.onlineRoom=e.target.checked; saveState(); renderSetup(); });
 document.getElementById("c-fburl").addEventListener("input",e=>{ config.fbUrl=(e.target.value||"").trim(); saveState(); });
 document.getElementById("c-quizonly").addEventListener("change",e=>{ config.quizOnly=e.target.checked; saveState(); });
 
@@ -2783,8 +2795,14 @@ function renderResult(){
   // 개인(혼자) 랭킹 등록 — 팀·온라인·무한이 아닌 솔로 플레이에서 정답이 1곡 이상일 때
   const rs=document.getElementById("r-rank-submit");
   if(rs){
-    if(!config.teamMode && !config.onlineRoom && config.mode!=="infinite" && c>0){ renderRankSubmit(rs, "solo", c, "곡"); }
-    else { rs.style.display="none"; rs.innerHTML=""; }
+    const isSolo = !config.teamMode && !config.onlineRoom && config.mode!=="infinite";
+    if(isSolo && answered===SOLO_FIXED_COUNT && c===SOLO_FIXED_COUNT){
+      const secs = (soloStartMs && soloEndMs) ? Math.max(1, Math.round((soloEndMs-soloStartMs)/1000)) : 0;
+      renderRankSubmit(rs, "solo_speed", secs, "초");   // 20/20 만점 → 최속 랭킹 등록
+    } else if(isSolo){
+      rs.style.display=""; rs.className="rk-submit";
+      rs.innerHTML=`<div class="rk-sub-h">🏆 <b>20문제 만점</b>이면 최속 랭킹에 도전! <span style="color:var(--muted)">(이번 정답 ${c}/${answered})</span></div>`;
+    } else { rs.style.display="none"; rs.innerHTML=""; }
   }
 
   // team ranking
@@ -2934,6 +2952,9 @@ function renderSetup(){
   renderScopeSetup();
   renderModeCards();
   renderScenarios();
+  // 문제 수는 팀전·온라인에서만 조절(개인=20 고정, 무한=무제한)
+  const qc=document.getElementById("qcount-card");
+  if(qc) qc.style.display=((config.teamMode||config.onlineRoom)&&config.mode!=="infinite")?"":"none";
   // 모드 프리셋은 추천 기본값을 '설정'만 하고 잠그지 않는다(사용자가 개별 조정 가능).
   // 하드 잠금은 팀 선택 가리기를 못 켜거나 대결에서 부저(4지선다 OFF)를 막는 문제가 있어 제거.
   ["c-team","c-mc","c-teamblind"].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=false; });
@@ -3403,7 +3424,9 @@ const Room = (function(){
   function startGame(){
     const sel=counts.querySelector("button.on");
     const n=sel? (parseInt(sel.dataset.n,10)||0):0;
-    quizCount = n>0 ? n : null;
+    if(config.mode==="infinite"){ quizCount=null; }                                 // 무한: 무제한
+    else if(!config.teamMode && !config.onlineRoom){ quizCount=SOLO_FIXED_COUNT; }   // 솔로(개인): 20문제 고정
+    else { quizCount = n>0 ? n : null; }                                            // 팀전·온라인: 선택 문제 수
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
     if(config.onlineRoom){
@@ -3430,7 +3453,7 @@ const Room = (function(){
   // ── 게임 방법 자동 노출 정책 (페르소나 토의 결론) ──────────────────
   // 최초 '시작하기' 클릭 시 1회 · 이후 (내용 버전 상승) 또는 (마지막 열람 후 14일) 이면 재노출
   // · 랜딩 ❓ 버튼은 상시 수동 · "이제 안 볼게요"는 시간 재노출만 끄고 신기능(버전)은 계속 안내
-  const GUIDE_VERSION="2026-07-30b";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출 (b: 점수 안내 정정 — 1개=1점, 보너스 없음)
+  const GUIDE_VERSION="2026-07-31";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출 (0731: 솔로 20문제·최속 랭킹 안내)
   const GUIDE_REPEAT_DAYS=14;
   function guideSeenV(){ try{ return localStorage.getItem("svtq_guide_v"); }catch(e){ return null; } }
   function guideSeenTs(){ try{ return +localStorage.getItem("svtq_guide_ts")||0; }catch(e){ return 0; } }
@@ -3459,15 +3482,16 @@ const Room = (function(){
   })();
   (function(){   // 랭킹 팝업
     const rm=document.getElementById("rank-modal"); if(!rm) return;
-    let board="solo";
+    let board="solo_speed";
     const scopeEl=document.getElementById("rank-scope"); const listEl=document.getElementById("rank-list");
+    const boardUnit=b=>b==="solo_speed"?"초":"곡 연속";
     function draw(){
       document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.classList.toggle("active", t.dataset.board===board));
       scopeEl.textContent = rankGlobalOn() ? "🌐 전 세계 랭킹 · 상위 20" : "💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)";
-      rankRenderInto(board, listEl, board==="solo"?"곡":"곡 연속");
+      rankRenderInto(board, listEl, boardUnit(board));
     }
-    window.openRankModal=function(b){ board=b||"solo"; rm.style.display="flex"; draw(); };
-    document.getElementById("intro-rank").addEventListener("click",()=>window.openRankModal("solo"));
+    window.openRankModal=function(b){ board=(b==="solo")?"solo_speed":(b||"solo_speed"); rm.style.display="flex"; draw(); };
+    document.getElementById("intro-rank").addEventListener("click",()=>window.openRankModal("solo_speed"));
     document.getElementById("rank-close").addEventListener("click",()=>{ rm.style.display="none"; });
     rm.addEventListener("click",e=>{ if(e.target===rm) rm.style.display="none"; });
     document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.addEventListener("click",()=>{ board=t.dataset.board; draw(); }));

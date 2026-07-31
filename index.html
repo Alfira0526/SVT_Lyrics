@@ -569,6 +569,9 @@
   .stats-tbl th{color:var(--muted);font-weight:700;font-size:12px}
   .stats-tbl tbody tr:last-child td{border-bottom:none}
   .stats-rate{font-weight:900}
+  .stbar{display:inline-block;vertical-align:middle;width:64px;height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin-right:7px}
+  .stbar i{display:block;height:100%;border-radius:5px}
+  .stcell{display:flex;align-items:center;justify-content:flex-end;gap:0}
   .stats-empty{font-size:13px;color:var(--muted);padding:10px 0}
   .stats-scroll{overflow-x:auto}
   .intro-setup{margin:2px 0 26px}
@@ -2142,7 +2145,8 @@ function renderStats(){
   const totGames=st.sessions.length;
   let tc=0,ts=0; for(const m in st.modeCounts){ tc+=st.modeCounts[m].correct; ts+=st.modeCounts[m].served; }
   const tRate=ts?Math.round(tc/ts*100):0;
-  if(!totGames){ box.innerHTML='<p class="stats-empty">아직 기록된 게임이 없어요. 게임을 끝까지 진행하면 이곳에 통계가 쌓입니다.</p>'; return; }
+  const anyData = totGames>0 || Object.keys(st.funnel||{}).length>0;   // 완주 0·이탈만 있어도 퍼널은 표시
+  if(!anyData){ box.innerHTML='<p class="stats-empty">아직 기록된 게임이 없어요. 게임을 끝까지 진행하면 이곳에 통계가 쌓입니다.</p>'; return; }
   // 모드별
   const modeRows=Object.keys(st.modeCounts).sort((a,b)=>st.modeCounts[b].games-st.modeCounts[a].games).map(m=>{
     const d=st.modeCounts[m], r=d.served?Math.round(d.correct/d.served*100):0;
@@ -2154,7 +2158,7 @@ function renderStats(){
     const d=st.songStats[id], s=songById(id), r=d.served?Math.round(d.correct/d.served*100):0;
     return {id, name:(s?s.name:id), diff:(s?s.diff:"–"), served:d.served, correct:d.correct, r};
   }).filter(x=>x.served>0).sort((a,b)=>a.r-b.r || b.served-a.served);
-  const songBody=songRows.map(x=>`<tr><td>${escapeHtml(x.name)} <span style="color:var(--muted)">${escapeHtml(x.diff)}</span></td><td>${x.served}</td><td>${x.correct}</td><td class="stats-rate" style="color:${rateColor(x.r)}">${x.r}%</td></tr>`).join("");
+  const songBody=songRows.map(x=>`<tr><td>${escapeHtml(x.name)} <span style="color:var(--muted)">${escapeHtml(diffLabel(x.diff))}</span></td><td>${x.served}</td><td>${x.correct}</td><td class="stats-rate"><span class="stcell"><span class="stbar"><i style="width:${x.r}%;background:${rateColor(x.r)}"></i></span><span style="color:${rateColor(x.r)}">${x.r}%</span></span></td></tr>`).join("");
   // S2 퍼널: 모드별 시작→완주율·이탈지점
   const fu=st.funnel||{};
   const fKeys=Object.keys(fu).sort((a,b)=>fu[b].starts-fu[a].starts);

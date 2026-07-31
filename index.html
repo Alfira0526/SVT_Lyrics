@@ -100,6 +100,19 @@
   body.stage .timer-top b{font-size:22px}
   body.stage .answer .song-name{font-size:clamp(30px,4.4vw,44px)}
   body.stage #g-speed-row, body.stage #g-hide-row, body.stage .hint-area{display:none !important}
+  /* 접근성: 글자 크게 — 무대 모드와 달리 컨트롤(힌트·속도·가리기)은 그대로 유지 */
+  body.a11y-big .lyric-box{font-size:clamp(25px,4.4vw,40px);line-height:1.55}
+  body.a11y-big .mc-opt{padding:17px 14px}
+  body.a11y-big .mc-name{font-size:19px}
+  body.a11y-big .mc-key{font-size:16px}
+  body.a11y-big .counter{font-size:16.5px}
+  body.a11y-big .counter b{font-size:20px}
+  body.a11y-big .badge{font-size:15px;padding:5px 13px}
+  body.a11y-big .timer-top{font-size:15px}
+  body.a11y-big .timer-top b{font-size:20px}
+  body.a11y-big .answer .song-name{font-size:clamp(25px,3.8vw,38px)}
+  body.a11y-big .controls .btn{font-size:17px}
+  body.a11y-big .hint-area .btn{font-size:16px}
 
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
   button.btn{border:0;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s;color:var(--ink);display:inline-flex;align-items:center;gap:8px;justify-content:center}
@@ -909,6 +922,7 @@
           <span class="streak-badge" id="g-streak" style="display:none">🔥2</span>
         </div>
         <div class="status-right">
+          <button class="stage-btn" id="g-a11y-btn" title="글자 크게 — 저시력·가독성(컨트롤 유지)" aria-pressed="false">🔎 크게</button>
           <button class="stage-btn" id="g-stage-btn" title="무대 모드 — 프로젝터/원거리용 크게 보기" aria-pressed="false">🎦 무대</button>
           <span class="badge b-중" id="g-badge">중</span>
         </div>
@@ -1628,6 +1642,11 @@ function applyStage(){
   const btn=document.getElementById("g-stage-btn");
   if(btn) btn.setAttribute("aria-pressed", config.stage?"true":"false");
 }
+function applyA11y(){
+  document.body.classList.toggle("a11y-big", !!config.a11yBig);
+  const btn=document.getElementById("g-a11y-btn");
+  if(btn) btn.setAttribute("aria-pressed", config.a11yBig?"true":"false");
+}
 
 function addSlot(){
   const inp=document.getElementById("slot-name");
@@ -2064,6 +2083,7 @@ function renderGame(){
   const gvv=document.getElementById("view-game");
   if(gvv && gvv.classList.contains("active")) window.scrollTo({top:0, behavior:"smooth"});   // 문항 전환 시 맨 위로
   applyStage();   // 무대 모드 상태 반영
+  applyA11y();    // 글자 크게(접근성) 상태 반영
   syncGameScopeChips();   // 문제 범위 칩·표시 동기화
   const total=order.length;
   els.total.textContent=total;
@@ -2577,6 +2597,7 @@ function battleVictory(){
 els.speed.addEventListener("input",()=>{ els.speedval.textContent=parseFloat(els.speed.value).toFixed(1)+"×"; });
 els.hide.addEventListener("change",()=>{ config.hideLyrics=els.hide.checked; saveState(); applyHide(); });
 document.getElementById("g-stage-btn").addEventListener("click",()=>{ config.stage=!config.stage; saveState(); applyStage(); toast(config.stage?"🎦 무대 모드 켜짐(크게 보기)":"무대 모드 꺼짐"); });
+document.getElementById("g-a11y-btn").addEventListener("click",()=>{ config.a11yBig=!config.a11yBig; saveState(); applyA11y(); toast(config.a11yBig?"🔎 글자 크게 켜짐":"글자 크게 꺼짐"); });
 document.getElementById("g-play").addEventListener("click",speak);
 document.getElementById("g-stopread").addEventListener("click",()=>{ stopTTS(); stopTimer(); });
 document.getElementById("g-reveal").addEventListener("click",()=>{
@@ -2602,7 +2623,14 @@ document.addEventListener("keydown",e=>{
   if(btns[i] && !btns[i].disabled){ e.preventDefault(); if(config.teamMode) pickMcTeam(i); else pickMc(i); }
 });
 document.getElementById("g-noone").addEventListener("click",()=>{ if(order.length){ marks[order[pos]]="wrong"; turn=(turn+1)%(config.teamNames.length||1); updateCounters(); renderTeamBoard(); } next(); });
-document.getElementById("g-next").addEventListener("click",next);
+document.getElementById("g-next").addEventListener("click",()=>{
+  // 안 고르고 넘기기: 솔로=오답 처리(20문제 완주 유지·랭킹 가능) · 무한=포기로 종료 · 온라인/팀전은 관여 안 함
+  if(order.length && !answerShown() && !marks[order[pos]] && !config.onlineRoom && !config.teamMode){
+    if(isInfinite()){ marks[order[pos]]="wrong"; updateCounters(); const s=streak; bumpStreak(false); showAnswer(); infiniteGameOver(s); return; }
+    marks[order[pos]]="wrong"; updateCounters(); bumpStreak(false); toast("⏭ 안 고르고 넘기면 오답이에요");
+  }
+  next();
+});
 document.getElementById("g-prev").addEventListener("click",prev);
 
 function syncGameScopeChips(){

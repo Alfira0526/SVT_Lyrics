@@ -509,8 +509,9 @@
   .scn-btn.sel .scn-nm::after{content:" ✓";color:var(--rose-ink)}
   @media(max-width:360px){ .scn-btn .scn-nm{font-size:14px} .scn-btn .scn-ds{font-size:11px} }
   /* 무한(서바이벌) 게임오버 오버레이 */
-  .io-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(60,40,80,.5);backdrop-filter:blur(4px)}
-  .io-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 20px 50px rgba(120,80,160,.3);animation:pop .4s ease-out}
+  .io-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(60,40,80,.5);backdrop-filter:blur(4px);overflow-y:auto}
+  @media(max-height:640px){ .io-overlay{align-items:flex-start} }   /* 소프트키보드 등으로 화면이 짧아지면 위 정렬 → 버튼 가림 방지 */
+  .io-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 24px;text-align:center;max-width:340px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 50px rgba(120,80,160,.3);animation:pop .4s ease-out}
   .io-emoji{font-size:48px;line-height:1}
   .io-title{font-size:20px;font-weight:900;margin-top:8px;color:var(--rose-ink)}
   .io-score{font-size:46px;font-weight:900;color:var(--txt);margin:10px 0 0}
@@ -2082,6 +2083,10 @@ function renderGame(){
   els.index.textContent=pos+1;
   els.badge.className=badgeClass(song.diff); els.badge.textContent=song.diff;
   els.bar.style.width=(pos+1)/total*100+"%";
+  // 무한(서바이벌): 유한 '문항 N/총량'·진행바 혼동 제거 → ∞ 표기 + 진행바 숨김
+  const progEl=document.querySelector(".progress");
+  if(isInfinite()){ els.total.textContent="∞"; if(progEl) progEl.style.display="none"; }
+  else if(progEl) progEl.style.display="";
 
   if(c.lyrics && c.lyrics.trim()) els.lyric.textContent=c.lyrics.trim();
   else els.lyric.innerHTML='<span class="placeholder">이 문항의 가사가 아직 입력되지 않았습니다.<br>설정 탭에서 입력하세요.</span>';
@@ -2636,6 +2641,11 @@ document.getElementById("g-restart").addEventListener("click",()=>{
 });
 function stopEverything(){ autoRun=false; autoStopTimers(); stopTTS(); stopTimer(); }
 document.getElementById("g-end").addEventListener("click",()=>{
+  if(isInfinite() && gameActive && !answerShown()){   // 무한: 자발적 종료도 연속기록 남기기
+    const s=streak;
+    if(!confirm(`지금까지 ${s}연속! 기록을 남기고 종료할까요?`)) return;
+    stopEverything(); infiniteGameOver(s); return;
+  }
   if(!confirm("게임을 종료하고 결과를 볼까요?")) return;
   stopEverything();
   if(Room.host.active) Room.hostEnd();   // 온라인 방: 참가자에게 종료 알림 후 방 닫기
@@ -3059,7 +3069,7 @@ function renderSetup(){
 const MODE_DEFAULTS={
   normal:{ teamMode:false, onlineRoom:false },
   battle:{ teamMode:true, mc:true, teamBlind:true },
-  infinite:{ teamMode:false, mc:true, hideLyrics:true, onlineRoom:false }
+  infinite:{ teamMode:false, mc:true, hideLyrics:true, onlineRoom:false, timerOn:false }   // 무한: 직전 타이머 상속 방지(기본 끄기 — 켜면 시간초과=오답 종료)
 };
 function selectMode(m){
   if(!MODE_DEFAULTS[m]) m="normal";

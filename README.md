@@ -208,6 +208,7 @@ https://alfira0526.github.io/SVT_Lyrics/
 - **[운영 가이드](docs/OPERATION_GUIDE.md)** — 사회자용 진행 시나리오, 팀전/타이머 운영, 준비 체크리스트
 - **[데이터 스펙](docs/DATA_SPEC.md)** — 데이터 구조·JSON 스키마·입력 규격·전체 곡 목록표
 - **[변경 이력](CHANGELOG.md)** — 버전별 변경 내용
+- **[개발 로드맵](ROADMAP.md)** — 날짜 기준 향후 개발 계획(마일스톤·확장성·업데이트 팝업 스펙)
 
 ---
 

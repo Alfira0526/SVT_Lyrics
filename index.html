@@ -777,142 +777,142 @@
 <!-- ================= 기본 설정(게임 옵션) ================= -->
 <div class="intro" id="setup" style="display:none">
   <div class="setup-inner">
-    <h2 class="setup-title">게임 설정</h2>
-    <p class="setup-sub">모드를 고르고 옵션을 정한 뒤 시작하세요</p>
+    <h2 class="setup-title" data-i18n="st_title">게임 설정</h2>
+    <p class="setup-sub" data-i18n="st_sub">모드를 고르고 옵션을 정한 뒤 시작하세요</p>
 
-    <div class="setup-label" style="margin-bottom:8px">어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 옵션이 맞춰져요 · 아래에서 조절 후 시작</span></div>
+    <div class="setup-label" style="margin-bottom:8px" data-i18n-html="st_howplay">어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 옵션이 맞춰져요 · 아래에서 조절 후 시작</span></div>
     <div class="scenario-grid" id="scenario-grid"></div>
 
     <div class="setup-card" id="teamcount-card">
-      <div class="setup-label">👥 팀 수 <span style="color:var(--muted);font-weight:400;font-size:12px">· 팀 대결·온라인 대결을 이 수로 나눠요</span></div>
+      <div class="setup-label" data-i18n-html="st_teamcount">👥 팀 수 <span style="color:var(--muted);font-weight:400;font-size:12px">· 팀 대결·온라인 대결을 이 수로 나눠요</span></div>
       <div class="intro-counts" id="teamcount-counts">
         <button type="button" class="ic-step" id="tc-minus" aria-label="팀 1개 줄이기">−</button>
         <button type="button" class="ic-num on" id="tc-num">2</button>
         <button type="button" class="ic-step" id="tc-plus" aria-label="팀 1개 늘리기">+</button>
       </div>
-      <div class="setup-tip"><b>2~8팀</b>까지 정할 수 있어요. 팀 대결·온라인 대결을 고르면 이 팀 수로 시작해요 🙌<br>팀 <b>이름</b>을 직접 바꾸려면 아래 <b>세부 설정 · 팀</b>에서 편집하세요.</div>
+      <div class="setup-tip" data-i18n-html="st_teamcount_tip"><b>2~8팀</b>까지 정할 수 있어요. 팀 대결·온라인 대결을 고르면 이 팀 수로 시작해요 🙌<br>팀 <b>이름</b>을 직접 바꾸려면 아래 <b>세부 설정 · 팀</b>에서 편집하세요.</div>
     </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-hide" checked /><span class="slider"></span></label>
-        <span style="font-size:14px">🎧 듣기 전용 (가사 가리기) <span style="color:var(--muted)">· 권장</span></span>
+        <span style="font-size:14px" data-i18n-html="st_hide">🎧 듣기 전용 (가사 가리기) <span style="color:var(--muted)">· 권장</span></span>
       </div>
-      <div class="setup-tip">이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).</div>
+      <div class="setup-tip" data-i18n-html="st_hide_tip">이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).</div>
     </div>
 
     <div class="setup-card" id="qcount-card">
-      <div class="setup-label">문제 수 <span style="color:var(--muted);font-size:12px;font-weight:700">· 팀전·온라인 전용 (개인은 20문제 고정)</span></div>
+      <div class="setup-label" data-i18n-html="st_qcount">문제 수 <span style="color:var(--muted);font-size:12px;font-weight:700">· 팀전·온라인 전용 (개인은 20문제 고정)</span></div>
       <div class="intro-counts" id="intro-counts">
         <button type="button" class="ic-step" id="ic-minus" aria-label="5개 줄이기">−</button>
         <button type="button" class="ic-num" id="ic-num" data-n="15">15</button>
         <button type="button" class="ic-step" id="ic-plus" aria-label="5개 늘리기">+</button>
-        <button type="button" class="ic-all on" id="ic-all" data-n="0">전체</button>
+        <button type="button" class="ic-all on" id="ic-all" data-n="0" data-i18n="g_all">전체</button>
       </div>
-      <label class="intro-unit" style="margin-top:14px"><input type="checkbox" id="intro-unit" checked /><span>유닛곡 비중 높이기</span></label>
-      <div class="setup-tip">문제 수는 <b>5문제 단위</b>로 −/+ 조절할 수 있어요. 처음 모이는 자리라면 <b>10~15문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
+      <label class="intro-unit" style="margin-top:14px"><input type="checkbox" id="intro-unit" checked /><span data-i18n="st_unitboost">유닛곡 비중 높이기</span></label>
+      <div class="setup-tip" data-i18n-html="st_qcount_tip">문제 수는 <b>5문제 단위</b>로 −/+ 조절할 수 있어요. 처음 모이는 자리라면 <b>10~15문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.</div>
     </div>
 
     <div class="setup-card">
-      <div class="setup-label">🎯 문제 범위 (그룹 선택)</div>
+      <div class="setup-label" data-i18n="st_scope_label">🎯 문제 범위 (그룹 선택)</div>
       <div class="scope-dims" id="scope-dims">
-        <span class="chip active" data-dim="all">전체</span>
-        <span class="chip" data-dim="diff">난이도</span>
-        <span class="chip" data-dim="unit">구성</span>
+        <span class="chip active" data-dim="all" data-i18n="g_all">전체</span>
+        <span class="chip" data-dim="diff" data-i18n="st_dim_diff">난이도</span>
+        <span class="chip" data-dim="unit" data-i18n="st_dim_unit">구성</span>
       </div>
       <div class="scope-vals" id="scope-vals"></div>
-      <div class="setup-tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>구성</b>(완전체·유닛곡).<br>예: 가볍게 즐길 땐 <b>중·신곡</b>, 고인물끼리는 <b>상·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
+      <div class="setup-tip" data-i18n-html="st_scope_tip"><b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>구성</b>(완전체·유닛곡).<br>예: 가볍게 즐길 땐 <b>중·신곡</b>, 고인물끼리는 <b>상·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.</div>
     </div>
 
     <details class="setup-adv setup-detail">
-      <summary>▸ 세부 설정 · 모드·타이머·팀·4지선다 직접 조정</summary>
+      <summary data-i18n="st_sum_detail">▸ 세부 설정 · 모드·타이머·팀·4지선다 직접 조정</summary>
     <div class="mode-cards" id="mode-cards" style="margin-bottom:12px">
-      <div class="mode-card" data-mode="normal" tabindex="0" role="button" aria-pressed="true"><div class="ic">🎧</div><div class="nm">일반</div><div class="ds">편하게 듣고 맞히기</div></div>
-      <div class="mode-card" data-mode="battle" tabindex="0" role="button" aria-pressed="false"><div class="ic">⚔️</div><div class="nm">대결</div><div class="ds">팀 대결·승부</div></div>
-      <div class="mode-card" data-mode="infinite" tabindex="0" role="button" aria-pressed="false"><div class="ic">♾️</div><div class="nm">무한</div><div class="ds">서바이벌·최고기록</div></div>
+      <div class="mode-card" data-mode="normal" tabindex="0" role="button" aria-pressed="true"><div class="ic">🎧</div><div class="nm" data-i18n="st_mc_normal_n">일반</div><div class="ds" data-i18n="st_mc_normal_d">편하게 듣고 맞히기</div></div>
+      <div class="mode-card" data-mode="battle" tabindex="0" role="button" aria-pressed="false"><div class="ic">⚔️</div><div class="nm" data-i18n="st_mc_battle_n">대결</div><div class="ds" data-i18n="st_mc_battle_d">팀 대결·승부</div></div>
+      <div class="mode-card" data-mode="infinite" tabindex="0" role="button" aria-pressed="false"><div class="ic">♾️</div><div class="nm" data-i18n="st_mc_inf_n">무한</div><div class="ds" data-i18n="st_mc_inf_d">서바이벌·최고기록</div></div>
     </div>
     <div class="setup-card">
-      <div class="setup-label">⏱️ 제한 시간 <span style="color:var(--muted);font-weight:400;font-size:12px">· 문항별 카운트다운</span></div>
+      <div class="setup-label" data-i18n-html="st_timer">⏱️ 제한 시간 <span style="color:var(--muted);font-weight:400;font-size:12px">· 문항별 카운트다운</span></div>
       <div class="seg" id="timer-seg">
-        <button type="button" class="seg-btn" data-sec="0">끄기</button>
-        <button type="button" class="seg-btn" data-sec="10">10초</button>
-        <button type="button" class="seg-btn" data-sec="20">20초</button>
-        <button type="button" class="seg-btn" data-sec="30">30초</button>
+        <button type="button" class="seg-btn" data-sec="0" data-i18n="ms_o_off">끄기</button>
+        <button type="button" class="seg-btn" data-sec="10" data-i18n="st_sec10">10초</button>
+        <button type="button" class="seg-btn" data-sec="20" data-i18n="st_sec20">20초</button>
+        <button type="button" class="seg-btn" data-sec="30" data-i18n="st_sec30">30초</button>
       </div>
-      <div class="setup-tip"><b>20초</b>면 충분해요 ⏱️ 더 쫄깃하게는 <b>10초</b>. 끄면 제한 없이 진행돼요.</div>
+      <div class="setup-tip" data-i18n-html="st_timer_tip"><b>20초</b>면 충분해요 ⏱️ 더 쫄깃하게는 <b>10초</b>. 끄면 제한 없이 진행돼요.</div>
     </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-sfx" checked /><span class="slider"></span></label>
-        <span style="font-size:14px">🔊 효과음 <span style="color:var(--muted)">(정답·오답·카운트다운)</span></span>
+        <span style="font-size:14px" data-i18n-html="st_sfx">🔊 효과음 <span style="color:var(--muted)">(정답·오답·카운트다운)</span></span>
       </div>
-      <div class="setup-tip">정답 딩·오답 부저·막판 카운트다운 소리로 <b>더 쫄깃하게</b> 즐겨요. 정답 시 <b>연속 정답 콤보</b>도 표시돼요 🔥<br>조용한 자리라면 꺼두세요(소리는 이 기기에서만 재생 · 별도 파일 없음).</div>
+      <div class="setup-tip" data-i18n-html="st_sfx_tip">정답 딩·오답 부저·막판 카운트다운 소리로 <b>더 쫄깃하게</b> 즐겨요. 정답 시 <b>연속 정답 콤보</b>도 표시돼요 🔥<br>조용한 자리라면 꺼두세요(소리는 이 기기에서만 재생 · 별도 파일 없음).</div>
     </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-team" /><span class="slider"></span></label>
-        <span style="font-size:14px">팀전 모드 <span style="color:var(--muted)">(팀별 점수 대결)</span></span>
+        <span style="font-size:14px" data-i18n-html="st_team">팀전 모드 <span style="color:var(--muted)">(팀별 점수 대결)</span></span>
       </div>
-      <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px">+ 팀 추가</button>
+      <button class="btn btn-ghost btn-sm" id="c-team-add" style="margin-top:8px" data-i18n="st_teamadd">+ 팀 추가</button>
       <div class="team-editor" id="c-team-editor"></div>
-      <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px">🎲 랜덤 이름</button>
-      <div class="setup-tip">여럿이 모였다면 팀전을 켜보세요 🙌 각 팀이 맞히면 <b>1문제 = 1점</b>씩 쌓여 <b>팀별 점수</b>로 순위를 매겨요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
+      <button class="btn btn-ghost btn-sm" id="c-team-random" style="margin-top:8px" data-i18n="st_teamrandom_btn">🎲 랜덤 이름</button>
+      <div class="setup-tip" data-i18n-html="st_team_tip">여럿이 모였다면 팀전을 켜보세요 🙌 각 팀이 맞히면 <b>1문제 = 1점</b>씩 쌓여 <b>팀별 점수</b>로 순위를 매겨요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.</div>
     </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-mc" /><span class="slider"></span></label>
-        <span style="font-size:14px">4지선다 (객관식) — 보기 4개 중 정답 고르기 <span style="color:var(--muted)">· 변별력↓</span></span>
+        <span style="font-size:14px" data-i18n-html="st_mc">4지선다 (객관식) — 보기 4개 중 정답 고르기 <span style="color:var(--muted)">· 변별력↓</span></span>
       </div>
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-teamblind" /><span class="slider"></span></label>
-        <span style="font-size:14px">팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span></span>
+        <span style="font-size:14px" data-i18n-html="st_teamblind">팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span></span>
       </div>
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-quizonly" /><span class="slider"></span></label>
-        <span style="font-size:14px">문제만 맞추기 <span style="color:var(--muted)">(영상·자동낭독 없이 · 빠른 진행 · 변별력↓)</span></span>
+        <span style="font-size:14px" data-i18n-html="st_quizonly">문제만 맞추기 <span style="color:var(--muted)">(영상·자동낭독 없이 · 빠른 진행 · 변별력↓)</span></span>
       </div>
-      <div class="setup-tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
+      <div class="setup-tip" data-i18n-html="st_mc_tip">감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.</div>
     </div>
     </details>
 
     <details class="setup-adv">
-      <summary>⚙️ 고급 설정 · 자동 진행 · 온라인 방 · 음성 확인</summary>
+      <summary data-i18n="st_sum_adv">⚙️ 고급 설정 · 자동 진행 · 온라인 방 · 음성 확인</summary>
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-autohost" /><span class="slider"></span></label>
-        <span style="font-size:14px">자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span></span>
+        <span style="font-size:14px" data-i18n-html="st_autohost">자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span></span>
       </div>
-      <label class="hint" style="display:block;margin:10px 0 4px">정답 공개 후 다음까지(초)</label>
+      <label class="hint" style="display:block;margin:10px 0 4px" data-i18n="st_autoint">정답 공개 후 다음까지(초)</label>
       <input class="num-input" type="number" id="c-autointerval" min="2" max="60" value="20" />
       <div class="toggle-row" style="margin-top:12px">
         <label class="switch"><input type="checkbox" id="c-autohide" /><span class="slider"></span></label>
-        <span style="font-size:14px">진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span></span>
+        <span style="font-size:14px" data-i18n-html="st_autohide">진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span></span>
       </div>
-      <div class="setup-tip">자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.</div>
+      <div class="setup-tip" data-i18n-html="st_autohost_tip">자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.</div>
     </div>
 
     <div class="setup-card">
       <div class="toggle-row" style="margin-top:0">
         <label class="switch"><input type="checkbox" id="c-online" /><span class="slider"></span></label>
-        <span style="font-size:14px">온라인 방 (각 팀 폰 참가) <span style="color:var(--muted)">· 실험적 · 인터넷 연결 필요</span></span>
+        <span style="font-size:14px" data-i18n-html="st_online">온라인 방 (각 팀 폰 참가) <span style="color:var(--muted)">· 실험적 · 인터넷 연결 필요</span></span>
       </div>
-      <label class="hint" style="display:block;margin:10px 0 4px">Firebase Realtime DB 주소 <span style="color:var(--muted)">(선택 · 원격 안정화)</span></label>
-      <input class="num-input" type="text" id="c-fburl" placeholder="https://내프로젝트.firebaseio.com" style="text-transform:none" />
-      <div class="setup-tip">켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개 제출</b> → 방장 화면 자동 채점.<br><b>원격(다른 공간)</b>도 지원: 참가자 폰이 가사·힌트·듣기·타이머·정답 MV를 모두 받습니다. 전송은 <b>같은 브라우저=즉시</b>, <b>다른 기기=공개 릴레이(베스트에포트)</b>.<br>🔒 <b>안정적 원격</b>이 필요하면 무료 <b>Firebase Realtime DB</b> 주소를 넣으세요(규칙 test 모드). 넣으면 그 경로로 확실히 동기화되고, 비우면 공개 릴레이로 동작합니다.</div>
+      <label class="hint" style="display:block;margin:10px 0 4px" data-i18n-html="st_fburl">Firebase Realtime DB 주소 <span style="color:var(--muted)">(선택 · 원격 안정화)</span></label>
+      <input class="num-input" type="text" id="c-fburl" placeholder="https://내프로젝트.firebaseio.com" style="text-transform:none" data-i18n-ph="st_fburl_ph" />
+      <div class="setup-tip" data-i18n-html="st_online_tip">켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개 제출</b> → 방장 화면 자동 채점.<br><b>원격(다른 공간)</b>도 지원: 참가자 폰이 가사·힌트·듣기·타이머·정답 MV를 모두 받습니다. 전송은 <b>같은 브라우저=즉시</b>, <b>다른 기기=공개 릴레이(베스트에포트)</b>.<br>🔒 <b>안정적 원격</b>이 필요하면 무료 <b>Firebase Realtime DB</b> 주소를 넣으세요(규칙 test 모드). 넣으면 그 경로로 확실히 동기화되고, 비우면 공개 릴레이로 동작합니다.</div>
     </div>
 
     <div class="setup-card" id="voice-check-card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:6px">🔊 음성(TTS) 준비 확인</div>
-      <div id="voice-check-body" style="font-size:13px;line-height:1.65;color:var(--muted)">확인 중…</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px" data-i18n="st_voice">🔊 음성(TTS) 준비 확인</div>
+      <div id="voice-check-body" style="font-size:13px;line-height:1.65;color:var(--muted)" data-i18n="st_voice_checking">확인 중…</div>
     </div>
     </details>
 
     <div class="setup-actions">
-      <button class="btn btn-ghost" id="setup-back">← 뒤로</button>
-      <button class="intro-start" id="setup-start" style="flex:1;padding:15px">▶ 게임 시작</button>
+      <button class="btn btn-ghost" id="setup-back" data-i18n="rg_back">← 뒤로</button>
+      <button class="intro-start" id="setup-start" style="flex:1;padding:15px" data-i18n="rl_start">▶ 게임 시작</button>
     </div>
   </div>
 </div>
@@ -1542,6 +1542,47 @@ Object.assign(I18N.ko, {
   t_norenew:"남은 새 문제가 없어 전체에서 다시 뽑았어요", t_teamrandom:"🎲 팀 이름을 랜덤으로 지었어요", t_teammin:"최소 1개 팀이 필요합니다",
   t_notts:"이 브라우저는 음성 낭독을 지원하지 않습니다", t_nolyric:"입력된 가사가 없습니다", t_novoice:"이 기기엔 맞는 음성이 없어 낭독 대신 가사를 보여드려요 🙂",
   t_copied:"📋 복사됨 · 트위터에 붙여넣으세요", t_ig:"📸 결과 이미지 저장 + 캡션 복사됨 · 인스타 스토리에 올려보세요!", t_copiedclip:"클립보드에 복사했습니다",
+  st_title:"게임 설정", st_sub:"모드를 고르고 옵션을 정한 뒤 시작하세요",
+  st_howplay:'어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 옵션이 맞춰져요 · 아래에서 조절 후 시작</span>',
+  st_teamcount:'👥 팀 수 <span style="color:var(--muted);font-weight:400;font-size:12px">· 팀 대결·온라인 대결을 이 수로 나눠요</span>',
+  st_teamcount_tip:'<b>2~8팀</b>까지 정할 수 있어요. 팀 대결·온라인 대결을 고르면 이 팀 수로 시작해요 🙌<br>팀 <b>이름</b>을 직접 바꾸려면 아래 <b>세부 설정 · 팀</b>에서 편집하세요.',
+  st_hide:'🎧 듣기 전용 (가사 가리기) <span style="color:var(--muted)">· 권장</span>',
+  st_hide_tip:'이 게임의 <b>핵심 모드</b>예요. 화면의 가사를 가리고 <b>TTS 낭독만 듣고</b> 곡을 맞혀요 — 눈으로 읽는 것보다 변별력이 훨씬 높아요.<br>초보 팬 모임이라 가사를 함께 보여주고 싶으면 꺼도 돼요(진행 중 <b>가사 가리기</b> 토글로도 전환 가능).',
+  st_qcount:'문제 수 <span style="color:var(--muted);font-size:12px;font-weight:700">· 팀전·온라인 전용 (개인은 20문제 고정)</span>',
+  st_unitboost:"유닛곡 비중 높이기",
+  st_qcount_tip:'문제 수는 <b>5문제 단위</b>로 −/+ 조절할 수 있어요. 처음 모이는 자리라면 <b>10~15문제</b>로 가볍게, 제대로 겨뤄보려면 <b>전체</b>를 추천해요 🎯<br>유닛곡 비중을 켜두면 부석순·호시우지 같은 <b>유닛곡</b>이 더 자주 나와요.',
+  st_scope_label:"🎯 문제 범위 (그룹 선택)", st_dim_diff:"난이도", st_dim_unit:"구성",
+  st_scope_tip:'<b>특정 그룹만</b> 골라 출제할 수 있어요 — <b>난이도</b>(상·중·신곡), <b>구성</b>(완전체·유닛곡).<br>예: 가볍게 즐길 땐 <b>중·신곡</b>, 고인물끼리는 <b>상·유닛곡</b>으로 난이도를 조절하세요. 게임 중에도 상단 <b>난이도 칩</b>으로 바꿀 수 있어요.',
+  st_sum_detail:"▸ 세부 설정 · 모드·타이머·팀·4지선다 직접 조정",
+  st_mc_normal_n:"일반", st_mc_normal_d:"편하게 듣고 맞히기", st_mc_battle_n:"대결", st_mc_battle_d:"팀 대결·승부", st_mc_inf_n:"무한", st_mc_inf_d:"서바이벌·최고기록",
+  st_timer:'⏱️ 제한 시간 <span style="color:var(--muted);font-weight:400;font-size:12px">· 문항별 카운트다운</span>',
+  st_timer_tip:'<b>20초</b>면 충분해요 ⏱️ 더 쫄깃하게는 <b>10초</b>. 끄면 제한 없이 진행돼요.',
+  st_sfx:'🔊 효과음 <span style="color:var(--muted)">(정답·오답·카운트다운)</span>',
+  st_sfx_tip:'정답 딩·오답 부저·막판 카운트다운 소리로 <b>더 쫄깃하게</b> 즐겨요. 정답 시 <b>연속 정답 콤보</b>도 표시돼요 🔥<br>조용한 자리라면 꺼두세요(소리는 이 기기에서만 재생 · 별도 파일 없음).',
+  st_team:'팀전 모드 <span style="color:var(--muted)">(팀별 점수 대결)</span>', st_teamadd:"+ 팀 추가", st_teamrandom_btn:"🎲 랜덤 이름",
+  st_team_tip:'여럿이 모였다면 팀전을 켜보세요 🙌 각 팀이 맞히면 <b>1문제 = 1점</b>씩 쌓여 <b>팀별 점수</b>로 순위를 매겨요.<br>혼자 또는 각자 겨루는 자리라면 꺼두어도 좋아요.',
+  st_mc:'4지선다 (객관식) — 보기 4개 중 정답 고르기 <span style="color:var(--muted)">· 변별력↓</span>',
+  st_teamblind:'팀 선택 가리기 <span style="color:var(--muted)">(팀전 4지선다 · 동시/온라인)</span>',
+  st_quizonly:'문제만 맞추기 <span style="color:var(--muted)">(영상·자동낭독 없이 · 빠른 진행 · 변별력↓)</span>',
+  st_mc_tip:'감이 잘 안 올 땐 <b>보기 4개</b>가 있으면 훨씬 수월해요. 어려운 모드는 <b>OFF</b> 🔥<br><b>팀 선택 가리기</b>를 켜면 팀전에서 각 팀 선택이 <b>모두 고를 때까지 비공개</b>돼요.<br><b>문제만 맞추기</b>: 같은 공간에서 폰으로 빠르게 돌릴 때 좋아요 — 답만 다 고르면 <b>정답만 공개(영상 생략)</b>하고 바로 다음으로.',
+  st_sum_adv:"⚙️ 고급 설정 · 자동 진행 · 온라인 방 · 음성 확인",
+  st_autohost:'자동 진행 (오토 호스트) <span style="color:var(--muted)">— 사람 진행자 없이</span>', st_autoint:"정답 공개 후 다음까지(초)",
+  st_autohide:'진행 컨트롤 숨기기 <span style="color:var(--muted)">(키오스크)</span>',
+  st_autohost_tip:'자동 진행을 켜면 <b>낭독 → 카운트다운 → 정답 공개 → 다음</b>이 저절로 흘러가요 🤖 진행자가 필요 없어요.<br>화면의 <b>▶/⏸/⏭</b> 컨트롤은 <b>방장(진행 화면)</b> 용 보조 장치 — 안 눌러도 진행돼요. <b>컨트롤 숨기기</b>를 켜면 버튼 없이 순수 자동(키오스크)으로 돌아가요.',
+  st_online:'온라인 방 (각 팀 폰 참가) <span style="color:var(--muted)">· 실험적 · 인터넷 연결 필요</span>',
+  st_fburl:'Firebase Realtime DB 주소 <span style="color:var(--muted)">(선택 · 원격 안정화)</span>', st_fburl_ph:"https://내프로젝트.firebaseio.com",
+  st_online_tip:'켜면 게임 시작 시 <b>방 코드</b>가 뜨고, 각 팀은 폰에서 <b>🔗 방 참가</b>로 코드를 입력해 들어와요. 각 팀이 <b>자기 폰에서 비공개 제출</b> → 방장 화면 자동 채점.<br><b>원격(다른 공간)</b>도 지원: 참가자 폰이 가사·힌트·듣기·타이머·정답 MV를 모두 받습니다. 전송은 <b>같은 브라우저=즉시</b>, <b>다른 기기=공개 릴레이(베스트에포트)</b>.<br>🔒 <b>안정적 원격</b>이 필요하면 무료 <b>Firebase Realtime DB</b> 주소를 넣으세요(규칙 test 모드). 넣으면 그 경로로 확실히 동기화되고, 비우면 공개 릴레이로 동작합니다.',
+  st_voice:"🔊 음성(TTS) 준비 확인", st_voice_checking:"확인 중…",
+  sv_full:"완전체(단체곡)", sv_unit:"유닛곡", st_sec10:"10초", st_sec20:"20초", st_sec30:"30초",
+  scn_solo_n:"혼자·가볍게", scn_solo_d:"한 명이 듣고 맞히기", scn_infinite_n:"무한 도전", scn_infinite_d:"틀리면 끝·최고기록 도전",
+  scn_online_n:"온라인 4지선다", scn_online_d:"각자 폰으로 보기 선택", scn_buzz_n:"온라인 부저 대결", scn_buzz_d:"폰으로 먼저 누르기 승부",
+  lang_ko:"한국어", lang_en:"영어", lang_zh:"중국어", lang_ja:"일본어",
+  vc_notts:"이 브라우저는 음성 낭독(TTS)을 지원하지 않습니다. Chrome/Edge를 권장해요.",
+  vc_loading:"음성 목록을 불러오는 중… <span style='color:var(--muted)'>잠시 후 자동 갱신됩니다.</span>",
+  vc_langs:"이 문제 세트 낭독 언어: <b>{rows}</b>",
+  vc_missing:"<br>ℹ️ <b>{langs}</b> 음성이 이 기기엔 없지만 <b>괜찮아요</b> — 자동으로 <b>한글 독음</b>으로 읽어줘요(소리는 정상적으로 납니다).",
+  vc_install:"<br><span style='color:var(--muted)'>원어 발음 그대로 듣고 싶은 호스트만(선택) — <b>Windows</b>: 설정 → 시간 및 언어 → 언어 및 지역 → 언어 추가 → 언어 옵션에서 <b>음성</b> 설치 → 브라우저 재시작. 설치하면 원어로 읽어줘요.</span>",
+  vc_ready:"<br>✅ 필요한 음성이 모두 준비됐어요(원어 발음으로 낭독).",
   rl_title:"참가자 대기", rl_sub:"모두 들어오면 게임을 시작하세요", rl_conn:"연결 확인 중…",
   rl_qrcap:"📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요",
   rl_hostjoin:'🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span>',
@@ -1616,6 +1657,47 @@ Object.assign(I18N.en, {
   t_norenew:"No new songs left — redrew from all", t_teamrandom:"🎲 Team names randomized", t_teammin:"At least 1 team is required",
   t_notts:"This browser doesn't support voice read-aloud", t_nolyric:"No lyrics entered", t_novoice:"No matching voice on this device — showing lyrics instead 🙂",
   t_copied:"📋 Copied · paste into Twitter", t_ig:"📸 Result image saved + caption copied · post it to your IG Story!", t_copiedclip:"Copied to clipboard",
+  st_title:"Game settings", st_sub:"Pick a mode, set options, then start",
+  st_howplay:'How do you want to play? <span style="color:var(--muted);font-weight:400;font-size:12px">· tap to preset options · adjust below, then start</span>',
+  st_teamcount:'👥 Number of teams <span style="color:var(--muted);font-weight:400;font-size:12px">· team & online battles split into this many</span>',
+  st_teamcount_tip:'You can set <b>2-8 teams</b>. Team & online battles start with this count 🙌<br>To rename teams, edit under <b>Detailed settings · Teams</b> below.',
+  st_hide:'🎧 Listen-only (hide lyrics) <span style="color:var(--muted)">· recommended</span>',
+  st_hide_tip:'This is the <b>core mode</b>. Hide the on-screen lyrics and guess <b>by TTS read-aloud only</b> - far more discriminating than reading with your eyes.<br>For a beginner crowd you can turn it off to show lyrics too (also toggleable mid-game via <b>Hide lyrics</b>).',
+  st_qcount:'Number of questions <span style="color:var(--muted);font-size:12px;font-weight:700">· team/online only (Solo fixed at 20)</span>',
+  st_unitboost:"Boost unit songs",
+  st_qcount_tip:'Adjust in <b>steps of 5</b> with -/+. For a first meetup, keep it light at <b>10-15</b>; for a real contest, <b>All</b> is recommended 🎯<br>With unit-song boost on, <b>unit songs</b> like BSS / Hoshi·Woozi appear more often.',
+  st_scope_label:"🎯 Question scope (group)", st_dim_diff:"Difficulty", st_dim_unit:"Lineup",
+  st_scope_tip:'You can quiz <b>specific groups only</b> - <b>Difficulty</b> (Hard·Med·New), <b>Lineup</b> (full group·units).<br>e.g. keep it light with <b>Med·New</b>, or go hard among veterans with <b>Hard·units</b>. You can also switch via the <b>difficulty chips</b> at the top mid-game.',
+  st_sum_detail:"▸ Detailed settings · adjust mode·timer·teams·multiple-choice",
+  st_mc_normal_n:"Normal", st_mc_normal_d:"Relaxed listen & guess", st_mc_battle_n:"Battle", st_mc_battle_d:"Team battle·contest", st_mc_inf_n:"Endless", st_mc_inf_d:"Survival·best record",
+  st_timer:'⏱️ Time limit <span style="color:var(--muted);font-weight:400;font-size:12px">· per-question countdown</span>',
+  st_timer_tip:'<b>20s</b> is plenty ⏱️ for extra tension try <b>10s</b>. Off means no limit.',
+  st_sfx:'🔊 Sound effects <span style="color:var(--muted)">(correct·wrong·countdown)</span>',
+  st_sfx_tip:'Correct dings, wrong buzzers, and final-countdown sounds make it <b>more thrilling</b>. On a correct answer a <b>combo streak</b> shows too 🔥<br>Turn off for quiet rooms (sound plays on this device only · no separate files).',
+  st_team:'Team mode <span style="color:var(--muted)">(team score battle)</span>', st_teamadd:"+ Add team", st_teamrandom_btn:"🎲 Random names",
+  st_team_tip:'Got a crowd? Turn on team mode 🙌 Each correct answer is <b>1 point</b>, ranked by <b>team score</b>.<br>For solo or everyone-for-themselves, you can leave it off.',
+  st_mc:'Multiple choice - pick the answer from 4 <span style="color:var(--muted)">· easier</span>',
+  st_teamblind:'Hide team picks <span style="color:var(--muted)">(team MC · simultaneous/online)</span>',
+  st_quizonly:'Guess-only <span style="color:var(--muted)">(no video·auto read · fast · easier)</span>',
+  st_mc_tip:'When you are stuck, <b>4 choices</b> make it much easier. For hard mode, keep it <b>OFF</b> 🔥<br><b>Hide team picks</b> keeps each team choice <b>hidden until everyone has picked</b>.<br><b>Guess-only</b>: great for fast rounds on phones in one room - once all answers are in, it <b>reveals only the answer (skips the video)</b> and moves on.',
+  st_sum_adv:"⚙️ Advanced · auto-advance · online room · voice check",
+  st_autohost:'Auto-advance (auto host) <span style="color:var(--muted)">- no human host needed</span>', st_autoint:"Seconds to next after reveal",
+  st_autohide:'Hide host controls <span style="color:var(--muted)">(kiosk)</span>',
+  st_autohost_tip:'With auto-advance on, <b>read → countdown → reveal → next</b> flows on its own 🤖 no host needed.<br>The on-screen <b>▶/⏸/⏭</b> controls are a helper for the <b>host screen</b> - it advances without them. Turn on <b>Hide controls</b> for pure auto (kiosk).',
+  st_online:'Online room (each team joins by phone) <span style="color:var(--muted)">· experimental · needs internet</span>',
+  st_fburl:'Firebase Realtime DB URL <span style="color:var(--muted)">(optional · stable remote)</span>', st_fburl_ph:"https://my-project.firebaseio.com",
+  st_online_tip:'When on, a <b>room code</b> appears at start; each team enters it via <b>🔗 Join a room</b> on their phone. Each team <b>submits privately from their phone</b> → the host screen scores automatically.<br><b>Remote (different places)</b> works too: player phones receive lyrics·hints·listen·timer·answer MV. Delivery is <b>same browser = instant</b>, <b>other devices = public relay (best-effort)</b>.<br>🔒 For <b>stable remote</b>, paste a free <b>Firebase Realtime DB</b> URL (rules in test mode). With it, sync is reliable via that path; empty falls back to the public relay.',
+  st_voice:"🔊 Voice (TTS) readiness check", st_voice_checking:"Checking…",
+  sv_full:"Full group", sv_unit:"Unit songs", st_sec10:"10s", st_sec20:"20s", st_sec30:"30s",
+  scn_solo_n:"Solo · casual", scn_solo_d:"One person listens & guesses", scn_infinite_n:"Endless", scn_infinite_d:"One miss ends it · beat your best",
+  scn_online_n:"Online multiple-choice", scn_online_d:"Everyone picks on their phone", scn_buzz_n:"Online buzzer battle", scn_buzz_d:"First to buzz on the phone wins",
+  lang_ko:"Korean", lang_en:"English", lang_zh:"Chinese", lang_ja:"Japanese",
+  vc_notts:"This browser doesn't support read-aloud (TTS). Chrome/Edge recommended.",
+  vc_loading:"Loading the voice list… <span style='color:var(--muted)'>it refreshes automatically in a moment.</span>",
+  vc_langs:"Read-aloud languages in this set: <b>{rows}</b>",
+  vc_missing:"<br>ℹ️ <b>{langs}</b> voice isn't on this device, but <b>that's fine</b> — it auto-reads via <b>Korean romanization</b> (sound plays normally).",
+  vc_install:"<br><span style='color:var(--muted)'>Only hosts who want native pronunciation (optional) — <b>Windows</b>: Settings → Time & language → Language & region → Add a language → in Language options install <b>Speech</b> → restart the browser. Once installed it reads in the native language.</span>",
+  vc_ready:"<br>✅ All needed voices are ready (native-pronunciation read-aloud).",
   rl_title:"Waiting for players", rl_sub:"Start the game once everyone's in", rl_conn:"Checking connection…",
   rl_qrcap:"📷 Scan with a phone camera to jump straight to the join screen",
   rl_hostjoin:'🖥 Join in too (host) <span style="color:var(--muted);font-size:12px;font-weight:400">· pick a team and play</span>',
@@ -1657,6 +1739,7 @@ let LANG="ko";
 function i18nDetectLang(){ try{ const u=new URLSearchParams(location.search).get("lang"); if(u&&I18N[u]) return u; const s=localStorage.getItem("svtq_lang"); if(s&&I18N[s]) return s; const n=(navigator.language||"ko").toLowerCase(); if(n.indexOf("en")===0) return "en"; }catch(e){} return "ko"; }
 function i18nT(k){ const v=I18N[LANG]&&I18N[LANG][k]; return v!=null?v:(I18N.ko[k]!=null?I18N.ko[k]:k); }
 function diffLabel(d){ return d==="상"?i18nT("diff_high"):(d==="중"?i18nT("diff_mid"):(d==="신곡"?i18nT("diff_new"):d)); }
+function scopeValLabel(by,o){ if(by==="diff") return diffLabel(o.v); if(by==="unit") return o.v==="full"?i18nT("sv_full"):i18nT("sv_unit"); return o.label; }
 function teamLabel(names,t){ return (names&&names[t])||i18nT("g_team_fallback").replace("{n}",t+1); }
 function applyI18n(){
   try{
@@ -2332,8 +2415,7 @@ function scopeSummary(){
   if(sc.by==="test") return i18nT("sc_test").replace("{n}",testIds.size);
   if(sc.by==="all"||!sc.val) return i18nT("sc_all")+" "+songs.length+i18nT("sc_songs_unit");
   let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
-  if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
-  if(sc.by==="diff") vlabel=diffLabel(sc.val);
+  if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=scopeValLabel(sc.by,f); }
   return vlabel+" · "+scopeCount(sc.by, sc.val)+i18nT("sc_songs_unit");
 }
 
@@ -2680,19 +2762,19 @@ function neededLangs(){
 // 설정 화면: 시작 전 필요한 언어 음성이 이 기기에 있는지 안내(없으면 설치 방법).
 function renderVoiceCheck(){
   const body=document.getElementById("voice-check-body"); if(!body) return;
-  if(!("speechSynthesis" in window)){ body.innerHTML="이 브라우저는 음성 낭독(TTS)을 지원하지 않습니다. Chrome/Edge를 권장해요."; return; }
+  if(!("speechSynthesis" in window)){ body.innerHTML=i18nT("vc_notts"); return; }
   pickVoice();
-  const NAMES={ko:"한국어",en:"영어",zh:"중국어",ja:"일본어"}, V={ko:koVoice,en:enVoice,zh:zhVoice,ja:jaVoice};
+  const NAMES={ko:i18nT("lang_ko"),en:i18nT("lang_en"),zh:i18nT("lang_zh"),ja:i18nT("lang_ja")}, V={ko:koVoice,en:enVoice,zh:zhVoice,ja:jaVoice};
   const need=["ko","en","zh","ja"].filter(l=>neededLangs().has(l));
-  if(!speechSynthesis.getVoices().length){ body.innerHTML="음성 목록을 불러오는 중… <span style='color:var(--muted)'>잠시 후 자동 갱신됩니다.</span>"; return; }
+  if(!speechSynthesis.getVoices().length){ body.innerHTML=i18nT("vc_loading"); return; }
   const rows=need.map(l=>(V[l]?"✅ ":"⚠️ ")+NAMES[l]);
   const missing=need.filter(l=>!V[l]);
-  let html="이 문제 세트 낭독 언어: <b>"+rows.join(" · ")+"</b>";
+  let html=i18nT("vc_langs").replace("{rows}",rows.join(" · "));
   if(missing.length){
-    html+="<br>ℹ️ <b>"+missing.map(l=>NAMES[l]).join("·")+"</b> 음성이 이 기기엔 없지만 <b>괜찮아요</b> — 자동으로 <b>한글 독음</b>으로 읽어줘요(소리는 정상적으로 납니다).";
-    html+="<br><span style='color:var(--muted)'>원어 발음 그대로 듣고 싶은 호스트만(선택) — <b>Windows</b>: 설정 → 시간 및 언어 → 언어 및 지역 → 언어 추가 → 언어 옵션에서 <b>음성</b> 설치 → 브라우저 재시작. 설치하면 원어로 읽어줘요.</span>";
+    html+=i18nT("vc_missing").replace("{langs}",missing.map(l=>NAMES[l]).join("·"));
+    html+=i18nT("vc_install");
   } else {
-    html+="<br>✅ 필요한 음성이 모두 준비됐어요(원어 발음으로 낭독).";
+    html+=i18nT("vc_ready");
   }
   body.innerHTML=html;
 }
@@ -3435,8 +3517,8 @@ const SCENARIOS=[
 ];
 function renderScenarios(){
   const g=document.getElementById("scenario-grid"); if(!g) return;
-  if(!g.childElementCount){   // 버튼은 1회만 생성(정적)
-    g.innerHTML=SCENARIOS.map(s=>`<button type="button" class="scn-btn" data-scn="${s.id}"><span class="scn-ic">${s.ic}</span><span class="scn-nm">${escapeHtml(s.nm)}</span><span class="scn-ds">${escapeHtml(s.ds)}</span></button>`).join("");
+  if(!g.childElementCount){   // 버튼은 1회만 생성(정적) — 라벨은 현재 언어로
+    g.innerHTML=SCENARIOS.map(s=>`<button type="button" class="scn-btn" data-scn="${s.id}"><span class="scn-ic">${s.ic}</span><span class="scn-nm">${escapeHtml(i18nT("scn_"+s.id+"_n"))}</span><span class="scn-ds">${escapeHtml(i18nT("scn_"+s.id+"_d"))}</span></button>`).join("");
   }
   const cur=config._scn||"";   // 선택된 시나리오 하이라이트(렌더마다 갱신)
   g.querySelectorAll("[data-scn]").forEach(b=>b.classList.toggle("sel", b.dataset.scn===cur));
@@ -3451,7 +3533,7 @@ function renderScopeSetup(){
   def.vals.forEach(o=>{
     const c=document.createElement("span");
     c.className="chip"+(sc.val===o.v?" active":"");
-    c.textContent=o.label+" "+scopeCount(sc.by,o.v);
+    c.textContent=scopeValLabel(sc.by,o)+" "+scopeCount(sc.by,o.v);
     c.addEventListener("click",()=>{ config.scope={by:sc.by,val:o.v}; saveState(); renderScopeSetup(); });
     vwrap.appendChild(c);
   });

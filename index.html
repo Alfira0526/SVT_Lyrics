@@ -1306,6 +1306,7 @@ let quizCount = null;        // 출제 문제 수 (null = 전체)
 let quizUnitBoost = true;    // 유닛곡 비중 높이기 (가중 랜덤)
 const SOLO_FIXED_COUNT = 20; // 개인(솔로) 모드는 20문제 고정 · 20/20 만점 시 '최속' 랭킹 등록
 let soloStartMs = 0, soloEndMs = 0;   // 솔로 총 소요시간(게임 시작~마지막 정답) 측정
+let scoredQ = new Set();   // 이미 채점된 문항 id(팀전 재방문 시 점수 중복 가산 방지)
 
 /* ---- 저장/로드 ---- */
 async function loadState(){
@@ -1868,6 +1869,7 @@ function renderMc(){
 }
 /* --- 개인전/솔로: 먼저 맞히기 (선택한 보기 하나만 표시) --- */
 function pickMc(i){
+  if(answerShown()) return;   // 정답이 이미 공개된 문항은 선택 불가(정답공개 후 클릭으로 만점 조작 방지)
   const btns=[...document.getElementById("g-mc").querySelectorAll(".mc-opt")];
   btns.forEach(b=>{ b.disabled=true; });
   const ok=!!mcOptions[i].correct;
@@ -1916,11 +1918,13 @@ function finalizeTeamRound(){
   const ci=mcOptions.findIndex(o=>o.correct);
   btns.forEach((b,idx)=>{ b.disabled=true; if(idx===ci) b.classList.add("correct"); });
   let anyCorrect=false;
+  const already=scoredQ.has(order[pos]);   // 이미 채점된 문항 재방문 시 점수 중복 가산 방지
   teamPicks.forEach((p,t)=>{
     if(p==null) return;
-    if(p===ci){ teamScores[t]=(teamScores[t]||0)+1; anyCorrect=true; }   // 팀전: 1문제 = 1점 고정(시간 보너스 없음)
+    if(p===ci){ if(!already) teamScores[t]=(teamScores[t]||0)+1; anyCorrect=true; }   // 팀전: 1문제 = 1점(중복 가산 방지)
     else if(btns[p]) btns[p].classList.add("wrong");
   });
+  scoredQ.add(order[pos]);
   marks[order[pos]]=anyCorrect?"correct":"wrong";
   if(anyCorrect){ sfxCorrect(); celebrateBurst(); } else sfxWrong();   // 팀전은 개인 streak 미집계
   turn=(turn+1)%teamCount();   // 다음 문항은 다음 팀부터 시작
@@ -1989,7 +1993,7 @@ function refillInfinite(){
   order=order.concat(batch);
 }
 function startNewGame(shuffle){
-  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
+  marks={}; teamScores=(config.teamNames||[]).map(()=>0); turn=0; playedIds=new Set(); gameRecorded=false; streak=0; sessionMaxStreak=0; scoredQ=new Set(); updateStreakBadge();
   if(els.hide) els.hide.checked = config.hideLyrics!==false;   // 듣기 전용 기본값을 게임 화면 토글에 반영
   buildOrder(!!shuffle);
   // 솔로 총 소요시간 측정 시작(개인 모드에서만) — 게임 시작 시각 기록
@@ -2001,7 +2005,7 @@ function startNextRound(){
   order.forEach(id=>playedIds.add(id));
   buildOrder(true, playedIds);
   if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(true); }
-  marks={}; pos=0; gameRecorded=false; streak=0; sessionMaxStreak=0; updateStreakBadge();
+  marks={}; pos=0; gameRecorded=false; streak=0; sessionMaxStreak=0; scoredQ=new Set(); updateStreakBadge();
   if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
   renderGame();
   document.querySelector('nav.tabs button[data-view="game"]').click();
@@ -2124,6 +2128,7 @@ function showAnswer(){
     }
   }
   stopTimer();
+  document.querySelectorAll("#g-mc .mc-opt").forEach(b=>{ b.disabled=true; });   // 공개 후 보기 클릭 차단(치트/재채점 방지)
   els.answer.classList.add("show");
   els.answer.scrollIntoView({behavior:"smooth",block:"nearest"});
   if(Room.host.active){ Room.hostReveal(); }   // 온라인 방: 참가자 답 채점·정답 전송
@@ -2142,7 +2147,8 @@ function renderAwardRow(){
   });
 }
 function awardTeam(i,pts){
-  const id=order[pos]; marks[id]="correct";
+  const id=order[pos]; if(scoredQ.has(id)) return; scoredQ.add(id);   // 재방문 중복 가산 방지
+  marks[id]="correct";
   teamScores[i]=(teamScores[i]||0)+pts;
   turn=(i+1)%(config.teamNames.length||1);
   updateCounters(); renderTeamBoard();
@@ -2439,10 +2445,13 @@ function autoSkip(){ if(!answerShown()) autoReveal(); else autoAdvance(); }
 /* ---- 채점 / 이동 ---- */
 function mark(kind){
   if(order.length===0) return;
+  if(answerShown()) return;   // 이미 공개/채점된 문항 재채점 방지
   const ok=kind==="correct";
   marks[order[pos]]=kind; updateCounters();
+  const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
   toast(ok?"✔ 정답 처리":"✘ 오답 처리");
+  if(isInfinite() && !ok){ showAnswer(); infiniteGameOver(survived); return; }   // 무한: 주관식 오답도 즉시 종료(4지선다 경로와 통일)
   setTimeout(next,350);
 }
 function goResult(){ if(Room.host.active) Room.hostIntermission(); document.querySelector('nav.tabs button[data-view="result"]').click(); }

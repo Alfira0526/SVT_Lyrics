@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "svtq_rank": {
+      ".read": true,
+      "$board": {
+        ".read": true,
+        "$entry": {
+          ".write": "!data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['nick','val','ts']) && newData.child('nick').isString() && newData.child('nick').val().length >= 1 && newData.child('nick').val().length <= 16 && newData.child('val').isNumber() && newData.child('val').val() >= 0 && newData.child('val').val() <= 99999 && newData.child('ts').isNumber() && (!newData.hasChild('t') || (newData.child('t').isNumber() && newData.child('t').val() >= 0 && newData.child('t').val() <= 99999))",
+          "nick": { ".validate": true },
+          "val": { ".validate": true },
+          "ts": { ".validate": true },
+          "t": { ".validate": true },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+
+    "svtq": {
+      "$code": {
+        ".read": true,
+        ".write": true,
+        ".validate": "$code.length <= 12"
+      }
+    }
+  }
+}

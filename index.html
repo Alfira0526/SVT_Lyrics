@@ -304,6 +304,13 @@
   /* 참가자 본인 점수(상단 상시) */
   .rg-myscore{background:linear-gradient(180deg,#FFFFFF,#F3ECFA);border:1.5px solid var(--lilac);border-radius:12px;padding:9px 12px;margin:2px 0 8px;font-weight:800;color:var(--txt);text-align:center;font-size:15px}
   .rg-myscore b{color:var(--rose-ink)}
+  .rg-final-h{font-size:17px;font-weight:900;color:var(--txt);text-align:center;margin:10px 0 10px}
+  .rg-final-rank .r{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#FFFFFF,#F7F2FC);border:1.5px solid var(--lilac);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+  .rg-final-rank .rank-no{font-size:13px;font-weight:800;color:var(--serene-ink);min-width:34px}
+  .rg-final-rank .medal{font-size:18px;min-width:22px}
+  .rg-final-rank .rn{flex:1;font-weight:800;color:var(--txt);font-size:15px}
+  .rg-final-rank .rs{font-weight:900;color:var(--rose-ink);font-size:15px}
+  .rg-final-rank .r.me{border-color:var(--rose-ink);box-shadow:0 0 0 2px rgba(224,122,158,.18)}
   /* 새 문항 시 '듣기' 버튼을 눈에 띄게(모바일 자동재생 제약 대비 — 탭 유도) */
   #rg-speak.cue{animation:rgpulse 1s ease-in-out infinite}
   @keyframes rgpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(214,51,126,.5)}50%{transform:scale(1.04);box-shadow:0 0 0 8px rgba(214,51,126,0)}}
@@ -604,51 +611,51 @@
 <div id="guide-modal" style="display:none">
   <div class="guide-card">
     <button type="button" id="guide-close" class="guide-x" aria-label="닫기">✕</button>
-    <h2 class="guide-title">❓ 게임 방법</h2>
-    <p class="g-lead">가사를 <b>보지 않고</b>, <b>귀로만</b> 듣고 세븐틴 노래 제목을 맞히는 게임이에요! 🎧</p>
+    <h2 class="guide-title" data-i18n="gd_title">❓ 게임 방법</h2>
+    <p class="g-lead" data-i18n-html="gd_lead">가사를 <b>보지 않고</b>, <b>귀로만</b> 듣고 세븐틴 노래 제목을 맞히는 게임이에요! 🎧</p>
     <div class="guide-body">
 
       <div class="g-box">
-        <div class="g-box-h">🎯 이렇게 해요</div>
+        <div class="g-box-h" data-i18n="gd_b1_h">🎯 이렇게 해요</div>
         <div class="g-steps">
-          <div class="g-step"><span class="g-num">1</span><span>🔊 노래 가사를 <b>소리로 읽어줘요.</b> ▶ 버튼을 누르면 들려요.</span></div>
-          <div class="g-step"><span class="g-num">2</span><span>🙈 화면의 가사는 <b>가려져 있어요.</b> 눈이 아니라 <b>귀로</b> 들어요!</span></div>
-          <div class="g-step"><span class="g-num">3</span><span>✅ 아래 <b>4개</b> 중에서 <b>맞는 노래</b>를 골라요.</span></div>
+          <div class="g-step"><span class="g-num">1</span><span data-i18n-html="gd_b1_s1">🔊 노래 가사를 <b>소리로 읽어줘요.</b> ▶ 버튼을 누르면 들려요.</span></div>
+          <div class="g-step"><span class="g-num">2</span><span data-i18n-html="gd_b1_s2">🙈 화면의 가사는 <b>가려져 있어요.</b> 눈이 아니라 <b>귀로</b> 들어요!</span></div>
+          <div class="g-step"><span class="g-num">3</span><span data-i18n-html="gd_b1_s3">✅ 아래 <b>4개</b> 중에서 <b>맞는 노래</b>를 골라요.</span></div>
         </div>
       </div>
 
       <div class="g-box">
-        <div class="g-box-h">🎮 놀이 방법 4가지</div>
+        <div class="g-box-h" data-i18n="gd_b2_h">🎮 놀이 방법 4가지</div>
         <div class="g-modes">
-          <div class="g-mode"><b>🎧 혼자 하기</b> — 나 혼자 듣고 맞혀요.</div>
-          <div class="g-mode"><b>♾️ 무한 도전</b> — 틀리면 끝! 몇 개를 <b>연속으로</b> 맞힐 수 있을까?</div>
-          <div class="g-mode"><b>📱 폰으로 팀 대결</b> — 친구들이 <b>각자 폰</b>으로 정답을 골라요.</div>
-          <div class="g-mode"><b>🖐 부저 대결</b> — <b>먼저 누른 팀</b>이 입으로 답해요. 맞으면 다음 문제, 틀리면 <b>다른 팀</b>에게 기회!</div>
+          <div class="g-mode" data-i18n-html="gd_b2_m1"><b>🎧 혼자 하기</b> — 나 혼자 듣고 맞혀요.</div>
+          <div class="g-mode" data-i18n-html="gd_b2_m2"><b>♾️ 무한 도전</b> — 틀리면 끝! 몇 개를 <b>연속으로</b> 맞힐 수 있을까?</div>
+          <div class="g-mode" data-i18n-html="gd_b2_m3"><b>📱 폰으로 팀 대결</b> — 친구들이 <b>각자 폰</b>으로 정답을 골라요.</div>
+          <div class="g-mode" data-i18n-html="gd_b2_m4"><b>🖐 부저 대결</b> — <b>먼저 누른 팀</b>이 입으로 답해요. 맞으면 다음 문제, 틀리면 <b>다른 팀</b>에게 기회!</div>
         </div>
       </div>
 
       <div class="g-box">
-        <div class="g-box-h">👫 친구랑 같이 하려면</div>
+        <div class="g-box-h" data-i18n="gd_b3_h">👫 친구랑 같이 하려면</div>
         <ul class="g-list">
-          <li>진행하는 사람이 시작하면 <b>방 번호</b>가 나와요.</li>
-          <li>친구들은 첫 화면에서 <b>🔗 방 참가</b>를 누르고 번호를 넣어요.</li>
-          <li>큰 화면엔 <b>문제</b>가, 내 폰엔 <b>정답 버튼</b>이 나와요.</li>
+          <li data-i18n-html="gd_b3_l1">진행하는 사람이 시작하면 <b>방 번호</b>가 나와요.</li>
+          <li data-i18n-html="gd_b3_l2">친구들은 첫 화면에서 <b>🔗 방 참가</b>를 누르고 번호를 넣어요.</li>
+          <li data-i18n-html="gd_b3_l3">큰 화면엔 <b>문제</b>가, 내 폰엔 <b>정답 버튼</b>이 나와요.</li>
         </ul>
       </div>
 
       <div class="g-box">
-        <div class="g-box-h">⭐ 점수·랭킹은요</div>
+        <div class="g-box-h" data-i18n="gd_b4_h">⭐ 점수·랭킹은요</div>
         <ul class="g-list">
-          <li><b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.</li>
-          <li>🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. 🏆 <b>많이 맞힐수록</b> 위, 정답 수가 같으면 <b>빨리 끝낼수록</b> 위!</li>
-          <li>♾️ <b>무한</b>은 틀리기 전까지 <b>연속으로 많이</b> 맞힐수록 랭킹 위로 올라가요.</li>
+          <li data-i18n-html="gd_b4_l1"><b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.</li>
+          <li data-i18n-html="gd_b4_l2">🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. 🏆 <b>많이 맞힐수록</b> 위, 정답 수가 같으면 <b>빨리 끝낼수록</b> 위!</li>
+          <li data-i18n-html="gd_b4_l3">♾️ <b>무한</b>은 틀리기 전까지 <b>연속으로 많이</b> 맞힐수록 랭킹 위로 올라가요.</li>
         </ul>
       </div>
 
-      <p class="g-tip">💡 가사를 <b>같이 보고</b> 싶으면 <b>‘가사 가리기’</b>를 꺼도 돼요. 처음이라면 <b>켜 두는 걸</b> 추천해요!</p>
+      <p class="g-tip" data-i18n-html="gd_tip">💡 가사를 <b>같이 보고</b> 싶으면 <b>‘가사 가리기’</b>를 꺼도 돼요. 처음이라면 <b>켜 두는 걸</b> 추천해요!</p>
     </div>
-    <label class="g-optout"><input type="checkbox" id="guide-noauto" /><span>이제 안 볼게요 (새로운 게 생기면 다시 알려줄게요)</span></label>
-    <button type="button" id="guide-ok" class="intro-start" style="width:100%;margin-top:6px">알겠어요 · 시작하기</button>
+    <label class="g-optout"><input type="checkbox" id="guide-noauto" /><span data-i18n="gd_optout">이제 안 볼게요 (새로운 게 생기면 다시 알려줄게요)</span></label>
+    <button type="button" id="guide-ok" class="intro-start" style="width:100%;margin-top:6px" data-i18n="gd_ok">알겠어요 · 시작하기</button>
   </div>
 </div>
 
@@ -723,7 +730,7 @@
     <div id="rg-play" style="display:none">
       <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
       <div class="rg-myscore" id="rg-myscore" style="display:none"></div>
-      <div class="rg-toprow" style="display:flex;gap:8px;align-items:center;margin:6px 0 10px">
+      <div class="rg-toprow" id="rg-toprow" style="display:flex;gap:8px;align-items:center;margin:6px 0 10px">
         <button class="btn btn-play btn-sm" id="rg-speak">▶ 듣기</button>
         <span class="rg-timer" id="rg-timer"></span>
       </div>
@@ -731,6 +738,10 @@
       <div class="hints" id="rg-hints" style="margin-top:10px"></div>
       <div class="mc-options" id="rg-mc" style="display:none;margin-top:14px"></div>
       <div class="video-wrap" id="rg-video" style="margin-top:14px"></div>
+      <div id="rg-final" style="display:none;margin-top:6px">
+        <div class="rg-final-h" id="rg-final-h">🏁 게임 끝! 최종 순위</div>
+        <div id="rg-final-rank" class="rg-final-rank"></div>
+      </div>
       <div class="rg-score" id="rg-score"></div>
       <button class="btn btn-ghost btn-sm" id="rg-leave" style="margin-top:16px">방 나가기</button>
     </div>
@@ -1441,6 +1452,57 @@ Object.assign(I18N.en, {
   ms_f_comp:"Format", ms_o_team:"Teams", ms_o_solo:"Individual", ms_f_teams:"Number of teams", ms_teams_note:"Team names are assigned randomly 🎲.",
   ms_note_omc:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> on the home screen → pick answers on their phones.',
   ms_note_obz:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> → first team to buzz answers, the host judges.'
+});
+// 게임 방법 가이드 팝업 문자열
+Object.assign(I18N.ko, {
+  gd_title:"❓ 게임 방법",
+  gd_lead:'가사를 <b>보지 않고</b>, <b>귀로만</b> 듣고 세븐틴 노래 제목을 맞히는 게임이에요! 🎧',
+  gd_b1_h:"🎯 이렇게 해요",
+  gd_b1_s1:"🔊 노래 가사를 <b>소리로 읽어줘요.</b> ▶ 버튼을 누르면 들려요.",
+  gd_b1_s2:"🙈 화면의 가사는 <b>가려져 있어요.</b> 눈이 아니라 <b>귀로</b> 들어요!",
+  gd_b1_s3:"✅ 아래 <b>4개</b> 중에서 <b>맞는 노래</b>를 골라요.",
+  gd_b2_h:"🎮 놀이 방법 4가지",
+  gd_b2_m1:"<b>🎧 혼자 하기</b> — 나 혼자 듣고 맞혀요.",
+  gd_b2_m2:"<b>♾️ 무한 도전</b> — 틀리면 끝! 몇 개를 <b>연속으로</b> 맞힐 수 있을까?",
+  gd_b2_m3:"<b>📱 폰으로 팀 대결</b> — 친구들이 <b>각자 폰</b>으로 정답을 골라요.",
+  gd_b2_m4:"<b>🖐 부저 대결</b> — <b>먼저 누른 팀</b>이 입으로 답해요. 맞으면 다음 문제, 틀리면 <b>다른 팀</b>에게 기회!",
+  gd_b3_h:"👫 친구랑 같이 하려면",
+  gd_b3_l1:"진행하는 사람이 시작하면 <b>방 번호</b>가 나와요.",
+  gd_b3_l2:"친구들은 첫 화면에서 <b>🔗 방 참가</b>를 누르고 번호를 넣어요.",
+  gd_b3_l3:"큰 화면엔 <b>문제</b>가, 내 폰엔 <b>정답 버튼</b>이 나와요.",
+  gd_b4_h:"⭐ 점수·랭킹은요",
+  gd_b4_l1:"<b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.",
+  gd_b4_l2:"🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. 🏆 <b>많이 맞힐수록</b> 위, 정답 수가 같으면 <b>빨리 끝낼수록</b> 위!",
+  gd_b4_l3:"♾️ <b>무한</b>은 틀리기 전까지 <b>연속으로 많이</b> 맞힐수록 랭킹 위로 올라가요.",
+  gd_tip:"💡 가사를 <b>같이 보고</b> 싶으면 <b>‘가사 가리기’</b>를 꺼도 돼요. 처음이라면 <b>켜 두는 걸</b> 추천해요!",
+  gd_optout:"이제 안 볼게요 (새로운 게 생기면 다시 알려줄게요)",
+  gd_ok:"알겠어요 · 시작하기",
+  rg_ended:"🏁 게임이 종료되었습니다 · 최종 순위", rg_final_h:"🏁 게임 끝! 최종 순위", rg_rank_fmt:"{n}위", rg_pt:"점"
+});
+Object.assign(I18N.en, {
+  gd_title:"❓ How to play",
+  gd_lead:'Guess the SEVENTEEN song title <b>without reading</b> the lyrics — <b>by ear only</b>! 🎧',
+  gd_b1_h:"🎯 How it works",
+  gd_b1_s1:"🔊 The lyrics are <b>read aloud.</b> Press ▶ to hear them.",
+  gd_b1_s2:"🙈 The on-screen lyrics are <b>hidden.</b> Listen with your <b>ears</b>, not your eyes!",
+  gd_b1_s3:"✅ Pick the <b>right song</b> from the <b>4 choices</b> below.",
+  gd_b2_h:"🎮 4 ways to play",
+  gd_b2_m1:"<b>🎧 Solo</b> — listen and guess on your own.",
+  gd_b2_m2:"<b>♾️ Endless</b> — one miss ends it! How many <b>in a row</b> can you get?",
+  gd_b2_m3:"<b>📱 Team battle by phone</b> — friends pick answers <b>on their own phones</b>.",
+  gd_b2_m4:"<b>🖐 Buzzer battle</b> — the <b>first team to buzz</b> answers out loud. Right → next song; wrong → the <b>other team</b> gets a chance!",
+  gd_b3_h:"👫 To play with friends",
+  gd_b3_l1:"When the host starts, a <b>room code</b> appears.",
+  gd_b3_l2:"Friends tap <b>🔗 Join a room</b> on the home screen and enter the code.",
+  gd_b3_l3:"The <b>question</b> shows on the big screen; the <b>answer buttons</b> show on each phone.",
+  gd_b4_h:"⭐ Scoring & ranking",
+  gd_b4_l1:"<b>1 correct = 1 point!</b> Your <b>number</b> of correct answers is your score.",
+  gd_b4_l2:"🎧 <b>Solo</b> is <b>20 questions</b>. 🏆 More correct ranks higher; on a tie, <b>finishing faster</b> wins!",
+  gd_b4_l3:"♾️ <b>Endless</b> ranks you by how many you get <b>in a row</b> before a miss.",
+  gd_tip:"💡 Want to <b>see the lyrics too</b>? You can turn <b>‘Hide lyrics’</b> off. If it's your first time, we recommend <b>keeping it on</b>!",
+  gd_optout:"Don't show again (we'll still tell you about new stuff)",
+  gd_ok:"Got it · Start",
+  rg_ended:"🏁 Game over · Final ranking", rg_final_h:"🏁 Game over! Final ranking", rg_rank_fmt:"#{n}", rg_pt:" pt"
 });
 let LANG="ko";
 function i18nDetectLang(){ try{ const u=new URLSearchParams(location.search).get("lang"); if(u&&I18N[u]) return u; const s=localStorage.getItem("svtq_lang"); if(s&&I18N[s]) return s; const n=(navigator.language||"ko").toLowerCase(); if(n.indexOf("en")===0) return "en"; }catch(e){} return "ko"; }
@@ -3545,7 +3607,7 @@ const Room = (function(){
       else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
       else if(m.type==="intermission"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 라운드 종료 · 방장이 다음 라운드를 준비 중이에요"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-timer").textContent=""; }
-      else if(m.type==="ended"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 게임이 종료되었습니다 · 최종 순위"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-video").innerHTML=""; document.getElementById("rg-timer").textContent=""; }
+      else if(m.type==="ended"){ guestShowFinal(m); }
     });
     guestHello();
     // 팀 목록을 받을 때까지 hello 재전송(최대 ~8s). 그래도 응답 없으면 실패 안내 + 다시 시도 노출.
@@ -3586,6 +3648,7 @@ const Room = (function(){
   function guestEnterPlay(){
     document.getElementById("rg-pick").style.display="none";
     document.getElementById("rg-play").style.display="block";
+    guestResetPlayUI();
     document.getElementById("rg-status").textContent="입장 완료 ("+escapeHtml(guest.team)+") · 방장을 기다리는 중…";
     document.getElementById("rg-video").innerHTML=randomMvEmbed();
   }
@@ -3661,6 +3724,36 @@ const Room = (function(){
     const myEl=document.getElementById("rg-myscore");
     if(myEl && me){ const myRank=rank.findIndex(t=>t.name===me.name)+1; myEl.style.display="block"; myEl.innerHTML=`⭐ 우리 팀 <b>${escapeHtml(me.name)}</b> · <b>${me.score}점</b>${rank.length>1?` · ${myRank}위/${rank.length}팀`:""}`; }
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
+  }
+  // 게임 종료 시 참가자도 '최종 결과' 화면으로 전환 — 플레이 컨트롤을 감추고 순위표를 크게 노출
+  function guestShowFinal(m){
+    guestCdStop();
+    guestRoster(m);   // rg-myscore(우리 팀) 갱신
+    ["rg-toprow","rg-lyric","rg-hints","rg-mc","rg-score"].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display="none"; });
+    const vid=document.getElementById("rg-video"); if(vid){ vid.style.display="none"; vid.innerHTML=""; }
+    const tm=document.getElementById("rg-timer"); if(tm) tm.textContent="";
+    const st=document.getElementById("rg-status"); if(st) st.textContent=i18nT("rg_ended");
+    const fin=document.getElementById("rg-final");
+    if(fin && m.roster && m.roster.length){
+      const rank=m.roster.slice().sort((a,b)=>b.score-a.score);
+      const medals=["🥇","🥈","🥉"];
+      let prevScore=null, rn=0;
+      const html=rank.map((t,i)=>{
+        if(prevScore===null || t.score!==prevScore){ rn=i+1; prevScore=t.score; }   // 동점=등수 유지
+        const mine=(t.name===guest.team)?" me":"";
+        return `<div class="r${mine}"><span class="rank-no">${i18nT("rg_rank_fmt").replace("{n}",rn)}</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(t.name)}</span><span class="rs">${t.score}${i18nT("rg_pt")}</span></div>`;
+      }).join("");
+      const fr=document.getElementById("rg-final-rank"); if(fr) fr.innerHTML=html;
+      const fh=document.getElementById("rg-final-h"); if(fh) fh.textContent=i18nT("rg_final_h");
+      fin.style.display="block";
+    }
+  }
+  // 재입장/새 연결 시 플레이 컨트롤 복원 + 최종 결과 숨김
+  function guestResetPlayUI(){
+    ["rg-lyric","rg-hints","rg-score"].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display=""; });
+    const tr=document.getElementById("rg-toprow"); if(tr) tr.style.display="flex";
+    const vid=document.getElementById("rg-video"); if(vid) vid.style.display="";
+    const fin=document.getElementById("rg-final"); if(fin) fin.style.display="none";
   }
 
   return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, hostRenderBuzz, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered, hostJoinSelf, hostSelfAnswer, hostAnswered };

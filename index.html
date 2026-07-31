@@ -597,7 +597,7 @@
         <div class="g-box-h">⭐ 점수·랭킹은요</div>
         <ul class="g-list">
           <li><b>정답 1개 = 1점!</b> 맞힌 <b>개수</b>가 곧 점수예요.</li>
-          <li>🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. <b>전부 맞히면</b>(20/20) 🏆 <b>최속 랭킹</b> 도전 — <b>빨리 끝낼수록</b> 높은 등수!</li>
+          <li>🎧 <b>혼자</b>는 <b>20문제</b>를 풀어요. 🏆 <b>많이 맞힐수록</b> 위, 정답 수가 같으면 <b>빨리 끝낼수록</b> 위!</li>
           <li>♾️ <b>무한</b>은 틀리기 전까지 <b>연속으로 많이</b> 맞힐수록 랭킹 위로 올라가요.</li>
         </ul>
       </div>
@@ -615,7 +615,7 @@
     <button type="button" id="rank-close" class="guide-x" aria-label="닫기">✕</button>
     <h2 class="guide-title">🏆 랭킹</h2>
     <div class="rk-tabs">
-      <button type="button" class="rk-tab active" data-board="solo_speed">🎧 혼자 (20문제 최속)</button>
+      <button type="button" class="rk-tab active" data-board="solo_speed">🎧 혼자 (20문제 · 정답↑·최속)</button>
       <button type="button" class="rk-tab" data-board="infinite">♾️ 무한 (연속)</button>
     </div>
     <div class="rk-scope" id="rank-scope"></div>
@@ -1400,9 +1400,20 @@ function loadRank(){
   try{ const o=JSON.parse(localStorage.getItem(RANK_KEY)||"{}"); o.nick=o.nick||""; o.solo=Array.isArray(o.solo)?o.solo:[]; o.infinite=Array.isArray(o.infinite)?o.infinite:[]; o.solo_speed=Array.isArray(o.solo_speed)?o.solo_speed:[]; return o; }
   catch(e){ return {nick:"", solo:[], infinite:[], solo_speed:[]}; }
 }
-// 보드 방향: solo_speed(초)는 작을수록 상위(오름차순), 나머지(정답 수·연속)는 클수록 상위.
-function rankAsc(board){ return board==="solo_speed"; }
-function rankCmp(board){ return rankAsc(board) ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0)); }
+// 보드별 정렬:
+//  · solo_speed = 20문제 완주 기록. 정답 수(val)↓ 우선, 같으면 총 소요시간(t·초)↑ 빠른 순.
+//  · infinite   = 연속 정답 수(val)↓.
+function rankCmp(board){
+  if(board==="solo_speed") return (a,b)=>((b.val||0)-(a.val||0))||((a.t||0)-(b.t||0))||((a.ts||0)-(b.ts||0));
+  return (a,b)=>((b.val||0)-(a.val||0))||((a.ts||0)-(b.ts||0));
+}
+// 랭킹 행에 보여줄 기록 문자열(보드별)
+function rankValHTML(board, r){
+  const val=parseInt(r.val,10)||0;
+  if(board==="solo_speed"){ const t=parseInt(r.t,10)||0; return `${val}곡${t?` · ${t}초`:""}`; }
+  if(board==="infinite") return `${val}곡 연속`;
+  return `${val}`;
+}
 function saveRank(o){ try{ localStorage.setItem(RANK_KEY, JSON.stringify(o)); }catch(e){} }
 function rankCleanNick(s){ return (String(s||"").replace(/[<>]/g,"").trim().slice(0,12)) || "익명캐럿"; }
 // 글로벌 제출/조회(Firebase RTDB REST). 실패해도 게임엔 영향 없음(로컬은 이미 저장됨).
@@ -1414,39 +1425,38 @@ function rankFetchGlobal(board){
   const base=rankBase(); if(!base) return Promise.resolve(null);
   return fetch(base+"/svtq_rank/"+board+".json").then(r=>r.json()).then(o=>o?Object.values(o):[]).catch(()=>null);
 }
-// board: "solo_speed"(20만점 총 소요초·작을수록 상위) | "infinite"(연속 수·클수록 상위).
-function rankRegister(board, val, nick){
-  nick=rankCleanNick(nick); const cap=rankAsc(board)?99999:999; val=Math.max(0, Math.min(cap, parseInt(val,10)||0));
+// board: "solo_speed"(val=정답 수·t=총 소요초) | "infinite"(val=연속 수). 상위 규칙은 rankCmp 참조.
+function rankRegister(board, val, nick, t){
+  nick=rankCleanNick(nick); val=Math.max(0, Math.min(999, parseInt(val,10)||0));
   const entry={nick, val, ts:Date.now()};
+  if(t!=null) entry.t=Math.max(0, Math.min(99999, parseInt(t,10)||0));
   const r=loadRank(); r.nick=nick;
   r[board]=(r[board]||[]).concat([entry]).sort(rankCmp(board)).slice(0,RANK_MAX);
   saveRank(r);
   rankSubmitGlobal(board, entry);   // 가능하면 글로벌로도(비동기·실패 무시)
   return entry;
 }
-function rankRowsHTML(list, unit, asc){
+function rankRowsHTML(list, board){
   const medals=["🥇","🥈","🥉"];
-  const cmp = asc ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0));
-  const top=(list||[]).slice().sort(cmp).slice(0,20);
+  const top=(list||[]).slice().sort(rankCmp(board)).slice(0,20);
   if(!top.length) return '<div class="rk-empty">아직 기록이 없어요 · 첫 주인공이 되어보세요!</div>';
-  return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="rk-val">${(parseInt(r.val,10)||0)}${unit}</span></div>`).join("");
+  return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="rk-val">${rankValHTML(board,r)}</span></div>`).join("");
 }
-function rankRenderInto(board, el, unit){
+function rankRenderInto(board, el){
   if(!el) return;
-  const asc=rankAsc(board);
   const local=loadRank()[board]||[];
   el.innerHTML='<div class="rk-loading">불러오는 중…</div>';
   if(rankGlobalOn()){
-    rankFetchGlobal(board).then(g=>{ if(g){ el.innerHTML=rankRowsHTML(g, unit, asc); el.dataset.src="global"; } else { el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; } })
-      .catch(()=>{ el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; });
-  } else { el.innerHTML=rankRowsHTML(local, unit, asc); el.dataset.src="local"; }
+    rankFetchGlobal(board).then(g=>{ const src=g?g:local; el.innerHTML=rankRowsHTML(src, board); el.dataset.src=g?"global":"local"; })
+      .catch(()=>{ el.innerHTML=rankRowsHTML(local, board); el.dataset.src="local"; });
+  } else { el.innerHTML=rankRowsHTML(local, board); el.dataset.src="local"; }
 }
 // 메인(인트로) 실시간 랭킹 미리보기 — 보드별 데이터가 10개 이상 모이면 상위 5를 노출.
 const RANK_PREVIEW_MIN=10;
-function rankMiniRows(list, asc, unit){
-  const cmp = asc ? (a,b)=>(a.val-b.val)||((a.ts||0)-(b.ts||0)) : (a,b)=>(b.val-a.val)||((a.ts||0)-(b.ts||0));
-  const top=(list||[]).slice().sort(cmp).slice(0,5);
-  return top.map((r,i)=>`<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${(parseInt(r.val,10)||0)}${unit||""}</span></div>`).join("");
+function rankMiniRows(list, board){
+  const top=(list||[]).slice().sort(rankCmp(board)).slice(0,5);
+  return top.map((r,i)=>{ const val=parseInt(r.val,10)||0; const mv=board==="solo_speed"?`${val}곡`:`${val}`;
+    return `<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${mv}</span></div>`; }).join("");
 }
 function renderIntroRankPreview(){
   const box=document.getElementById("intro-rank-preview"); if(!box) return;
@@ -1456,22 +1466,23 @@ function renderIntroRankPreview(){
     const showSolo=solo.length>=RANK_PREVIEW_MIN, showInf=infinite.length>=RANK_PREVIEW_MIN;
     if(!showSolo && !showInf){ box.style.display="none"; return; }   // 아직 10개 미만이면 숨김
     let html='<div class="irp-title"><span class="irp-live"></span>🏆 실시간 랭킹</div><div class="irp-grid">';
-    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 20문제 최속</div>${rankMiniRows(solo, true, "초")}</div>`;
-    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite, false, "")}</div>`;
+    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 20문제</div>${rankMiniRows(solo, "solo_speed")}</div>`;
+    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite, "infinite")}</div>`;
     html+='</div>';
     box.innerHTML=html; box.style.display="";
   }).catch(()=>{ /* 네트워크 실패 시 조용히 숨김(게임엔 영향 없음) */ });
 }
 
-// 닉네임 입력 + 등록 카드(결과 화면·무한 오버레이 공용). board:"solo"|"infinite", val:이번 기록.
-function renderRankSubmit(el, board, val, unit){
+// 닉네임 입력 + 등록 카드(결과 화면·무한 오버레이 공용). board:"solo_speed"(val=정답 수·t=초)|"infinite"(val=연속).
+function renderRankSubmit(el, board, val, t){
   if(!el) return; el.style.display=""; el.className="rk-submit";
   const nick=(loadRank().nick||"");
-  el.innerHTML=`<div class="rk-sub-h">🏆 이번 기록 <b>${val}${unit}</b> · 랭킹 등록</div>
+  const rec = board==="solo_speed" ? `${val}곡${t?` · ${t}초`:""}` : (board==="infinite"?`${val}곡 연속`:`${val}`);
+  el.innerHTML=`<div class="rk-sub-h">🏆 이번 기록 <b>${rec}</b> · 랭킹 등록</div>
     <div class="rk-sub-row"><input id="rk-nick-in" maxlength="12" placeholder="닉네임(최대 12자)" value="${escapeHtml(nick)}"/><button type="button" id="rk-sub-go">등록</button></div>`;
   const go=el.querySelector("#rk-sub-go"); const inp=el.querySelector("#rk-nick-in");
-  const submit=()=>{ const nm=rankCleanNick(inp.value); rankRegister(board, val, nm);
-    el.innerHTML=`<div class="rk-done">✅ <b>${escapeHtml(nm)}</b> · ${val}${unit} 등록! <button type="button" class="btn btn-ghost btn-sm" id="rk-view" style="margin-left:6px">랭킹 보기</button></div>`;
+  const submit=()=>{ const nm=rankCleanNick(inp.value); rankRegister(board, val, nm, t);
+    el.innerHTML=`<div class="rk-done">✅ <b>${escapeHtml(nm)}</b> · ${rec} 등록! <button type="button" class="btn btn-ghost btn-sm" id="rk-view" style="margin-left:6px">랭킹 보기</button></div>`;
     const v=el.querySelector("#rk-view"); if(v) v.addEventListener("click",()=>{ if(window.openRankModal) window.openRankModal(board); }); };
   if(go) go.addEventListener("click",submit);
   if(inp) inp.addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
@@ -2455,7 +2466,7 @@ function infiniteGameOver(n){
       <button class="btn btn-ghost" id="io-quit">🏠 그만두기</button>
     </div></div>`;
   ov.style.display="flex";
-  if(n>0){ try{ renderRankSubmit(document.getElementById("io-rank-submit"), "infinite", n, "곡 연속"); }catch(e){} }   // 무한 랭킹 등록
+  if(n>0){ try{ renderRankSubmit(document.getElementById("io-rank-submit"), "infinite", n); }catch(e){} }   // 무한 랭킹 등록
   document.getElementById("io-retry").onclick=()=>{ ov.style.display="none"; restartInfinite(); };
   document.getElementById("io-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
 }
@@ -2796,12 +2807,12 @@ function renderResult(){
   const rs=document.getElementById("r-rank-submit");
   if(rs){
     const isSolo = !config.teamMode && !config.onlineRoom && config.mode!=="infinite";
-    if(isSolo && answered===SOLO_FIXED_COUNT && c===SOLO_FIXED_COUNT){
+    if(isSolo && answered===SOLO_FIXED_COUNT && c>0){
       const secs = (soloStartMs && soloEndMs) ? Math.max(1, Math.round((soloEndMs-soloStartMs)/1000)) : 0;
-      renderRankSubmit(rs, "solo_speed", secs, "초");   // 20/20 만점 → 최속 랭킹 등록
+      renderRankSubmit(rs, "solo_speed", c, secs);   // 20문제 완주 → 정답 수(주)·소요시간(부)로 랭킹 등록
     } else if(isSolo){
       rs.style.display=""; rs.className="rk-submit";
-      rs.innerHTML=`<div class="rk-sub-h">🏆 <b>20문제 만점</b>이면 최속 랭킹에 도전! <span style="color:var(--muted)">(이번 정답 ${c}/${answered})</span></div>`;
+      rs.innerHTML=`<div class="rk-sub-h">🏆 <b>20문제를 끝까지</b> 풀면 랭킹에 등록돼요 <span style="color:var(--muted)">(이번 정답 ${c}/${answered})</span></div>`;
     } else { rs.style.display="none"; rs.innerHTML=""; }
   }
 
@@ -3453,7 +3464,7 @@ const Room = (function(){
   // ── 게임 방법 자동 노출 정책 (페르소나 토의 결론) ──────────────────
   // 최초 '시작하기' 클릭 시 1회 · 이후 (내용 버전 상승) 또는 (마지막 열람 후 14일) 이면 재노출
   // · 랜딩 ❓ 버튼은 상시 수동 · "이제 안 볼게요"는 시간 재노출만 끄고 신기능(버전)은 계속 안내
-  const GUIDE_VERSION="2026-07-31";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출 (0731: 솔로 20문제·최속 랭킹 안내)
+  const GUIDE_VERSION="2026-07-31b";   // 가이드 내용이 바뀌면 이 값을 올려 1회 재노출 (0731b: 솔로 랭킹 완화 — 정답 수↑·동점 최속)
   const GUIDE_REPEAT_DAYS=14;
   function guideSeenV(){ try{ return localStorage.getItem("svtq_guide_v"); }catch(e){ return null; } }
   function guideSeenTs(){ try{ return +localStorage.getItem("svtq_guide_ts")||0; }catch(e){ return 0; } }
@@ -3484,11 +3495,10 @@ const Room = (function(){
     const rm=document.getElementById("rank-modal"); if(!rm) return;
     let board="solo_speed";
     const scopeEl=document.getElementById("rank-scope"); const listEl=document.getElementById("rank-list");
-    const boardUnit=b=>b==="solo_speed"?"초":"곡 연속";
     function draw(){
       document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.classList.toggle("active", t.dataset.board===board));
       scopeEl.textContent = rankGlobalOn() ? "🌐 전 세계 랭킹 · 상위 20" : "💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)";
-      rankRenderInto(board, listEl, boardUnit(board));
+      rankRenderInto(board, listEl);
     }
     window.openRankModal=function(b){ board=(b==="solo")?"solo_speed":(b||"solo_speed"); rm.style.display="flex"; draw(); };
     document.getElementById("intro-rank").addEventListener("click",()=>window.openRankModal("solo_speed"));

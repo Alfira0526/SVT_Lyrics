@@ -248,6 +248,27 @@
   .rk-submit input{flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;box-sizing:border-box}
   .rk-submit button{flex:0 0 auto;border:0;border-radius:9px;padding:9px 14px;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(180deg,var(--serene-deep),var(--serene-ink));cursor:pointer}
   .rk-submit .rk-done{font-size:13px;color:var(--green-ink);font-weight:800;text-align:center;padding:4px}
+  /* 모드 시작 팝업 */
+  #modestart-modal{position:fixed;inset:0;z-index:100000;background:rgba(40,24,54,.5);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+  #modestart-modal .ms-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 18px 46px rgba(80,50,110,.28)}
+  #modestart-modal .ms-lead{font-size:14px;color:var(--muted);font-weight:700;margin:0 2px 14px}
+  #modestart-modal .ms-lead b{color:var(--rose-ink)}
+  .ms-modes{display:flex;flex-direction:column;gap:9px}
+  .ms-mode{display:flex;align-items:center;gap:13px;text-align:left;background:var(--panel2);border:1.5px solid var(--line);border-radius:13px;padding:13px 14px;cursor:pointer;font-family:inherit;transition:.12s;width:100%}
+  .ms-mode:hover{border-color:var(--rose-ink);transform:translateY(-1px);box-shadow:0 6px 16px rgba(214,51,126,.12)}
+  .ms-mode .ms-ic{font-size:25px;flex:0 0 auto;line-height:1}
+  .ms-mode .ms-txt{display:flex;flex-direction:column;gap:2px}
+  .ms-mode .ms-nm{font-weight:900;font-size:15px;color:var(--txt)}
+  .ms-mode .ms-ds{font-size:12px;color:var(--muted)}
+  .ms-field{margin:14px 0}
+  .ms-field .ms-flabel{font-size:13.5px;font-weight:800;color:var(--txt);margin-bottom:7px}
+  .ms-seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .ms-seg button{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer;min-height:44px;font-family:inherit;transition:.12s}
+  .ms-seg button.on{background:linear-gradient(135deg,var(--rose),var(--serene));color:var(--ink)}
+  .ms-stepper{display:flex;align-items:center;gap:10px}
+  .ms-stepper button{width:44px;height:44px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;font-size:20px;font-weight:900;color:var(--txt);cursor:pointer}
+  .ms-stepper .ms-num{font-size:20px;font-weight:900;color:var(--rose-ink);min-width:56px;text-align:center}
+  .ms-note{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px;background:var(--panel2);border-radius:10px;padding:10px 12px}
   /* 세그먼트 선택버튼(설정을 토글 대신 버튼으로) */
   .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
   .seg-btn{flex:1;padding:11px 8px;border:0;border-radius:9px;background:transparent;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.12s;min-height:44px}
@@ -620,6 +641,33 @@
     </div>
     <div class="rk-scope" id="rank-scope"></div>
     <div class="rk-list" id="rank-list"></div>
+  </div>
+</div>
+
+<!-- ================= 모드 시작 팝업 (원터치 + 필수만) ================= -->
+<div id="modestart-modal" style="display:none">
+  <div class="ms-card">
+    <button type="button" id="ms-close" class="guide-x" aria-label="닫기">✕</button>
+    <div id="ms-step1">
+      <h2 class="guide-title">🎮 어떻게 놀까요?</h2>
+      <p class="ms-lead">모드를 고르면 <b>꼭 필요한 것만</b> 정하고 바로 시작해요.</p>
+      <div class="ms-modes">
+        <button type="button" class="ms-mode" data-m="solo"><span class="ms-ic">🎧</span><span class="ms-txt"><b class="ms-nm">혼자</b><span class="ms-ds">듣고 4지선다 · 20문제</span></span></button>
+        <button type="button" class="ms-mode" data-m="infinite"><span class="ms-ic">♾️</span><span class="ms-txt"><b class="ms-nm">무한 도전</b><span class="ms-ds">틀리면 끝 · 연속 기록</span></span></button>
+        <button type="button" class="ms-mode" data-m="team"><span class="ms-ic">⚔️</span><span class="ms-txt"><b class="ms-nm">팀전 (오프라인)</b><span class="ms-ds">한 화면으로 팀 대결</span></span></button>
+        <button type="button" class="ms-mode" data-m="online-mc"><span class="ms-ic">📱</span><span class="ms-txt"><b class="ms-nm">온라인 4지선다</b><span class="ms-ds">각자 폰으로 참여</span></span></button>
+        <button type="button" class="ms-mode" data-m="online-buzzer"><span class="ms-ic">🖐</span><span class="ms-txt"><b class="ms-nm">온라인 부저</b><span class="ms-ds">먼저 누른 팀이 답</span></span></button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced" style="width:100%;margin-top:14px">⚙️ 세부 설정으로</button>
+    </div>
+    <div id="ms-step2" style="display:none">
+      <button type="button" id="ms-back" class="btn btn-ghost btn-sm" style="margin-bottom:6px">← 모드 다시</button>
+      <h2 class="guide-title" id="ms-title" style="margin-bottom:6px">모드</h2>
+      <p class="ms-lead" id="ms-sub" style="margin-bottom:12px"></p>
+      <div id="ms-form"></div>
+      <button type="button" class="intro-start" id="ms-start" style="width:100%;margin-top:14px">▶ 바로 시작</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced2" style="width:100%;margin-top:8px">⚙️ 세부 설정에서 더 바꾸기</button>
+    </div>
   </div>
 </div>
 
@@ -3519,11 +3567,73 @@ const Room = (function(){
     if(noauto) noauto.addEventListener("change",()=>{ try{ if(noauto.checked) localStorage.setItem("svtq_guide_noauto","1"); else localStorage.removeItem("svtq_guide_noauto"); }catch(e){} });
     const gb=document.getElementById("intro-guide"); if(gb) gb.addEventListener("click",open);
     const gx=document.getElementById("guide-close"); if(gx) gx.addEventListener("click",close);
-    const gok=document.getElementById("guide-ok"); if(gok) gok.addEventListener("click",()=>{ close(); unlockAudio(); showSetup(); });
+    const gok=document.getElementById("guide-ok"); if(gok) gok.addEventListener("click",()=>{ close(); unlockAudio(); openModeStart(); });
     gm.addEventListener("click",e=>{ if(e.target===gm) close(); });   // 배경 탭 → 닫기(랜딩 유지)
     // '시작하기' → 필요하면 가이드 먼저 자동 노출. 알겠어요=설정으로, X·배경=랜딩 유지(이미 '열람'으로 기록돼 다음엔 바로 설정)
     const startBtn=document.getElementById("intro-start");
-    if(startBtn) startBtn.addEventListener("click",()=>{ unlockAudio(); if(shouldAutoShowGuide()) open(); else showSetup(); });
+    if(startBtn) startBtn.addEventListener("click",()=>{ unlockAudio(); if(shouldAutoShowGuide()) open(); else openModeStart(); });
+  })();
+  // ── 모드 시작 팝업 (원터치 + 필수만) ──────────────────────────────
+  let msMode=null, msSel={};
+  const msModal=document.getElementById("modestart-modal");
+  const msStep1=document.getElementById("ms-step1"), msStep2=document.getElementById("ms-step2");
+  function openModeStart(){ if(!msModal){ showSetup(); return; } msStep1.style.display=""; msStep2.style.display="none"; msModal.style.display="flex"; msModal.scrollTop=0; }
+  function closeModeStart(){ if(msModal) msModal.style.display="none"; }
+  function toSetup(){ closeModeStart(); showSetup(); }
+  function renderMsForm(m){
+    msSel={};
+    const T={solo:"🎧 혼자", infinite:"♾️ 무한 도전", team:"⚔️ 팀전 (오프라인)", "online-mc":"📱 온라인 4지선다", "online-buzzer":"🖐 온라인 부저"};
+    const S={solo:"20문제를 듣고 맞혀요 · 끝까지 풀면 랭킹 등록!", infinite:"틀리면 끝! 몇 곡 연속으로 맞힐까요?", team:"한 화면(프로젝터)으로 팀을 나눠 대결해요.", "online-mc":"참가자가 각자 폰으로 접속해 보기를 골라요.", "online-buzzer":"먼저 부저를 누른 팀이 답하고 진행자가 판정해요."};
+    document.getElementById("ms-title").textContent=T[m]||"모드";
+    document.getElementById("ms-sub").textContent=S[m]||"";
+    const seg=(key,label,opts,def)=>{ msSel[key]=def; return `<div class="ms-field"><div class="ms-flabel">${label}</div><div class="ms-seg" data-key="${key}">`+opts.map(o=>`<button type="button" data-v="${o.v}" class="${o.v===def?"on":""}">${o.t}</button>`).join("")+`</div></div>`; };
+    let html="";
+    if(m==="solo"){
+      html+=seg("fmt","문제 형식",[{v:"mc",t:"4지선다"},{v:"subj",t:"주관식"}],"mc");
+      html+=seg("timer","제한시간",[{v:0,t:"끄기"},{v:1,t:"20초"}],0);
+      html+=seg("hide","가사",[{v:1,t:"가리기(권장)"},{v:0,t:"보이기"}],1);
+    } else if(m==="infinite"){
+      html+=seg("timer","제한시간",[{v:0,t:"끄기"},{v:1,t:"20초(초과=오답)"}],0);
+      html+=seg("hide","가사",[{v:1,t:"가리기(권장)"},{v:0,t:"보이기"}],1);
+      html+='<div class="ms-note">무한 모드는 <b>4지선다</b>로 진행돼요.</div>';
+    } else if(m==="team"){
+      html+=`<div class="ms-field"><div class="ms-flabel">팀 수</div><div class="ms-stepper"><button type="button" id="ms-team-minus" aria-label="팀 줄이기">−</button><span class="ms-num" id="ms-team-n">2</span><button type="button" id="ms-team-plus" aria-label="팀 늘리기">+</button></div></div>`;
+      msSel.teams=2;
+      html+=seg("fmt","채점 방식",[{v:"mc",t:"4지선다"},{v:"subj",t:"주관식(수동)"}],"mc");
+      html+=seg("timer","제한시간",[{v:0,t:"끄기"},{v:1,t:"20초"}],0);
+    } else if(m==="online-mc" || m==="online-buzzer"){
+      html+=seg("comp","참가 구성",[{v:"team",t:"팀 대항"},{v:"solo",t:"개인전"}],"team");
+      html+='<div class="ms-note">시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장' + (m==="online-buzzer"?' → 먼저 누른 팀이 답, 진행자가 정답/오답 판정.':' → 각자 폰에서 보기 선택.') + '</div>';
+    }
+    const f=document.getElementById("ms-form"); f.innerHTML=html;
+    f.querySelectorAll(".ms-seg").forEach(sg=>{ sg.addEventListener("click",e=>{ const btn=e.target.closest("button[data-v]"); if(!btn) return; sg.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn)); let v=btn.dataset.v; if(v==="0"||v==="1") v=+v; msSel[sg.dataset.key]=v; }); });
+    if(m==="team"){ const nEl=document.getElementById("ms-team-n");
+      document.getElementById("ms-team-minus").addEventListener("click",()=>{ msSel.teams=Math.max(2,(msSel.teams||2)-1); nEl.textContent=msSel.teams; });
+      document.getElementById("ms-team-plus").addEventListener("click",()=>{ msSel.teams=Math.min(8,(msSel.teams||2)+1); nEl.textContent=msSel.teams; });
+    }
+  }
+  function selectMsMode(m){ msMode=m; renderMsForm(m); msStep1.style.display="none"; msStep2.style.display=""; msModal.scrollTop=0; }
+  function applyMsAndStart(){
+    const m=msMode, s=msSel;
+    config.onlineRoom=false; config.teamMode=false; config.autoHost=false;
+    if(m==="solo"){ config.mode="normal"; config.mc=(s.fmt!=="subj"); config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }
+    else if(m==="infinite"){ config.mode="infinite"; config.mc=true; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; config.hideLyrics=(s.hide!==0); }
+    else if(m==="team"){ config.mode="normal"; config.teamMode=true; config.mc=(s.fmt!=="subj"); config.teamBlind=false; config.timerOn=(s.timer===1); if(s.timer===1) config.timerSec=20; setTeamCount(s.teams||2); }
+    else if(m==="online-mc"){ config.mode="normal"; config.onlineRoom=true; config.mc=true; config.autoHost=true; config.teamMode=(s.comp!=="solo"); config.teamBlind=true; }
+    else if(m==="online-buzzer"){ config.mode="normal"; config.onlineRoom=true; config.mc=false; config.autoHost=true; config.teamMode=(s.comp!=="solo"); }
+    saveState();
+    closeModeStart(); renderSetup();
+    document.getElementById("setup-start").click();   // 기존 시작 로직 재사용(온라인=방 로비)
+  }
+  (function(){
+    if(!msModal) return;
+    msModal.querySelectorAll(".ms-mode").forEach(b=>b.addEventListener("click",()=>selectMsMode(b.dataset.m)));
+    document.getElementById("ms-back").addEventListener("click",()=>{ msStep2.style.display="none"; msStep1.style.display=""; });
+    document.getElementById("ms-close").addEventListener("click",closeModeStart);
+    document.getElementById("ms-advanced").addEventListener("click",toSetup);
+    document.getElementById("ms-advanced2").addEventListener("click",toSetup);
+    document.getElementById("ms-start").addEventListener("click",applyMsAndStart);
+    msModal.addEventListener("click",e=>{ if(e.target===msModal) closeModeStart(); });
   })();
   (function(){   // 랭킹 팝업
     const rm=document.getElementById("rank-modal"); if(!rm) return;

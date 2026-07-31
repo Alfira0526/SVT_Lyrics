@@ -712,26 +712,26 @@
 <!-- ================= 참가자(온라인 방) 화면 ================= -->
 <div class="intro" id="room-guest" style="display:none">
   <div class="intro-inner" style="max-width:420px">
-    <h1 class="intro-title" style="font-size:24px">방 참가</h1>
+    <h1 class="intro-title" style="font-size:24px" data-i18n="rg_title">방 참가</h1>
     <div id="rg-join">
-      <p class="intro-desc">사회자 화면의 <b>방 코드</b>를 입력하세요.</p>
-      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase" />
-      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%">입장</button>
+      <p class="intro-desc" data-i18n-html="rg_join_desc">사회자 화면의 <b>방 코드</b>를 입력하세요.</p>
+      <input class="num-input" id="rg-code" placeholder="방 코드 (예: AB12)" maxlength="8" style="text-transform:uppercase" data-i18n-ph="rg_code_ph" />
+      <button class="intro-start" id="rg-enter" style="margin-top:14px;width:100%" data-i18n="rg_enter">입장</button>
       <div class="sl-err" id="rg-err"></div>
-      <button class="btn btn-ghost btn-sm" id="rg-back" style="margin-top:14px">← 뒤로</button>
+      <button class="btn btn-ghost btn-sm" id="rg-back" style="margin-top:14px" data-i18n="rg_back">← 뒤로</button>
     </div>
     <div id="rg-pick" style="display:none">
-      <p class="intro-desc"><b>참가할 팀</b>을 선택하세요. <span style="color:var(--muted)">(한 팀당 한 명)</span></p>
-      <select class="num-input" id="rg-team" style="text-transform:none"><option value="">팀 목록 불러오는 중…</option></select>
-      <button class="intro-start" id="rg-claim" style="margin-top:14px;width:100%">이 팀으로 참가</button>
+      <p class="intro-desc" data-i18n-html="rg_pick_desc"><b>참가할 팀</b>을 선택하세요. <span style="color:var(--muted)">(한 팀당 한 명)</span></p>
+      <select class="num-input" id="rg-team" style="text-transform:none"><option value="" data-i18n="rg_loading">팀 목록 불러오는 중…</option></select>
+      <button class="intro-start" id="rg-claim" style="margin-top:14px;width:100%" data-i18n="rg_claim">이 팀으로 참가</button>
       <div class="sl-err" id="rg-pick-err"></div>
-      <button class="btn btn-ghost btn-sm" id="rg-pick-back" style="margin-top:14px">← 방 코드 다시</button>
+      <button class="btn btn-ghost btn-sm" id="rg-pick-back" style="margin-top:14px" data-i18n="rg_pickback">← 방 코드 다시</button>
     </div>
     <div id="rg-play" style="display:none">
-      <div class="rg-status" id="rg-status">사회자를 기다리는 중…</div>
+      <div class="rg-status" id="rg-status" data-i18n="rg_waiting">사회자를 기다리는 중…</div>
       <div class="rg-myscore" id="rg-myscore" style="display:none"></div>
       <div class="rg-toprow" id="rg-toprow" style="display:flex;gap:8px;align-items:center;margin:6px 0 10px">
-        <button class="btn btn-play btn-sm" id="rg-speak">▶ 듣기</button>
+        <button class="btn btn-play btn-sm" id="rg-speak" data-i18n="rg_listen">▶ 듣기</button>
         <span class="rg-timer" id="rg-timer"></span>
       </div>
       <div class="rg-lyric" id="rg-lyric"></div>
@@ -743,7 +743,7 @@
         <div id="rg-final-rank" class="rg-final-rank"></div>
       </div>
       <div class="rg-score" id="rg-score"></div>
-      <button class="btn btn-ghost btn-sm" id="rg-leave" style="margin-top:16px">방 나가기</button>
+      <button class="btn btn-ghost btn-sm" id="rg-leave" style="margin-top:16px" data-i18n="rg_leave">방 나가기</button>
     </div>
   </div>
 </div>
@@ -751,25 +751,25 @@
 <!-- ================= 방장 로비(참가 대기) ================= -->
 <div class="intro" id="room-lobby" style="display:none">
   <div class="setup-inner" style="max-width:440px">
-    <h2 class="setup-title">참가자 대기</h2>
-    <p class="setup-sub">모두 들어오면 게임을 시작하세요</p>
+    <h2 class="setup-title" data-i18n="rl_title">참가자 대기</h2>
+    <p class="setup-sub" data-i18n="rl_sub">모두 들어오면 게임을 시작하세요</p>
     <div class="setup-card">
-      <div class="rhb-code" style="text-align:center;font-size:16px">방 코드 <b id="rl-code" style="font-size:26px;letter-spacing:4px;color:var(--rose-ink)">----</b></div>
-      <div class="rl-conn" id="rl-conn" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">연결 확인 중…</div>
+      <div class="rhb-code" style="text-align:center;font-size:16px"><span data-i18n="rhb_code">방 코드</span> <b id="rl-code" style="font-size:26px;letter-spacing:4px;color:var(--rose-ink)">----</b></div>
+      <div class="rl-conn" id="rl-conn" style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px" data-i18n="rl_conn">연결 확인 중…</div>
       <div style="text-align:center;margin-top:12px">
         <img id="rl-qr" alt="방 참가 QR" style="width:180px;height:180px;display:none;border-radius:12px;background:#fff;padding:8px" />
-        <div id="rl-qr-cap" style="font-size:12px;color:var(--muted);margin-top:6px;display:none">📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요</div>
+        <div id="rl-qr-cap" style="font-size:12px;color:var(--muted);margin-top:6px;display:none" data-i18n="rl_qrcap">📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요</div>
         <div id="rl-link" style="font-size:11px;color:var(--serene-ink);word-break:break-all;margin-top:4px"></div>
       </div>
-      <div class="setup-label" style="margin-top:16px">🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span></div>
-      <select class="num-input" id="rl-self-team" style="text-transform:none"><option value="">참가 안 함</option></select>
-      <div class="setup-label" style="margin-top:16px">참가 팀 (<b id="rl-count">0</b>)</div>
-      <div id="rl-teams" style="font-size:14px;line-height:1.9">아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.</div>
+      <div class="setup-label" style="margin-top:16px" data-i18n-html="rl_hostjoin">🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span></div>
+      <select class="num-input" id="rl-self-team" style="text-transform:none"><option value="" data-i18n="rl_nojoin">참가 안 함</option></select>
+      <div class="setup-label" style="margin-top:16px"><span data-i18n="rl_teams_label">참가 팀</span> (<b id="rl-count">0</b>)</div>
+      <div id="rl-teams" style="font-size:14px;line-height:1.9" data-i18n-html="rl_noteam">아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.</div>
       <div class="video-wrap" id="rl-video" style="margin-top:14px"></div>
     </div>
     <div class="setup-actions">
-      <button class="btn btn-ghost" id="rl-cancel">← 취소</button>
-      <button class="intro-start" id="rl-start" style="flex:1;padding:15px">▶ 게임 시작</button>
+      <button class="btn btn-ghost" id="rl-cancel" data-i18n="rl_cancel">← 취소</button>
+      <button class="intro-start" id="rl-start" style="flex:1;padding:15px" data-i18n="rl_start">▶ 게임 시작</button>
     </div>
   </div>
 </div>
@@ -922,22 +922,22 @@
     <div class="brand">
       <div class="diamond"></div>
       <div>
-        <h1>세븐틴 가사 퀴즈</h1>
-        <p>SVT Lyrics Quiz · 듣고 맞히는 오프라인 퀴즈쇼</p>
+        <h1 data-i18n="hdr_title">세븐틴 가사 퀴즈</h1>
+        <p data-i18n="hdr_sub">SVT Lyrics Quiz · 듣고 맞히는 오프라인 퀴즈쇼</p>
       </div>
     </div>
   </header>
 
   <nav class="tabs">
-    <button data-view="game" class="active">게임</button>
-    <button data-view="settings">설정</button>
-    <button data-view="result">결과</button>
+    <button data-view="game" class="active" data-i18n="tab_game">게임</button>
+    <button data-view="settings" data-i18n="tab_settings">설정</button>
+    <button data-view="result" data-i18n="tab_result">결과</button>
   </nav>
 
   <!-- ================= GAME ================= -->
   <section class="view active" id="view-game">
     <div class="card room-host-bar" id="room-host-bar" style="display:none">
-      <div class="rhb-code">방 코드 <b id="rhb-code">----</b></div>
+      <div class="rhb-code"><span data-i18n="rhb_code">방 코드</span> <b id="rhb-code">----</b></div>
       <div class="rhb-info" id="rhb-info">참가 팀 0 · 대기 중</div>
     </div>
     <div class="card" id="team-card" style="display:none">
@@ -947,42 +947,42 @@
     <div class="card">
       <div class="status-row">
         <div class="counter">
-          문항 <b id="g-index">1</b> / <span id="g-total">40</span>
-          &nbsp;·&nbsp; 정답 <b id="g-correct">0</b> · 오답 <b id="g-wrong">0</b>
+          <span data-i18n="g_q">문항</span> <b id="g-index">1</b> / <span id="g-total">40</span>
+          &nbsp;·&nbsp; <span data-i18n="g_correct">정답</span> <b id="g-correct">0</b> · <span data-i18n="g_wrong">오답</span> <b id="g-wrong">0</b>
           <span class="streak-badge" id="g-streak" style="display:none">🔥2</span>
         </div>
         <div class="status-right">
-          <button class="stage-btn" id="g-a11y-btn" title="글자 크게 — 저시력·가독성(컨트롤 유지)" aria-pressed="false">🔎 크게</button>
-          <button class="stage-btn" id="g-stage-btn" title="무대 모드 — 프로젝터/원거리용 크게 보기" aria-pressed="false">🎦 무대</button>
+          <button class="stage-btn" id="g-a11y-btn" title="글자 크게 — 저시력·가독성(컨트롤 유지)" aria-pressed="false" data-i18n="g_big">🔎 크게</button>
+          <button class="stage-btn" id="g-stage-btn" title="무대 모드 — 프로젝터/원거리용 크게 보기" aria-pressed="false" data-i18n="g_stage">🎦 무대</button>
           <span class="badge b-중" id="g-badge">중</span>
         </div>
       </div>
       <div class="progress"><i id="g-bar"></i></div>
 
       <div class="timer" id="g-timer">
-        <div class="timer-top"><span>⏱ 제한 시간</span><b id="g-timer-val">15초</b></div>
+        <div class="timer-top"><span data-i18n="g_timelimit">⏱ 제한 시간</span><b id="g-timer-val">15초</b></div>
         <div class="timer-bar"><i id="g-timer-fill"></i></div>
       </div>
 
       <div class="lyric-box" id="g-lyricbox">
-        <span class="hide-note" id="g-hidenote" style="display:none">🙈 가사 가림</span>
+        <span class="hide-note" id="g-hidenote" style="display:none" data-i18n="g_hidden">🙈 가사 가림</span>
         <span class="lyric-text" id="g-lyric"></span>
       </div>
 
       <div class="speed-row" id="g-speed-row">
-        <span>🐢 속도</span>
+        <span data-i18n="g_speed">🐢 속도</span>
         <input type="range" id="g-speed" min="0.5" max="1.2" step="0.1" value="1.0" />
         <span class="speed-val" id="g-speedval">1.0×</span>
-        <button class="btn btn-ghost btn-sm" id="g-ttsdiag" style="display:none;margin-left:8px" title="TTS 음성 진단">🔎 음성</button>
+        <button class="btn btn-ghost btn-sm" id="g-ttsdiag" style="display:none;margin-left:8px" title="TTS 음성 진단" data-i18n="g_voice">🔎 음성</button>
       </div>
 
       <div class="toggle-row" id="g-hide-row">
         <label class="switch"><input type="checkbox" id="g-hide" /><span class="slider"></span></label>
-        <span style="font-size:14px">가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span></span>
+        <span style="font-size:14px" data-i18n-html="g_hidetoggle">가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span></span>
       </div>
 
       <div class="hint-area">
-        <button class="btn btn-ghost btn-sm" id="g-hint">💡 힌트 <span id="g-hint-n">(0/3)</span></button>
+        <button class="btn btn-ghost btn-sm" id="g-hint"><span data-i18n="g_hint">💡 힌트</span> <span id="g-hint-n">(0/3)</span></button>
         <div class="hints" id="g-hints"></div>
       </div>
 
@@ -990,15 +990,15 @@
       <div class="mc-options" id="g-mc" style="display:none"></div>
 
       <div class="controls">
-        <button class="btn btn-play" id="g-play">▶ 가사 낭독</button>
+        <button class="btn btn-play" id="g-play" data-i18n="g_play">▶ 가사 낭독</button>
         <button class="btn btn-stop" id="g-stopread" title="멈춤">⏹</button>
-        <button class="btn btn-reveal" id="g-reveal">정답 공개</button>
+        <button class="btn btn-reveal" id="g-reveal" data-i18n="g_reveal">정답 공개</button>
       </div>
 
       <div class="auto-bar" id="g-auto-bar" style="display:none">
-        <button class="auto-btn" id="g-auto-toggle">⏸ 일시정지</button>
-        <button class="auto-btn" id="g-auto-skip">⏭ 다음</button>
-        <span class="auto-status" id="g-auto-status">자동 진행 중</span>
+        <button class="auto-btn" id="g-auto-toggle" data-i18n="g_pause">⏸ 일시정지</button>
+        <button class="auto-btn" id="g-auto-skip" data-i18n="g_skip">⏭ 다음</button>
+        <span class="auto-status" id="g-auto-status" data-i18n="g_autorun">자동 진행 중</span>
       </div>
 
       <div class="answer" id="g-answer" role="status" aria-live="polite">
@@ -1006,44 +1006,44 @@
         <div class="part-label" id="g-answer-part"></div>
         <div class="video-wrap" id="g-video"></div>
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn btn-ghost btn-sm" id="g-video-reload" style="flex:1">🔄 다시 불러오기</button>
-          <a id="g-video-open" class="btn btn-ghost btn-sm" target="_blank" rel="noopener" style="flex:1;display:none;align-items:center;justify-content:center">▶ YouTube에서 보기</a>
+          <button class="btn btn-ghost btn-sm" id="g-video-reload" style="flex:1" data-i18n="g_reload">🔄 다시 불러오기</button>
+          <a id="g-video-open" class="btn btn-ghost btn-sm" target="_blank" rel="noopener" style="flex:1;display:none;align-items:center;justify-content:center" data-i18n="g_ytopen">▶ YouTube에서 보기</a>
         </div>
 
         <!-- solo scoring -->
         <div class="controls" id="g-solo-score">
-          <button class="btn btn-correct" id="g-mark-correct">✔ 정답 처리</button>
-          <button class="btn btn-wrong" id="g-mark-wrong">✘ 오답 처리</button>
+          <button class="btn btn-correct" id="g-mark-correct" data-i18n="g_mark_correct">✔ 정답 처리</button>
+          <button class="btn btn-wrong" id="g-mark-wrong" data-i18n="g_mark_wrong">✘ 오답 처리</button>
         </div>
         <!-- team scoring -->
         <div id="g-team-score" style="display:none">
           <div class="award-row" id="g-award-row"></div>
-          <button class="btn btn-wrong btn-sm" id="g-noone" style="margin-top:8px;width:100%">아무도 못 맞힘 · 넘어가기</button>
+          <button class="btn btn-wrong btn-sm" id="g-noone" style="margin-top:8px;width:100%" data-i18n="g_noone">아무도 못 맞힘 · 넘어가기</button>
         </div>
       </div>
 
       <div class="nav-row">
-        <button class="btn btn-ghost" id="g-prev" style="flex:1">← 이전</button>
-        <button class="btn btn-ghost" id="g-next" style="flex:1">다음 →</button>
+        <button class="btn btn-ghost" id="g-prev" style="flex:1" data-i18n="g_prev">← 이전</button>
+        <button class="btn btn-ghost" id="g-next" style="flex:1" data-i18n="g_next">다음 →</button>
       </div>
     </div>
 
     <div class="card">
       <div class="filter-bar" style="margin-bottom:0">
-        <span class="chip active" data-filter="all">전체</span>
-        <span class="chip" data-filter="상">상</span>
-        <span class="chip" data-filter="중">중</span>
-        <span class="chip" data-filter="신곡">신곡</span>
-        <span class="chip chip-test" id="g-test-only" style="display:none">🧪 테스트 문제만</span>
+        <span class="chip active" data-filter="all" data-i18n="g_all">전체</span>
+        <span class="chip" data-filter="상" data-i18n="diff_high">상</span>
+        <span class="chip" data-filter="중" data-i18n="diff_mid">중</span>
+        <span class="chip" data-filter="신곡" data-i18n="diff_new">신곡</span>
+        <span class="chip chip-test" id="g-test-only" style="display:none" data-i18n="g_testonly">🧪 테스트 문제만</span>
         <span style="flex:1"></span>
-        <span class="chip" id="g-shuffle">🔀 셔플</span>
-        <span class="chip" id="g-restart">↻ 처음부터</span>
+        <span class="chip" id="g-shuffle" data-i18n="g_shuffle">🔀 셔플</span>
+        <span class="chip" id="g-restart" data-i18n="g_restart">↻ 처음부터</span>
       </div>
       <div class="scope-line" id="g-scope">🎯 범위: 전체</div>
       <div class="filter-bar" style="margin:12px 0 0">
-        <span class="chip" id="g-end">⏹ 게임 종료(결과)</span>
+        <span class="chip" id="g-end" data-i18n="g_endgame">⏹ 게임 종료(결과)</span>
         <span style="flex:1"></span>
-        <span class="chip" id="g-home">🏠 처음으로</span>
+        <span class="chip" id="g-home" data-i18n="g_home">🏠 처음으로</span>
       </div>
     </div>
   </section>
@@ -1479,6 +1479,95 @@ Object.assign(I18N.ko, {
   gd_ok:"알겠어요 · 시작하기",
   rg_ended:"🏁 게임이 종료되었습니다 · 최종 순위", rg_final_h:"🏁 게임 끝! 최종 순위", rg_rank_fmt:"{n}위", rg_pt:"점"
 });
+// 게임 화면 · 방 로비 · 참가자 화면 문자열
+Object.assign(I18N.ko, {
+  hdr_title:"세븐틴 가사 퀴즈", hdr_sub:"SVT Lyrics Quiz · 듣고 맞히는 오프라인 퀴즈쇼",
+  tab_game:"게임", tab_settings:"설정", tab_result:"결과",
+  rhb_code:"방 코드",
+  g_q:"문항", g_correct:"정답", g_wrong:"오답",
+  g_big:"🔎 크게", g_stage:"🎦 무대",
+  g_timelimit:"⏱ 제한 시간", g_hidden:"🙈 가사 가림",
+  g_speed:"🐢 속도", g_voice:"🔎 음성",
+  g_hidetoggle:'가사 가리기 <span style="color:var(--muted)">(듣기 전용 모드)</span>',
+  g_hint:"💡 힌트", g_play:"▶ 가사 낭독", g_reveal:"정답 공개",
+  g_pause:"⏸ 일시정지", g_skip:"⏭ 다음", g_autorun:"자동 진행 중",
+  g_reload:"🔄 다시 불러오기", g_ytopen:"▶ YouTube에서 보기",
+  g_mark_correct:"✔ 정답 처리", g_mark_wrong:"✘ 오답 처리", g_noone:"아무도 못 맞힘 · 넘어가기",
+  g_prev:"← 이전", g_next:"다음 →",
+  g_all:"전체", diff_high:"상", diff_mid:"중", diff_new:"신곡",
+  g_testonly:"🧪 테스트 문제만", g_shuffle:"🔀 셔플", g_restart:"↻ 처음부터",
+  g_endgame:"⏹ 게임 종료(결과)", g_home:"🏠 처음으로",
+  unit_sec:"초", g_play_status:"▶ 재생", g_paused:"일시정지됨", g_autonext:"다음까지 {n}초",
+  g_turn:"🎤 <b>{team}</b> 차례 · 보기를 선택하세요 ({done}/{total})", g_turn_blind:" · <span style=\"color:var(--muted)\">선택은 비공개</span>",
+  g_scored:"채점 완료 · ", g_team_fallback:"팀{n}",
+  rhb_wait:"참가 팀 {n} · 대기 중", rhb_live:"참가 {n} · 제출 {sub}/{n}",
+  g_host_done:"✅ 내 답 제출 완료 · 다른 팀 폰 대기", g_host_pick:"🖥 <b>나({team})</b> 답 선택 · 📱 다른 팀은 폰에서",
+  g_phones_picking:"📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인",
+  gp_pick_q:"문항 {i} / {t} · 정답을 고르세요", gp_buzz_q:"문항 {i} / {t} · 먼저 「정답!」을 누르세요",
+  gp_hidelyric:"🙈 가사 가리기 · ▶ 듣기로 맞혀보세요", gp_buzz_btn:"🖐 정답!", gp_buzz_done:"🖐 제출 완료!",
+  gp_buzz_wait:"🖐 제출! 방장 판정을 기다리는 중…", gp_answered:"제출 완료 · 결과를 기다리는 중…", gp_answer_label:"정답: ",
+  gp_entered_wait:"입장 완료 ({team}) · 방장을 기다리는 중…", gp_lobby_wait:"입장 완료 · 방장이 곧 시작합니다",
+  gp_intermission:"🏁 라운드 종료 · 방장이 다음 라운드를 준비 중이에요",
+  gp_buzz_wrong_btn:"✗ 오답 · 다음 문제 대기", gp_buzz_wrong_status:"✗ 오답 · 다음 문제를 기다려요", gp_buzz_passed:"다음 팀에게 기회가 넘어왔어요 · 먼저 누른 팀부터!",
+  hb_front:"🖐 <b>{team}</b> 먼저! · 구두로 답을 듣고 아래에서 <b>정답/오답</b>을 눌러요", hb_nextwait:"🖐 다음 팀 대기중 · 아직 못 누른 팀이 「정답!」을 누르면 순서가 떠요", hb_wait:"🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요",
+  hb_answer_pre:"🎵 정답", hb_answer_note:"사회자 전용 · 팀이 부른 답과 비교해 정답/오답 판정", hb_ok:"정답 ✓ · 다음 곡", hb_no:"오답 ✗ · 다음 팀", hb_queue:"대기", hb_reveal_none:"정답 공개 (아무도 못 맞힘)",
+  g_scope_pre:"🎯 범위: ", sc_all:"전체", sc_songs_unit:"곡", sc_test:"🧪 테스트 문제 {n}개",
+  rl_title:"참가자 대기", rl_sub:"모두 들어오면 게임을 시작하세요", rl_conn:"연결 확인 중…",
+  rl_qrcap:"📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요",
+  rl_hostjoin:'🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span>',
+  rl_nojoin:"참가 안 함", rl_teams_label:"참가 팀",
+  rl_noteam:'아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.',
+  rl_cancel:"← 취소", rl_start:"▶ 게임 시작",
+  rg_title:"방 참가", rg_join_desc:'사회자 화면의 <b>방 코드</b>를 입력하세요.', rg_code_ph:"방 코드 (예: AB12)",
+  rg_enter:"입장", rg_back:"← 뒤로",
+  rg_pick_desc:'<b>참가할 팀</b>을 선택하세요. <span style="color:var(--muted)">(한 팀당 한 명)</span>',
+  rg_loading:"팀 목록 불러오는 중…", rg_claim:"이 팀으로 참가", rg_pickback:"← 방 코드 다시",
+  rg_waiting:"사회자를 기다리는 중…", rg_listen:"▶ 듣기", rg_leave:"방 나가기"
+});
+Object.assign(I18N.en, {
+  hdr_title:"SEVENTEEN Lyrics Quiz", hdr_sub:"SVT Lyrics Quiz · a listen-and-guess offline quiz show",
+  tab_game:"Game", tab_settings:"Settings", tab_result:"Result",
+  rhb_code:"Room code",
+  g_q:"Q", g_correct:"Correct", g_wrong:"Wrong",
+  g_big:"🔎 Large", g_stage:"🎦 Stage",
+  g_timelimit:"⏱ Time limit", g_hidden:"🙈 Lyrics hidden",
+  g_speed:"🐢 Speed", g_voice:"🔎 Voice",
+  g_hidetoggle:'Hide lyrics <span style="color:var(--muted)">(listen-only mode)</span>',
+  g_hint:"💡 Hint", g_play:"▶ Read lyrics", g_reveal:"Reveal answer",
+  g_pause:"⏸ Pause", g_skip:"⏭ Next", g_autorun:"Auto-advancing",
+  g_reload:"🔄 Reload", g_ytopen:"▶ Watch on YouTube",
+  g_mark_correct:"✔ Mark correct", g_mark_wrong:"✘ Mark wrong", g_noone:"Nobody got it · skip",
+  g_prev:"← Prev", g_next:"Next →",
+  g_all:"All", diff_high:"Hard", diff_mid:"Med", diff_new:"New",
+  g_testonly:"🧪 Test songs only", g_shuffle:"🔀 Shuffle", g_restart:"↻ Restart",
+  g_endgame:"⏹ End game (result)", g_home:"🏠 Home",
+  unit_sec:"s", g_play_status:"▶ Play", g_paused:"Paused", g_autonext:"Next in {n}s",
+  g_turn:"🎤 <b>{team}</b>'s turn · pick an answer ({done}/{total})", g_turn_blind:" · <span style=\"color:var(--muted)\">choices are hidden</span>",
+  g_scored:"Scored · ", g_team_fallback:"Team {n}",
+  rhb_wait:"Teams {n} · waiting", rhb_live:"Joined {n} · submitted {sub}/{n}",
+  g_host_done:"✅ Your answer is in · waiting for other phones", g_host_pick:"🖥 <b>You ({team})</b> — pick an answer · 📱 others on their phones",
+  g_phones_picking:"📱 Each team is picking on <b>their own phone</b>… check submissions in the top bar",
+  gp_pick_q:"Q {i} / {t} · pick the answer", gp_buzz_q:"Q {i} / {t} · be first to hit 「Answer!」",
+  gp_hidelyric:"🙈 Lyrics hidden · guess by ▶ listening", gp_buzz_btn:"🖐 Answer!", gp_buzz_done:"🖐 Submitted!",
+  gp_buzz_wait:"🖐 Submitted! Waiting for the host's call…", gp_answered:"Answer submitted · waiting for the result…", gp_answer_label:"Answer: ",
+  gp_entered_wait:"Joined ({team}) · waiting for the host…", gp_lobby_wait:"Joined · the host will start soon",
+  gp_intermission:"🏁 Round over · the host is setting up the next round",
+  gp_buzz_wrong_btn:"✗ Wrong · wait for next", gp_buzz_wrong_status:"✗ Wrong · wait for the next song", gp_buzz_passed:"Passed to the next team · first to buzz goes!",
+  hb_front:"🖐 <b>{team}</b> first! · listen to their spoken answer, then tap <b>Correct/Wrong</b> below", hb_nextwait:"🖐 Waiting for the next team · a team that hasn't buzzed can hit 「Answer!」", hb_wait:"🖐 Waiting for buzzes · when a player hits 「Answer!」 on their phone, the order appears",
+  hb_answer_pre:"🎵 Answer", hb_answer_note:"Host only · compare with the team's spoken answer to judge", hb_ok:"Correct ✓ · next song", hb_no:"Wrong ✗ · next team", hb_queue:"Queue", hb_reveal_none:"Reveal answer (nobody got it)",
+  g_scope_pre:"🎯 Scope: ", sc_all:"All", sc_songs_unit:" songs", sc_test:"🧪 {n} test songs",
+  rl_title:"Waiting for players", rl_sub:"Start the game once everyone's in", rl_conn:"Checking connection…",
+  rl_qrcap:"📷 Scan with a phone camera to jump straight to the join screen",
+  rl_hostjoin:'🖥 Join in too (host) <span style="color:var(--muted);font-size:12px;font-weight:400">· pick a team and play</span>',
+  rl_nojoin:"Not joining", rl_teams_label:"Joined teams",
+  rl_noteam:'No teams have joined yet. Players tap <b>🔗 Join a room</b> and enter the code above.',
+  rl_cancel:"← Cancel", rl_start:"▶ Start game",
+  rg_title:"Join a room", rg_join_desc:'Enter the <b>room code</b> shown on the host\'s screen.', rg_code_ph:"Room code (e.g. AB12)",
+  rg_enter:"Enter", rg_back:"← Back",
+  rg_pick_desc:'Choose <b>your team</b>. <span style="color:var(--muted)">(one person per team)</span>',
+  rg_loading:"Loading teams…", rg_claim:"Join this team", rg_pickback:"← Re-enter code",
+  rg_waiting:"Waiting for the host…", rg_listen:"▶ Listen", rg_leave:"Leave room"
+});
 Object.assign(I18N.en, {
   gd_title:"❓ How to play",
   gd_lead:'Guess the SEVENTEEN song title <b>without reading</b> the lyrics — <b>by ear only</b>! 🎧',
@@ -1507,10 +1596,13 @@ Object.assign(I18N.en, {
 let LANG="ko";
 function i18nDetectLang(){ try{ const u=new URLSearchParams(location.search).get("lang"); if(u&&I18N[u]) return u; const s=localStorage.getItem("svtq_lang"); if(s&&I18N[s]) return s; const n=(navigator.language||"ko").toLowerCase(); if(n.indexOf("en")===0) return "en"; }catch(e){} return "ko"; }
 function i18nT(k){ const v=I18N[LANG]&&I18N[LANG][k]; return v!=null?v:(I18N.ko[k]!=null?I18N.ko[k]:k); }
+function diffLabel(d){ return d==="상"?i18nT("diff_high"):(d==="중"?i18nT("diff_mid"):(d==="신곡"?i18nT("diff_new"):d)); }
+function teamLabel(names,t){ return (names&&names[t])||i18nT("g_team_fallback").replace("{n}",t+1); }
 function applyI18n(){
   try{
     document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent=i18nT(el.getAttribute("data-i18n")); });
     document.querySelectorAll("[data-i18n-html]").forEach(el=>{ el.innerHTML=i18nT(el.getAttribute("data-i18n-html")); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el=>{ el.setAttribute("placeholder", i18nT(el.getAttribute("data-i18n-ph"))); });
     const tb=document.getElementById("lang-toggle"); if(tb) tb.textContent=(LANG==="ko"?"🌐 English":"🌐 한국어");
     document.documentElement.lang=LANG;
   }catch(e){}
@@ -2073,10 +2165,10 @@ function renderMc(){
       mcOptions.forEach((o,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.disabled=answered;
         b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(o.name)}</span><span class="mc-badges"></span>`;
         b.addEventListener("click",()=>Room.hostSelfAnswer(i)); box.appendChild(b); });
-      if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML= answered ? "✅ 내 답 제출 완료 · 다른 팀 폰 대기" : ("🖥 <b>나("+escapeHtml(Room.host.selfTeam)+")</b> 답 선택 · 📱 다른 팀은 폰에서"); }
+      if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML= answered ? i18nT("g_host_done") : i18nT("g_host_pick").replace("{team}",escapeHtml(Room.host.selfTeam)); }
       return;
     }
-    box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML="📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인"; } return;
+    box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML=i18nT("g_phones_picking"); } return;
   }
   if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; if(turnEl) turnEl.style.display="none"; return; }
   box.style.display="grid"; box.innerHTML="";
@@ -2115,18 +2207,18 @@ function renderTeamRound(){
   const blind=config.teamBlind!==false;
   // 가리기 모드에선 채점 전까지 어느 팀이 뭘 골랐는지 표시하지 않음(동시/온라인)
   const showBadges = teamRoundDone || !blind;
-  if(showBadges) teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=names[t]||("팀"+(t+1)); c.appendChild(s); } } });
+  if(showBadges) teamPicks.forEach((p,t)=>{ if(p!=null && btns[p]){ const c=btns[p].querySelector(".mc-badges"); if(c){ const s=document.createElement("span"); s.className="mc-badge"; s.textContent=teamLabel(names,t); c.appendChild(s); } } });
   if(!turnEl) return;
   if(teamRoundDone){
     turnEl.className="mc-turn done";
     const ci=mcOptions.findIndex(o=>o.correct);
-    turnEl.innerHTML="채점 완료 · "+teamPicks.map((p,t)=>`${escapeHtml(names[t]||("팀"+(t+1)))} ${p===ci?"✔":"✘"}`).join(" · ");
+    turnEl.innerHTML=i18nT("g_scored")+teamPicks.map((p,t)=>`${escapeHtml(teamLabel(names,t))} ${p===ci?"✔":"✘"}`).join(" · ");
   } else {
     turnEl.className="mc-turn";
     const cur=pickingOrder[pickIdx];
     const done=teamPicks.filter(p=>p!=null).length;
-    const note=blind?' · <span style="color:var(--muted)">선택은 비공개</span>':'';
-    turnEl.innerHTML=`🎤 <b>${escapeHtml(names[cur]||("팀"+(cur+1)))}</b> 차례 · 보기를 선택하세요 (${done+1}/${pickingOrder.length})${note}`;
+    const note=blind?i18nT("g_turn_blind"):'';
+    turnEl.innerHTML=i18nT("g_turn").replace("{team}",escapeHtml(teamLabel(names,cur))).replace("{done}",done+1).replace("{total}",pickingOrder.length)+note;
   }
 }
 function pickMcTeam(i){
@@ -2177,11 +2269,12 @@ function songInScope(id){ const sc=currentScope(); return songMatchesScope(id, s
 function scopeCount(by, val){ return songs.reduce((n,s)=>n+(songMatchesScope(s.id, by, val)?1:0), 0); }
 function scopeSummary(){
   const sc=currentScope();
-  if(sc.by==="test") return "🧪 테스트 문제 "+testIds.size+"개";
-  if(sc.by==="all"||!sc.val) return "전체 "+songs.length+"곡";
+  if(sc.by==="test") return i18nT("sc_test").replace("{n}",testIds.size);
+  if(sc.by==="all"||!sc.val) return i18nT("sc_all")+" "+songs.length+i18nT("sc_songs_unit");
   let vlabel=sc.val; const def=SCOPE_DEFS[sc.by];
   if(def){ const f=def.vals.find(x=>x.v===sc.val); if(f) vlabel=f.label; }
-  return vlabel+" · "+scopeCount(sc.by, sc.val)+"곡";
+  if(sc.by==="diff") vlabel=diffLabel(sc.val);
+  return vlabel+" · "+scopeCount(sc.by, sc.val)+i18nT("sc_songs_unit");
 }
 
 // 현재 범위(scope)에 해당하는 '문항 키' 목록. 테스트(검수) 범위는 문항 키 단위로 필터(변형 개별 검수).
@@ -2257,7 +2350,7 @@ function renderGame(){
   const id=order[pos]; const song=songById(id); const c=qc(id);
 
   els.index.textContent=pos+1;
-  els.badge.className=badgeClass(song.diff); els.badge.textContent=song.diff;
+  els.badge.className=badgeClass(song.diff); els.badge.textContent=diffLabel(song.diff);
   els.bar.style.width=(pos+1)/total*100+"%";
   // 무한(서바이벌): 유한 '문항 N/총량'·진행바 혼동 제거 → ∞ 표기 + 진행바 숨김
   const progEl=document.querySelector(".progress");
@@ -2584,7 +2677,7 @@ function speak(){
 }
 
 /* ---- Timer ---- */
-function fmt(s){ return s+"초"; }
+function fmt(s){ return s+i18nT("unit_sec"); }
 function resetTimer(){
   stopTimer();
   els.timer.classList.toggle("on", !!config.timerOn);
@@ -2641,8 +2734,8 @@ function updateAutoBar(){
   bar.style.display=(autoBarVisible() && gameActive)?"flex":"none";
   const tg=document.getElementById("g-auto-toggle");
   const st=document.getElementById("g-auto-status");
-  if(tg) tg.textContent=autoRun?"⏸ 일시정지":"▶ 재생";
-  if(st) st.textContent = !autoRun ? "일시정지됨" : (autoCdI ? `다음까지 ${Math.max(0,autoCdLeft)}초` : "자동 진행 중");
+  if(tg) tg.textContent=autoRun?i18nT("g_pause"):i18nT("g_play_status");
+  if(st) st.textContent = !autoRun ? i18nT("g_paused") : (autoCdI ? i18nT("g_autonext").replace("{n}",Math.max(0,autoCdLeft)) : i18nT("g_autorun"));
 }
 function autoStartQuestion(){   // 문항 표시 직후: 응답창 후 자동 공개 예약 + 자동 힌트
   autoStopTimers();
@@ -2809,7 +2902,7 @@ function syncGameScopeChips(){
     tb.textContent = "🧪 테스트 문제만 ("+testIds.size+")";
     tb.classList.toggle("active", sc.by==="test");
   }
-  const ind=document.getElementById("g-scope"); if(ind) ind.textContent="🎯 범위: "+scopeSummary();
+  const ind=document.getElementById("g-scope"); if(ind) ind.textContent=i18nT("g_scope_pre")+scopeSummary();
 }
 document.querySelectorAll('#view-game .chip[data-filter]').forEach(c=>{
   c.addEventListener("click",()=>{
@@ -3538,28 +3631,28 @@ const Room = (function(){
     if(!box) return;
     const ord=host.buzzes[pos]||[]; const wrong=host.buzzWrong[pos]||[];
     if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn";
-      turnEl.innerHTML = ord.length ? `🖐 <b>${escapeHtml(ord[0])}</b> 먼저! · 구두로 답을 듣고 아래에서 <b>정답/오답</b>을 눌러요` : (wrong.length? "🖐 다음 팀 대기중 · 아직 못 누른 팀이 「정답!」을 누르면 순서가 떠요" : "🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요"); }
+      turnEl.innerHTML = ord.length ? i18nT("hb_front").replace("{team}",escapeHtml(ord[0])) : (wrong.length? i18nT("hb_nextwait") : i18nT("hb_wait")); }
     box.style.display="block"; box.innerHTML="";
     // 방장(사회자) 전용 정답 표시 — 참가자가 구두로 부른 답이 맞는지 판정하는 데 사용(참가자 폰엔 안 보임).
     const song=songById(order[pos]);
     if(song){ const ans=document.createElement("div"); ans.className="buzz-answer";
-      ans.innerHTML=`🎵 정답 <b>${escapeHtml(song.name)}</b>${song.part?` <span>· ${escapeHtml(song.part)}</span>`:""}<br><span>사회자 전용 · 팀이 부른 답과 비교해 정답/오답 판정</span>`;
+      ans.innerHTML=`${i18nT("hb_answer_pre")} <b>${escapeHtml(song.name)}</b>${song.part?` <span>· ${escapeHtml(song.part)}</span>`:""}<br><span>${i18nT("hb_answer_note")}</span>`;
       box.appendChild(ans); }
     // 선착(맨 앞) 팀만 판정 대상 — 정답(득점·다음곡) / 오답(다음 팀에게)
     if(ord.length){
       const nm=ord[0];
       const row=document.createElement("div"); row.className="buzz-front";
       row.innerHTML=`<span class="bz-rank">⚡</span><span class="bz-name">${escapeHtml(nm)}</span>`;
-      const ok=document.createElement("button"); ok.type="button"; ok.className="buzz-ok"; ok.textContent="정답 ✓ · 다음 곡";
+      const ok=document.createElement("button"); ok.type="button"; ok.className="buzz-ok"; ok.textContent=i18nT("hb_ok");
       ok.addEventListener("click",()=>hostBuzzPick(nm)); row.appendChild(ok);
-      const no=document.createElement("button"); no.type="button"; no.className="buzz-no"; no.textContent="오답 ✗ · 다음 팀";
+      const no=document.createElement("button"); no.type="button"; no.className="buzz-no"; no.textContent=i18nT("hb_no");
       no.addEventListener("click",()=>hostBuzzWrong(nm)); row.appendChild(no);
       box.appendChild(row);
       const rest=ord.slice(1);
-      if(rest.length){ const q=document.createElement("div"); q.className="buzz-queue"; q.innerHTML="대기: "+rest.map((n,i)=>`${i+2}. ${escapeHtml(n)}`).join(" · "); box.appendChild(q); }
+      if(rest.length){ const q=document.createElement("div"); q.className="buzz-queue"; q.innerHTML=i18nT("hb_queue")+": "+rest.map((n,i)=>`${i+2}. ${escapeHtml(n)}`).join(" · "); box.appendChild(q); }
     }
-    if(wrong.length){ const w=document.createElement("div"); w.className="buzz-wrong-list"; w.innerHTML="✗ 오답: "+wrong.map(n=>escapeHtml(n)).join(" · "); box.appendChild(w); }
-    const none=document.createElement("button"); none.type="button"; none.className="buzz-none"; none.textContent="정답 공개 (아무도 못 맞힘)";
+    if(wrong.length){ const w=document.createElement("div"); w.className="buzz-wrong-list"; w.innerHTML="✗ "+i18nT("g_wrong")+": "+wrong.map(n=>escapeHtml(n)).join(" · "); box.appendChild(w); }
+    const none=document.createElement("button"); none.type="button"; none.className="buzz-none"; none.textContent=i18nT("hb_reveal_none");
     none.addEventListener("click",()=>hostBuzzPick(null)); box.appendChild(none);
   }
   function hostBar(){
@@ -3567,7 +3660,7 @@ const Room = (function(){
     const n=teamsJoined(); const sub=Object.keys(host.answers[pos]||{}).length;
     const conn=host.relay?"🌐":"💻";
     const top=n?" · "+rosterArr().sort((a,b)=>b.score-a.score).slice(0,3).map(t=>escapeHtml(t.name)+" "+t.score).join(" · "):"";
-    document.getElementById("rhb-info").textContent=`${conn} 참가 ${n} · 제출 ${sub}/${n}`+top;
+    document.getElementById("rhb-info").textContent=conn+" "+i18nT("rhb_live").replace(/\{n\}/g,n).replace("{sub}",sub)+top;
   }
   function hostIntermission(){   // 라운드 종료 — 방은 열어둔 채 참가자에게 대기 안내(다음 라운드로 이어감)
     if(!host.active) return;
@@ -3600,13 +3693,13 @@ const Room = (function(){
       else if(m.type==="buzzlock"){ if(m.qid===guest.qid){ const od=document.getElementById("rg-buzz-order"); if(od) od.innerHTML="🖐 "+(m.order||[]).map((nm,i)=>`${i+1}. ${escapeHtml(nm)}${nm===guest.team?" (나)":""}${i===0?" ⚡먼저":""}`).join("<br>"); } }
       else if(m.type==="buzzwrong"){ if(m.qid===guest.qid){
         const od=document.getElementById("rg-buzz-order"); if(od) od.innerHTML="🖐 "+(m.order||[]).map((nm,i)=>`${i+1}. ${escapeHtml(nm)}${nm===guest.team?" (나)":""}${i===0?" ⚡먼저":""}`).join("<br>");
-        if(m.name===guest.team){ guest.buzzed=true; const bz=document.getElementById("rg-buzz"); if(bz){ bz.disabled=true; bz.classList.add("buzzed"); bz.textContent="✗ 오답 · 다음 문제 대기"; } document.getElementById("rg-status").textContent="✗ 오답 · 다음 문제를 기다려요"; }
-        else { document.getElementById("rg-status").textContent="다음 팀에게 기회가 넘어왔어요 · 먼저 누른 팀부터!"; }
+        if(m.name===guest.team){ guest.buzzed=true; const bz=document.getElementById("rg-buzz"); if(bz){ bz.disabled=true; bz.classList.add("buzzed"); bz.textContent=i18nT("gp_buzz_wrong_btn"); } document.getElementById("rg-status").textContent=i18nT("gp_buzz_wrong_status"); }
+        else { document.getElementById("rg-status").textContent=i18nT("gp_buzz_passed"); }
       } }
       else if(m.type==="roster") guestRoster(m);
-      else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent="입장 완료 · 방장이 곧 시작합니다"; }
+      else if(m.type==="lobby"){ if(guest.team && guest.qid===null) document.getElementById("rg-status").textContent=i18nT("gp_lobby_wait"); }
       else if(m.type==="hint"){ if(m.qid===guest.qid) document.getElementById("rg-hints").innerHTML=(m.hints||[]).map(h=>`<span class="hint-chip"><span class="hv">${escapeHtml(h)}</span></span>`).join(""); }
-      else if(m.type==="intermission"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent="🏁 라운드 종료 · 방장이 다음 라운드를 준비 중이에요"; document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-timer").textContent=""; }
+      else if(m.type==="intermission"){ guestCdStop(); guestRoster(m); document.getElementById("rg-status").textContent=i18nT("gp_intermission"); document.getElementById("rg-mc").style.display="none"; document.getElementById("rg-timer").textContent=""; }
       else if(m.type==="ended"){ guestShowFinal(m); }
     });
     guestHello();
@@ -3649,7 +3742,7 @@ const Room = (function(){
     document.getElementById("rg-pick").style.display="none";
     document.getElementById("rg-play").style.display="block";
     guestResetPlayUI();
-    document.getElementById("rg-status").textContent="입장 완료 ("+escapeHtml(guest.team)+") · 방장을 기다리는 중…";
+    document.getElementById("rg-status").textContent=i18nT("gp_entered_wait").replace("{team}",escapeHtml(guest.team));
     document.getElementById("rg-video").innerHTML=randomMvEmbed();
   }
   function guestLeave(){ if(guest.tx) guest.tx.close(); guest.active=false; guest.team=null; }
@@ -3661,8 +3754,8 @@ const Room = (function(){
   function guestCountdown(sec){
     guestCdStop(); const el=document.getElementById("rg-timer");
     if(!sec||sec<=0){ if(el) el.textContent=""; return; }
-    guest.cdLeft=sec; if(el) el.textContent="⏱️ "+guest.cdLeft+"초";
-    guest.cdI=setInterval(()=>{ guest.cdLeft--; if(el) el.textContent="⏱️ "+Math.max(0,guest.cdLeft)+"초"; if(guest.cdLeft<=0) guestCdStop(); },1000);
+    guest.cdLeft=sec; if(el) el.textContent="⏱️ "+guest.cdLeft+i18nT("unit_sec");
+    guest.cdI=setInterval(()=>{ guest.cdLeft--; if(el) el.textContent="⏱️ "+Math.max(0,guest.cdLeft)+i18nT("unit_sec"); if(guest.cdLeft<=0) guestCdStop(); },1000);
   }
   function guestState(m){
     if((m.round||0)!==(guest.round||0)){ guest.round=m.round||0; guest.revealedQid=null; guest.qid=null; }   // 새 라운드: 문항 가드 초기화
@@ -3670,15 +3763,15 @@ const Room = (function(){
     const isNew = m.qid!==guest.qid;
     if(isNew){ guest.qid=m.qid; guest.answered=false; document.getElementById("rg-video").innerHTML=""; }
     guest.lyric=m.lyric||""; guest.lang=m.lang||""; guest.read=m.read||"";   // 낭독(guestSpeak)용으로는 보관
-    document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 정답을 고르세요`;
+    document.getElementById("rg-status").textContent=i18nT("gp_pick_q").replace("{i}",m.index).replace("{t}",m.total);
     // 방장이 '가사 가리기'면 참가자 화면에도 텍스트를 감춤(듣기로만 맞히기) — 낭독은 그대로 재생
-    document.getElementById("rg-lyric").textContent=m.hideLyrics ? "🙈 가사 가리기 · ▶ 듣기로 맞혀보세요" : (m.lyric||"");
+    document.getElementById("rg-lyric").textContent=m.hideLyrics ? i18nT("gp_hidelyric") : (m.lyric||"");
     if(isNew){ guest.buzzed=false; guestCountdown(m.sec||0); if(!m.quizOnly){ guestSpeak(); const sp=document.getElementById("rg-speak"); if(sp) sp.classList.add("cue"); } document.getElementById("rg-hints").innerHTML=""; }   // 새 문항: 폰 자동 낭독 시도(모바일 제약 대비 ▶듣기 버튼 강조)+카운트다운, 힌트 초기화
     const box=document.getElementById("rg-mc"); box.innerHTML="";
     if(m.buzzer){   // 부저 모드(4지선다 OFF): 큰 「정답!」 버튼 → 선착순
       box.style.display="block";
-      document.getElementById("rg-status").textContent=`문항 ${m.index} / ${m.total} · 먼저 「정답!」을 누르세요`;
-      const b=document.createElement("button"); b.id="rg-buzz"; b.className="rg-buzz"; b.type="button"; b.textContent="🖐 정답!"; b.disabled=!!guest.buzzed;
+      document.getElementById("rg-status").textContent=i18nT("gp_buzz_q").replace("{i}",m.index).replace("{t}",m.total);
+      const b=document.createElement("button"); b.id="rg-buzz"; b.className="rg-buzz"; b.type="button"; b.textContent=i18nT("gp_buzz_btn"); b.disabled=!!guest.buzzed;
       b.addEventListener("click",guestBuzz); box.appendChild(b);
       const od=document.createElement("div"); od.id="rg-buzz-order"; od.className="rg-buzz-order"; box.appendChild(od);
     } else {
@@ -3689,11 +3782,11 @@ const Room = (function(){
   }
   function guestBuzz(){
     if(guest.buzzed) return; guest.buzzed=true;
-    const b=document.getElementById("rg-buzz"); if(b){ b.disabled=true; b.classList.add("buzzed"); b.textContent="🖐 제출 완료!"; }
+    const b=document.getElementById("rg-buzz"); if(b){ b.disabled=true; b.classList.add("buzzed"); b.textContent=i18nT("gp_buzz_done"); }
     const qid=guest.qid, rnd=guest.round||0;
     const send=()=>{ rlog("guest buzz:", "team="+guest.team, "qid="+qid, "round="+rnd); if(guest.tx) guest.tx.send({type:"buzz", qid:qid, round:rnd, name:guest.team}); };
     send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 900);
-    document.getElementById("rg-status").textContent="🖐 제출! 방장 판정을 기다리는 중…";
+    document.getElementById("rg-status").textContent=i18nT("gp_buzz_wait");
   }
   function guestAnswer(i){
     if(guest.answered) return; guest.answered=true;
@@ -3701,7 +3794,7 @@ const Room = (function(){
     const qid=guest.qid, rnd=guest.round||0;   // 스냅샷 — 재전송이 다음 라운드(같은 qid)로 새지 않도록
     const send=()=>{ rlog("guest send answer:", "team="+guest.team, "pick="+i, "qid="+qid, "round="+rnd); guest.tx.send({type:"answer", qid:qid, round:rnd, name:guest.team, pick:i}); };
     send(); let t=0; const iv=setInterval(()=>{ if(t++>=3){ clearInterval(iv); return; } send(); }, 1200);
-    document.getElementById("rg-status").textContent="제출 완료 · 결과를 기다리는 중…";
+    document.getElementById("rg-status").textContent=i18nT("gp_answered");
   }
   function guestReveal(m){
     if((m.round||0)<(guest.round||0)) return;   // 이전 라운드의 잔여(retained) 공개는 무시
@@ -3711,7 +3804,7 @@ const Room = (function(){
     guestCdStop(); document.getElementById("rg-timer").textContent="";
     const btns=[...document.querySelectorAll("#rg-mc .mc-opt")];
     btns.forEach((b,idx)=>{ b.disabled=true; if(idx===m.correctIdx) b.classList.add("correct"); });
-    document.getElementById("rg-status").textContent=`정답: ${m.answer}`+(m.part?` · ${m.part}`:"")+(m.winner?` · 🏆 ${m.winner}`:"");
+    document.getElementById("rg-status").textContent=i18nT("gp_answer_label")+m.answer+(m.part?` · ${m.part}`:"")+(m.winner?` · 🏆 ${m.winner}`:"");
     if(m.mv){ const id=parseYouTube(m.mv); if(id){ const st=parseTime(m.time)||0; document.getElementById("rg-video").innerHTML=`<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}?start=${st}&autoplay=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; } }
     guestRoster(m);
   }

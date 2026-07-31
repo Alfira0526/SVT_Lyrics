@@ -703,9 +703,9 @@
 <div id="update-modal" style="display:none">
   <div class="guide-card" style="max-width:400px">
     <button type="button" id="update-close" class="guide-x" aria-label="닫기">✕</button>
-    <h2 class="guide-title" id="update-title">🎉 새로운 소식</h2>
+    <h2 class="guide-title" id="update-title" data-i18n="up_title">🎉 새로운 소식</h2>
     <div id="update-body"></div>
-    <button type="button" class="intro-start" id="update-ok" style="width:100%;margin-top:12px">확인</button>
+    <button type="button" class="intro-start" id="update-ok" style="width:100%;margin-top:12px" data-i18n="up_ok">확인</button>
   </div>
 </div>
 
@@ -1532,6 +1532,16 @@ Object.assign(I18N.ko, {
   rk_done:"✅ <b>{nm}</b> · {rec} 등록!", rk_view:"랭킹 보기",
   rk_scope_global:"🌐 전 세계 랭킹 · 상위 20", rk_scope_local:"💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)",
   io_newbest:"최고기록 경신!", io_gameover:"게임 오버", io_inarow:"곡 연속", io_best:"🏆 최고기록 {n}곡", io_retry:"🔄 다시 도전", io_quit:"🏠 그만두기",
+  up_title:"🎉 새로운 소식", up_news:"새로운 소식", up_ok:"확인",
+  t_correct:"✔ 정답!", t_wrong:"✘ 오답", t_correct_m:"✔ 정답 처리", t_wrong_m:"✘ 오답 처리",
+  t_timeout:"⏰ 시간 종료! 오답 처리", t_skipwarn:"⏭ 안 고르고 넘기면 오답이에요", t_suddendeath:"🔥 동점! 서든데스 1문항",
+  t_infquit:"지금까지 {n}연속! 기록을 남기고 종료할까요?", t_endconfirm:"게임을 종료하고 결과를 볼까요?",
+  t_homeconfirm:"처음 화면으로 돌아갈까요? (진행 중인 게임은 중단됩니다)", t_restartconfirm:"채점 기록·팀 점수를 지우고 처음부터 다시 시작할까요?",
+  t_restart:"처음부터 다시 시작", t_reshuffle:"🔀 순서를 섞었습니다", t_modechange:"모드가 바뀌어 새로 시작합니다",
+  t_replay:"다시 시작합니다", t_nextround:"🆕 새 문제로 이어갑니다", t_videoreload:"영상을 다시 불러옵니다",
+  t_norenew:"남은 새 문제가 없어 전체에서 다시 뽑았어요", t_teamrandom:"🎲 팀 이름을 랜덤으로 지었어요", t_teammin:"최소 1개 팀이 필요합니다",
+  t_notts:"이 브라우저는 음성 낭독을 지원하지 않습니다", t_nolyric:"입력된 가사가 없습니다", t_novoice:"이 기기엔 맞는 음성이 없어 낭독 대신 가사를 보여드려요 🙂",
+  t_copied:"📋 복사됨 · 트위터에 붙여넣으세요", t_ig:"📸 결과 이미지 저장 + 캡션 복사됨 · 인스타 스토리에 올려보세요!", t_copiedclip:"클립보드에 복사했습니다",
   rl_title:"참가자 대기", rl_sub:"모두 들어오면 게임을 시작하세요", rl_conn:"연결 확인 중…",
   rl_qrcap:"📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요",
   rl_hostjoin:'🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span>',
@@ -1596,6 +1606,16 @@ Object.assign(I18N.en, {
   rk_done:"✅ <b>{nm}</b> · {rec} submitted!", rk_view:"View ranking",
   rk_scope_global:"🌐 Global ranking · top 20", rk_scope_local:"💻 This device · top 20 (global coming soon)",
   io_newbest:"New best!", io_gameover:"Game over", io_inarow:" in a row", io_best:"🏆 Best {n}", io_retry:"🔄 Try again", io_quit:"🏠 Quit",
+  up_title:"🎉 What's new", up_news:"What's new", up_ok:"OK",
+  t_correct:"✔ Correct!", t_wrong:"✘ Wrong", t_correct_m:"✔ Marked correct", t_wrong_m:"✘ Marked wrong",
+  t_timeout:"⏰ Time's up! Marked wrong", t_skipwarn:"⏭ Skipping without picking counts as wrong", t_suddendeath:"🔥 Tie! Sudden-death question",
+  t_infquit:"{n} in a row so far! Save the record and quit?", t_endconfirm:"End the game and see results?",
+  t_homeconfirm:"Return to the home screen? (the current game will stop)", t_restartconfirm:"Clear scores and team points and restart from the beginning?",
+  t_restart:"Restarted from the beginning", t_reshuffle:"🔀 Order shuffled", t_modechange:"Mode changed — restarting",
+  t_replay:"Restarting", t_nextround:"🆕 Continuing with new songs", t_videoreload:"Reloading the video",
+  t_norenew:"No new songs left — redrew from all", t_teamrandom:"🎲 Team names randomized", t_teammin:"At least 1 team is required",
+  t_notts:"This browser doesn't support voice read-aloud", t_nolyric:"No lyrics entered", t_novoice:"No matching voice on this device — showing lyrics instead 🙂",
+  t_copied:"📋 Copied · paste into Twitter", t_ig:"📸 Result image saved + caption copied · post it to your IG Story!", t_copiedclip:"Copied to clipboard",
   rl_title:"Waiting for players", rl_sub:"Start the game once everyone's in", rl_conn:"Checking connection…",
   rl_qrcap:"📷 Scan with a phone camera to jump straight to the join screen",
   rl_hostjoin:'🖥 Join in too (host) <span style="color:var(--muted);font-size:12px;font-weight:400">· pick a team and play</span>',
@@ -2235,7 +2255,7 @@ function pickMc(i){
   if(soloStartMs && !soloEndMs && Object.keys(marks).length>=order.length) soloEndMs=Date.now();   // 마지막 문항 응답 시각(솔로 소요시간)
   const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
-  toast(ok?"✔ 정답!":"✘ 오답");
+  toast(ok?i18nT("t_correct"):i18nT("t_wrong"));
   showAnswer();
   if(isInfinite() && !ok) infiniteGameOver(survived);   // 서바이벌: 한 번 틀리면 종료
 }
@@ -2361,7 +2381,7 @@ function startNewGame(shuffle){
 function startNextRound(){
   order.forEach(id=>playedIds.add(id));
   buildOrder(true, playedIds);
-  if(order.length===0){ playedIds=new Set(); toast("남은 새 문제가 없어 전체에서 다시 뽑았어요"); buildOrder(true); }
+  if(order.length===0){ playedIds=new Set(); toast(i18nT("t_norenew")); buildOrder(true); }
   marks={}; pos=0; gameRecorded=false; streak=0; sessionMaxStreak=0; scoredQ=new Set(); updateStreakBadge();
   if(Room.host.active) Room.hostNextRound();   // 라운드 번호↑·답안 초기화 → renderGame이 새 상태 전송(참가자 동반 이동)
   renderGame();
@@ -2467,7 +2487,7 @@ function renderVideo(){
   }
 }
 let videoReloadNonce=0;
-function reloadVideo(){ videoReloadNonce++; renderVideo(); toast("영상을 다시 불러옵니다"); }
+function reloadVideo(){ videoReloadNonce++; renderVideo(); toast(i18nT("t_videoreload")); }
 
 function showAnswer(){
   if(order.length===0) return;
@@ -2701,15 +2721,15 @@ function ttsPlan(c){
   return "none";
 }
 function speak(){
-  if(!("speechSynthesis" in window)){ toast("이 브라우저는 음성 낭독을 지원하지 않습니다"); return; }
+  if(!("speechSynthesis" in window)){ toast(i18nT("t_notts")); return; }
   if(order.length===0) return;
   const c=qc(order[pos]); const text=(c.lyrics||"").trim();
-  if(!text){ toast("입력된 가사가 없습니다"); return; }
+  if(!text){ toast(i18nT("t_nolyric")); return; }
   if(ttsPlan(c)==="none"){
     // 낭독 수단 없음(예: 해외 기기에 한국어 음성 없음) → 무음 대신 가사 노출 + 안내
     if(els.lyricbox) els.lyricbox.classList.remove("hidden-mode");
     if(els.hidenote) els.hidenote.style.display="none";
-    if(!speak._noVoiceToasted){ toast("이 기기엔 맞는 음성이 없어 낭독 대신 가사를 보여드려요 🙂"); speak._noVoiceToasted=true; }
+    if(!speak._noVoiceToasted){ toast(i18nT("t_novoice")); speak._noVoiceToasted=true; }
     return;
   }
   stopTTS();
@@ -2739,7 +2759,7 @@ function startTimer(){
     els.timerFill.style.width=pct+"%";
     els.timerFill.className = timerLeft<=3?"danger":(timerLeft<=Math.ceil(config.timerSec/2)?"warn":"");
     if(timerLeft<=3 && timerLeft>0) sfxTick();   // 카운트다운 긴장(3·2·1)
-    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료! 오답 처리");
+    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast(i18nT("t_timeout"));
       if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()){ showAnswer(); }
       else if(isInfinite() && !answerShown()){ marks[order[pos]]="wrong"; updateCounters(); const survived=streak; bumpStreak(false); showAnswer(); infiniteGameOver(survived); }
       else if(!config.onlineRoom && !answerShown()){   // 솔로/오프라인 팀전: 시간 종료 = 자동 오답 + 진행
@@ -2821,7 +2841,7 @@ function mark(kind){
   if(soloStartMs && !soloEndMs && Object.keys(marks).length>=order.length) soloEndMs=Date.now();   // 솔로 주관식 소요시간 종료 기록(4지선다와 동일)
   const survived=streak;   // 이번 오답 직전까지의 연속(무한 서바이벌 기록)
   bumpStreak(ok); if(ok){ sfxCorrect(); celebrateBurst(); } else sfxWrong();
-  toast(ok?"✔ 정답 처리":"✘ 오답 처리");
+  toast(ok?i18nT("t_correct_m"):i18nT("t_wrong_m"));
   if(isInfinite() && !ok){ showAnswer(); infiniteGameOver(survived); return; }   // 무한: 주관식 오답도 즉시 종료(4지선다 경로와 통일)
   setTimeout(next,350);
 }
@@ -2868,7 +2888,7 @@ function battleVictory(){
   const ranked=names.map((nm,i)=>({nm,score:teamScores[i]||0,i})).sort((a,b)=>b.score-a.score);
   const isTie = ranked.length>1 && ranked[0].score===ranked[1].score;
   if(isTie && ranked[0].score>0){   // 동점 → 서든데스 한 문항 더
-    toast("🔥 동점! 서든데스 1문항"); if(pos>=order.length-1) refillInfinite(); pos++; renderGame(); return;
+    toast(i18nT("t_suddendeath")); if(pos>=order.length-1) refillInfinite(); pos++; renderGame(); return;
   }
   stopTTS(); stopTimer(); if(els.video) els.video.innerHTML="";
   if(!gameRecorded && recordStats()) gameRecorded=true;   // 모드별 이용율·정답률 적재
@@ -2921,7 +2941,7 @@ document.getElementById("g-next").addEventListener("click",()=>{
   // 안 고르고 넘기기: 솔로=오답 처리(20문제 완주 유지·랭킹 가능) · 무한=포기로 종료 · 온라인/팀전은 관여 안 함
   if(order.length && !answerShown() && !marks[order[pos]] && !config.onlineRoom && !config.teamMode){
     if(isInfinite()){ marks[order[pos]]="wrong"; updateCounters(); const s=streak; bumpStreak(false); showAnswer(); infiniteGameOver(s); return; }
-    marks[order[pos]]="wrong"; updateCounters(); bumpStreak(false); toast("⏭ 안 고르고 넘기면 오답이에요");
+    marks[order[pos]]="wrong"; updateCounters(); bumpStreak(false); toast(i18nT("t_skipwarn"));
   }
   next();
 });
@@ -2956,19 +2976,19 @@ document.getElementById("g-test-only").addEventListener("click",()=>{
   config.scope={by:"test",val:"1"}; saveState(); syncGameScopeChips(); buildOrder(true); renderGame();
   toast("🧪 테스트용 문제 "+testIds.size+"곡만 출제합니다");
 });
-document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast("🔀 순서를 섞었습니다"); });
+document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast(i18nT("t_reshuffle")); });
 document.getElementById("g-restart").addEventListener("click",()=>{
-  if(!confirm("채점 기록·팀 점수를 지우고 처음부터 다시 시작할까요?")) return;
-  startNewGame(true); renderGame(); toast("처음부터 다시 시작");
+  if(!confirm(i18nT("t_restartconfirm"))) return;
+  startNewGame(true); renderGame(); toast(i18nT("t_restart"));
 });
 function stopEverything(){ autoRun=false; autoStopTimers(); stopTTS(); stopTimer(); }
 document.getElementById("g-end").addEventListener("click",()=>{
   if(isInfinite() && gameActive && !answerShown()){   // 무한: 자발적 종료도 연속기록 남기기
     const s=streak;
-    if(!confirm(`지금까지 ${s}연속! 기록을 남기고 종료할까요?`)) return;
+    if(!confirm(i18nT("t_infquit").replace("{n}",s))) return;
     stopEverything(); infiniteGameOver(s); return;
   }
-  if(!confirm("게임을 종료하고 결과를 볼까요?")) return;
+  if(!confirm(i18nT("t_endconfirm"))) return;
   stopEverything();
   if(Room.host.active) Room.hostEnd();   // 온라인 방: 참가자에게 종료 알림 후 방 닫기
   document.querySelector('nav.tabs button[data-view="result"]').click();
@@ -2981,7 +3001,7 @@ function goHome(){
   window.scrollTo({top:0});
 }
 document.getElementById("g-home").addEventListener("click",()=>{
-  if(gameActive && !confirm("처음 화면으로 돌아갈까요? (진행 중인 게임은 중단됩니다)")) return;
+  if(gameActive && !confirm(i18nT("t_homeconfirm"))) return;
   goHome();
 });
 document.getElementById("r-home").addEventListener("click",goHome);   // 결과 화면 → 처음으로(게임 이미 종료 상태라 확인 없이 이동)
@@ -3102,7 +3122,7 @@ function renderTeamEditor(){
   });
   ed.querySelectorAll("[data-team]").forEach(inp=>inp.addEventListener("input",()=>{ config.teamNames[inp.dataset.team]=inp.value; saveState(); }));
   ed.querySelectorAll("[data-teamdel]").forEach(b=>b.addEventListener("click",()=>{
-    if(config.teamNames.length<=1){ toast("최소 1개 팀이 필요합니다"); return; }
+    if(config.teamNames.length<=1){ toast(i18nT("t_teammin")); return; }
     config.teamNames.splice(b.dataset.teamdel,1); saveState(); renderTeamEditor();
   }));
   renderTeamCount();   // 이름 편집기 변경(추가/삭제) 시 팀 수 스테퍼도 동기화
@@ -3113,14 +3133,14 @@ document.getElementById("c-team-add").addEventListener("click",()=>{ config.team
 document.getElementById("c-team-random").addEventListener("click",()=>{
   const pool=TEAM_NAME_POOL.slice(); shuffleArr(pool);
   config.teamNames = config.teamNames.map((_,i)=> pool[i] || ("팀 "+(i+1)));
-  saveState(); renderTeamEditor(); toast("🎲 팀 이름을 랜덤으로 지었어요");
+  saveState(); renderTeamEditor(); toast(i18nT("t_teamrandom"));
 });
 document.getElementById("c-hide").addEventListener("change",e=>{ config.hideLyrics=e.target.checked; saveState(); });
 document.getElementById("c-sfx").addEventListener("change",e=>{ config.sfx=e.target.checked; saveState(); if(config.sfx) audioCtx(); });
 document.getElementById("timer-seg").addEventListener("click",e=>{ const b=e.target.closest(".seg-btn"); if(!b) return; const s=parseInt(b.dataset.sec,10)||0; if(s<=0){ config.timerOn=false; } else { config.timerOn=true; config.timerSec=s; } saveState(); renderTimerSeg(); });
 // 팀전/4지선다를 게임 '도중' 바꾸면 이전(솔로 등) 정답 흔적(marks)과 팀 점수(teamScores)가 어긋나
 // "정답 N인데 팀 점수 0"처럼 보이는 문제가 생김 → 진행 중이면 새로 시작해 두 카운터 기준을 일치시킴.
-function modeToggleReset(){ if(gameActive && order.length){ startNewGame(true); renderGame(); toast("모드가 바뀌어 새로 시작합니다"); } }
+function modeToggleReset(){ if(gameActive && order.length){ startNewGame(true); renderGame(); toast(i18nT("t_modechange")); } }
 document.getElementById("c-team").addEventListener("change",e=>{ config.teamMode=e.target.checked; saveState(); modeToggleReset(); renderSetup(); });
 document.getElementById("c-mc").addEventListener("change",e=>{ config.mc=e.target.checked; saveState(); modeToggleReset(); });
 document.getElementById("c-teamblind").addEventListener("change",e=>{ config.teamBlind=e.target.checked; saveState(); });
@@ -3145,7 +3165,7 @@ document.getElementById("dlg-json-ok").addEventListener("click",()=>{
   if(dlgJson._mode==="export"){
     ta.select(); try{ document.execCommand("copy"); }catch(e){}
     try{ navigator.clipboard&&navigator.clipboard.writeText(ta.value); }catch(e){}
-    toast("클립보드에 복사했습니다"); dlgJson.close(); return;
+    toast(i18nT("t_copiedclip")); dlgJson.close(); return;
   }
   try{
     const obj=JSON.parse(ta.value);
@@ -3261,12 +3281,12 @@ document.getElementById("r-restart").addEventListener("click",()=>{
     autoRun=true; Room.hostNextRound();
   }
   document.querySelector('nav.tabs button[data-view="game"]').click();
-  toast("다시 시작합니다");
+  toast(i18nT("t_replay"));
 });
 document.getElementById("r-next-round").addEventListener("click",()=>{
   gameActive=true; autoRun=!!(config.autoHost||config.onlineRoom);
   startNextRound();
-  toast("🆕 새 문제로 이어갑니다");
+  toast(i18nT("t_nextround"));
 });
 
 /* ===================== 결과 공유 (트위터·인스타 스토리·카카오톡) ===================== */
@@ -3291,7 +3311,7 @@ function shareTwitter(){
       +"&url="+encodeURIComponent(SERVICE_URL)
       +"&hashtags="+encodeURIComponent(SHARE_TAGS.join(","));
     window.open(u,"_blank","noopener,noreferrer");
-  }catch(e){ copyText(shareFull()).then(()=>toast("📋 복사됨 · 트위터에 붙여넣으세요")); }
+  }catch(e){ copyText(shareFull()).then(()=>toast(i18nT("t_copied"))); }
 }
 async function shareKakao(){
   // 카카오 공식 공유는 JS SDK+앱키가 필요(단일 파일·무의존 원칙과 충돌)하므로
@@ -3346,7 +3366,7 @@ function shareInstagram(){
     // 폴백: 이미지 저장 + 캡션 복사(스토리에 직접 업로드 안내)
     try{ if(blob){ const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="svt-quiz-result.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); } }catch(e){}
     await copyText(cap);
-    toast("📸 결과 이미지 저장 + 캡션 복사됨 · 인스타 스토리에 올려보세요!");
+    toast(i18nT("t_ig"));
   });
 }
 document.getElementById("sh-tw").addEventListener("click",shareTwitter);
@@ -4028,12 +4048,18 @@ const Room = (function(){
   // ── 업데이트 알림 팝업 (새로운 소식) — 재방문자에게 신곡/기능 공지 ─────────
   // 데이터 주도: UPDATES 배열에 항목만 추가하면 공지 완료. 최신이 맨 앞.
   const UPDATES=[
-    { v:"2026-07-31", date:"2026-07-31", title:"새로워진 소식",
+    { v:"2026-07-31", date:"2026-07-31", title:"새로워진 소식", title_en:"What's new",
       items:[
         "🎮 새 '모드 시작' 화면 — 고르면 필요한 것만 정하고 바로 시작",
         "🏆 랭킹 개편 — 혼자는 20문제 정답 수·최속으로 겨뤄요",
         "🔎 글자 크게(접근성) · ⌨️ A~D·1~4 단축키",
-        "🎧 더 매끄러운 다국어 낭독",
+        "🌍 영어 지원 시작 — 랜딩부터 결과·랭킹까지",
+      ],
+      items_en:[
+        "🎮 New 'Start' screen — pick a mode, set only what matters, and go",
+        "🏆 Revamped ranking — Solo competes by correct count & fastest time over 20",
+        "🔎 Large text (a11y) · ⌨️ A–D / 1–4 shortcuts",
+        "🌍 English support — from landing to results & ranking",
       ] },
   ];
   const UPDATE_VERSION=UPDATES.length?UPDATES[0].v:null;
@@ -4048,8 +4074,10 @@ const Room = (function(){
   function openUpdate(){
     const m=document.getElementById("update-modal"); if(!m || !UPDATES.length) return;
     const u=UPDATES[0]; const body=document.getElementById("update-body");
-    document.getElementById("update-title").textContent="🎉 "+(u.title||"새로운 소식");
-    if(body) body.innerHTML=`<div class="up-date">${escapeHtml(u.date||"")}</div><ul class="up-list">`+u.items.map(it=>`<li>${escapeHtml(it)}</li>`).join("")+`</ul>`;
+    const title=(LANG==="en"?(u.title_en||u.title):u.title)||i18nT("up_news");
+    const items=(LANG==="en"?(u.items_en||u.items):u.items)||[];
+    document.getElementById("update-title").textContent="🎉 "+title;
+    if(body) body.innerHTML=`<div class="up-date">${escapeHtml(u.date||"")}</div><ul class="up-list">`+items.map(it=>`<li>${escapeHtml(it)}</li>`).join("")+`</ul>`;
     m.style.display="flex"; m.scrollTop=0;
   }
   function closeUpdate(){ const m=document.getElementById("update-modal"); if(m) m.style.display="none"; markUpdateSeen(); }

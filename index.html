@@ -2219,13 +2219,23 @@ function segmentByLang(text){
   }
   return out;
 }
+// 짧은 이질 언어 조각(예: oh·yeah 같은 추임새)은 인접 한국어에 흡수해 음성 전환 횟수를 줄인다 → 전환 로딩 완화.
+// 공백 없는 MAXLEN 이하 단일 비한국어 토큰만 대상(긴 영어 구절은 영어 음성 유지).
+function reduceSwitches(segs){
+  const MAXLEN=4;
+  const relabeled=(segs||[]).map(s=>{ const t=(s.text||"").trim();
+    return (s.lang!=="ko" && t.length && t.length<=MAXLEN && !/\s/.test(t)) ? {lang:"ko", text:s.text} : s; });
+  const out=[];
+  for(const s of relabeled){ if(out.length && out[out.length-1].lang===s.lang) out[out.length-1].text+=s.text; else out.push({lang:s.lang, text:s.text}); }
+  return out;
+}
 // 가사 낭독: 명시 lang이 있으면 통째로, 없으면 언어 구간별로 각 음성으로 순차 재생(큐).
 let ttsToken=0;   // 정지·문항전환 시 진행 중 낭독 체인을 무효화하는 세대 토큰
 // 언어 구간을 한 번에 큐잉하지 않고 onend로 하나씩 이어 재생 — 크롬의 다중 큐 누락/취소 버그 회피.
 function speakLyric(text, override, rate, readFallback){
   if(!("speechSynthesis" in window)) return;
   if(!(koVoice||enVoice||zhVoice||jaVoice)) pickVoice();   // 음성 목록 지연 로딩 대비 재조회
-  let segs=(override && LANG_BCP[override]) ? [{lang:override, text}] : segmentByLang(text);
+  let segs=(override && LANG_BCP[override]) ? [{lang:override, text}] : reduceSwitches(segmentByLang(text));
   // 원어(영/중/일) 음성이 이 기기에 없으면 → 한글 독음(read)을 한국어 음성으로 대체 낭독.
   // 음원이 아예 안 나오고 '팩 설치'만 요구하면 이탈하므로, 항상 소리는 나게 한다.
   const missingVoice = segs.some(s=> s.lang!=="ko" && !voiceForLang(s.lang));

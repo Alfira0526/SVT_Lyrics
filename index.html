@@ -3666,7 +3666,9 @@ const Room = (function(){
     else if(m==="online-mc"){ config.mode="normal"; config.onlineRoom=true; config.mc=true; config.autoHost=true; config.teamMode=(s.comp!=="solo"); config.teamBlind=true; }
     else if(m==="online-buzzer"){ config.mode="normal"; config.onlineRoom=true; config.mc=false; config.autoHost=true; config.teamMode=(s.comp!=="solo"); }
     saveState();
-    closeModeStart(); renderSetup();
+    closeModeStart();
+    intro.classList.add("hide");   // ★ 랜딩 숨김(정상 흐름의 showSetup 역할) — 안 하면 게임 화면이 랜딩 뒤에 가려짐
+    renderSetup();
     document.getElementById("setup-start").click();   // 기존 시작 로직 재사용(온라인=방 로비)
   }
   (function(){

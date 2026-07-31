@@ -663,10 +663,10 @@
 <div id="rank-modal" style="display:none">
   <div class="guide-card">
     <button type="button" id="rank-close" class="guide-x" aria-label="닫기">✕</button>
-    <h2 class="guide-title">🏆 랭킹</h2>
+    <h2 class="guide-title" data-i18n="rk_modal_title">🏆 랭킹</h2>
     <div class="rk-tabs">
-      <button type="button" class="rk-tab active" data-board="solo_speed">🎧 혼자 (20문제 · 정답↑·최속)</button>
-      <button type="button" class="rk-tab" data-board="infinite">♾️ 무한 (연속)</button>
+      <button type="button" class="rk-tab active" data-board="solo_speed" data-i18n="rk_tab_solo">🎧 혼자 (20문제 · 정답↑·최속)</button>
+      <button type="button" class="rk-tab" data-board="infinite" data-i18n="rk_tab_inf">♾️ 무한 (연속)</button>
     </div>
     <div class="rk-scope" id="rank-scope"></div>
     <div class="rk-list" id="rank-list"></div>
@@ -1125,41 +1125,41 @@
   <section class="view" id="view-result">
     <div class="card">
       <div id="r-team-block" style="display:none">
-        <div class="result-hero"><div class="result-sub">팀전 결과</div></div>
+        <div class="result-hero"><div class="result-sub" data-i18n="r_team_result">팀전 결과</div></div>
         <div class="rank" id="r-rank"></div>
       </div>
       <div class="result-hero">
-        <div class="result-sub">채점 결과</div>
+        <div class="result-sub" data-i18n="r_score_label">채점 결과</div>
         <div class="result-score"><span id="r-correct">0</span>/<span id="r-answered">0</span></div>
         <div class="result-grade" id="r-grade">🐣</div>
         <div class="result-sub" id="r-grade-desc"></div>
       </div>
       <div class="stat-grid">
-        <div class="stat"><div class="v" id="r-rate">0%</div><div class="k">정답률</div></div>
-        <div class="stat"><div class="v" id="r-done">0</div><div class="k">진행 문항</div></div>
-        <div class="stat"><div class="v" id="r-total">40</div><div class="k">전체 문항</div></div>
+        <div class="stat"><div class="v" id="r-rate">0%</div><div class="k" data-i18n="r_rate">정답률</div></div>
+        <div class="stat"><div class="v" id="r-done">0</div><div class="k" data-i18n="r_done">진행 문항</div></div>
+        <div class="stat"><div class="v" id="r-total">40</div><div class="k" data-i18n="r_total">전체 문항</div></div>
       </div>
       <div class="controls">
-        <button class="btn btn-ghost" id="r-next-round" style="flex:1">🆕 새 문제로 이어가기</button>
-        <button class="btn btn-reveal" id="r-restart" style="flex:1">↻ 다시 시작</button>
+        <button class="btn btn-ghost" id="r-next-round" style="flex:1" data-i18n="r_nextround">🆕 새 문제로 이어가기</button>
+        <button class="btn btn-reveal" id="r-restart" style="flex:1" data-i18n="r_restart">↻ 다시 시작</button>
       </div>
       <div class="controls" style="margin-top:10px">
-        <button class="btn btn-ghost" id="r-home" style="flex:1">🏠 처음으로</button>
+        <button class="btn btn-ghost" id="r-home" style="flex:1" data-i18n="r_home">🏠 처음으로</button>
       </div>
       <div class="share-box">
-        <div class="share-title">📣 결과 공유하기</div>
+        <div class="share-title" data-i18n="r_share">📣 결과 공유하기</div>
         <div class="share-btns">
-          <button class="share-btn sh-tw" id="sh-tw" type="button">🐦 트위터</button>
-          <button class="share-btn sh-ig" id="sh-ig" type="button">📸 인스타 스토리</button>
-          <button class="share-btn sh-kko" id="sh-kko" type="button">💬 카카오톡</button>
-          <button class="share-btn sh-copy" id="sh-copy" type="button">🔗 문구·링크 복사</button>
+          <button class="share-btn sh-tw" id="sh-tw" type="button" data-i18n="sh_tw">🐦 트위터</button>
+          <button class="share-btn sh-ig" id="sh-ig" type="button" data-i18n="sh_ig">📸 인스타 스토리</button>
+          <button class="share-btn sh-kko" id="sh-kko" type="button" data-i18n="sh_kko">💬 카카오톡</button>
+          <button class="share-btn sh-copy" id="sh-copy" type="button" data-i18n="sh_copy">🔗 문구·링크 복사</button>
         </div>
       </div>
       <p class="hint" id="r-breakdown"></p>
       <p class="hint" id="r-recap" style="margin-top:2px;display:none"></p>
       <p class="hint" id="r-best" style="margin-top:2px;display:none"></p>
       <div id="r-rank-submit" style="display:none"></div>
-      <p class="hint" id="r-next-note" style="margin-top:2px">🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).</p>
+      <p class="hint" id="r-next-note" style="margin-top:2px" data-i18n-html="r_nextnote">🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).</p>
     </div>
   </section>
 </div>
@@ -1512,6 +1512,26 @@ Object.assign(I18N.ko, {
   hb_front:"🖐 <b>{team}</b> 먼저! · 구두로 답을 듣고 아래에서 <b>정답/오답</b>을 눌러요", hb_nextwait:"🖐 다음 팀 대기중 · 아직 못 누른 팀이 「정답!」을 누르면 순서가 떠요", hb_wait:"🖐 부저 대기중 · 참가자가 폰에서 「정답!」을 누르면 순서가 떠요",
   hb_answer_pre:"🎵 정답", hb_answer_note:"사회자 전용 · 팀이 부른 답과 비교해 정답/오답 판정", hb_ok:"정답 ✓ · 다음 곡", hb_no:"오답 ✗ · 다음 팀", hb_queue:"대기", hb_reveal_none:"정답 공개 (아무도 못 맞힘)",
   g_scope_pre:"🎯 범위: ", sc_all:"전체", sc_songs_unit:"곡", sc_test:"🧪 테스트 문제 {n}개",
+  r_team_result:"팀전 결과", r_score_label:"채점 결과", r_rate:"정답률", r_done:"진행 문항", r_total:"전체 문항",
+  r_nextround:"🆕 새 문제로 이어가기", r_restart:"↻ 다시 시작", r_home:"🏠 처음으로", r_share:"📣 결과 공유하기",
+  sh_tw:"🐦 트위터", sh_ig:"📸 인스타 스토리", sh_kko:"💬 카카오톡", sh_copy:"🔗 문구·링크 복사",
+  r_nextnote:"🆕 <b>새 문제로 이어가기</b>: 지금까지 나온 문항을 빼고 새로 뽑아 이어서 진행합니다(점수 유지).",
+  r_bd_pre:"난이도별 정답", r_missed:"🎧 이번에 놓친 곡", r_missed_more:" 외 {n}곡",
+  r_best_new:"🎉 <b>최고 기록 갱신!</b>", r_best_rate:"최고 정답률", r_best_streak:"최다 연속", r_best_toast:"🎉 최고 기록 갱신!",
+  r_rank_hint:"🏆 <b>20문제를 끝까지</b> 풀면 랭킹에 등록돼요", r_rank_thisrun:"이번 정답",
+  grade0_t:"아직 시작 전", grade0_d:"게임 탭에서 채점을 시작해 보세요",
+  grade95_t:"캐럿 인증", grade95_d:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬",
+  grade80_t:"코어 팬", grade80_d:"수록곡까지 꿰뚫은 진성 캐럿",
+  grade60_t:"찐팬", grade60_d:"웬만한 곡은 다 아는 실력",
+  grade40_t:"라이트 팬", grade40_d:"조금만 더 들으면 코어 팬까지 금방!",
+  grade0f_t:"입덕 준비생", grade0f_d:"이제부터 세븐틴 정주행 시작해볼까요?",
+  rk_modal_title:"🏆 랭킹", rk_tab_solo:"🎧 혼자 (20문제 · 정답↑·최속)", rk_tab_inf:"♾️ 무한 (연속)",
+  rk_anon:"익명캐럿", rk_empty:"아직 기록이 없어요 · 첫 주인공이 되어보세요!", rk_loading:"불러오는 중…",
+  rk_streak:"{n}곡 연속", rk_live:"🏆 실시간 랭킹", rk_solo_h:"🎧 혼자 · 20문제", rk_inf_h:"♾️ 무한 · 연속",
+  rk_submit_h:"🏆 이번 기록 <b>{rec}</b> · 랭킹 등록", rk_nick_ph:"닉네임(최대 12자)", rk_submit_btn:"등록",
+  rk_done:"✅ <b>{nm}</b> · {rec} 등록!", rk_view:"랭킹 보기",
+  rk_scope_global:"🌐 전 세계 랭킹 · 상위 20", rk_scope_local:"💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)",
+  io_newbest:"최고기록 경신!", io_gameover:"게임 오버", io_inarow:"곡 연속", io_best:"🏆 최고기록 {n}곡", io_retry:"🔄 다시 도전", io_quit:"🏠 그만두기",
   rl_title:"참가자 대기", rl_sub:"모두 들어오면 게임을 시작하세요", rl_conn:"연결 확인 중…",
   rl_qrcap:"📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요",
   rl_hostjoin:'🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span>',
@@ -1556,6 +1576,26 @@ Object.assign(I18N.en, {
   hb_front:"🖐 <b>{team}</b> first! · listen to their spoken answer, then tap <b>Correct/Wrong</b> below", hb_nextwait:"🖐 Waiting for the next team · a team that hasn't buzzed can hit 「Answer!」", hb_wait:"🖐 Waiting for buzzes · when a player hits 「Answer!」 on their phone, the order appears",
   hb_answer_pre:"🎵 Answer", hb_answer_note:"Host only · compare with the team's spoken answer to judge", hb_ok:"Correct ✓ · next song", hb_no:"Wrong ✗ · next team", hb_queue:"Queue", hb_reveal_none:"Reveal answer (nobody got it)",
   g_scope_pre:"🎯 Scope: ", sc_all:"All", sc_songs_unit:" songs", sc_test:"🧪 {n} test songs",
+  r_team_result:"Team result", r_score_label:"Your score", r_rate:"Accuracy", r_done:"Answered", r_total:"Total songs",
+  r_nextround:"🆕 Continue with new songs", r_restart:"↻ Restart", r_home:"🏠 Home", r_share:"📣 Share result",
+  sh_tw:"🐦 Twitter", sh_ig:"📸 Instagram Story", sh_kko:"💬 KakaoTalk", sh_copy:"🔗 Copy text·link",
+  r_nextnote:"🆕 <b>Continue with new songs</b>: draws fresh questions (excluding ones already seen) and continues (score kept).",
+  r_bd_pre:"Correct by difficulty", r_missed:"🎧 Missed this round", r_missed_more:" +{n} more",
+  r_best_new:"🎉 <b>New personal best!</b>", r_best_rate:"Best accuracy", r_best_streak:"Longest streak", r_best_toast:"🎉 New personal best!",
+  r_rank_hint:"🏆 Finish <b>all 20 questions</b> to join the ranking", r_rank_thisrun:"this run",
+  grade0_t:"Not started", grade0_d:"Start scoring from the Game tab",
+  grade95_t:"Certified CARAT", grade95_d:"Near-perfect · a core fan who's binged every album",
+  grade80_t:"Core fan", grade80_d:"A true CARAT who knows the deep cuts too",
+  grade60_t:"Real fan", grade60_d:"You know pretty much every song",
+  grade40_t:"Light fan", grade40_d:"A little more listening and you'll be a core fan!",
+  grade0f_t:"Fan-in-training", grade0f_d:"Time to start bingeing SEVENTEEN!",
+  rk_modal_title:"🏆 Ranking", rk_tab_solo:"🎧 Solo (20 Q · more correct·fastest)", rk_tab_inf:"♾️ Endless (streak)",
+  rk_anon:"Anon CARAT", rk_empty:"No records yet · be the first!", rk_loading:"Loading…",
+  rk_streak:"{n} in a row", rk_live:"🏆 Live ranking", rk_solo_h:"🎧 Solo · 20 Q", rk_inf_h:"♾️ Endless · streak",
+  rk_submit_h:"🏆 This run <b>{rec}</b> · submit to ranking", rk_nick_ph:"Nickname (max 12)", rk_submit_btn:"Submit",
+  rk_done:"✅ <b>{nm}</b> · {rec} submitted!", rk_view:"View ranking",
+  rk_scope_global:"🌐 Global ranking · top 20", rk_scope_local:"💻 This device · top 20 (global coming soon)",
+  io_newbest:"New best!", io_gameover:"Game over", io_inarow:" in a row", io_best:"🏆 Best {n}", io_retry:"🔄 Try again", io_quit:"🏠 Quit",
   rl_title:"Waiting for players", rl_sub:"Start the game once everyone's in", rl_conn:"Checking connection…",
   rl_qrcap:"📷 Scan with a phone camera to jump straight to the join screen",
   rl_hostjoin:'🖥 Join in too (host) <span style="color:var(--muted);font-size:12px;font-weight:400">· pick a team and play</span>',
@@ -1713,12 +1753,12 @@ function rankCmp(board){
 // 랭킹 행에 보여줄 기록 문자열(보드별)
 function rankValHTML(board, r){
   const val=parseInt(r.val,10)||0;
-  if(board==="solo_speed"){ const t=parseInt(r.t,10)||0; return `${val}곡${t?` · ${t}초`:""}`; }
-  if(board==="infinite") return `${val}곡 연속`;
+  if(board==="solo_speed"){ const t=parseInt(r.t,10)||0; return `${val}${i18nT("sc_songs_unit")}${t?` · ${t}${i18nT("unit_sec")}`:""}`; }
+  if(board==="infinite") return i18nT("rk_streak").replace("{n}",val);
   return `${val}`;
 }
 function saveRank(o){ try{ localStorage.setItem(RANK_KEY, JSON.stringify(o)); }catch(e){} }
-function rankCleanNick(s){ return (String(s||"").replace(/[<>]/g,"").trim().slice(0,12)) || "익명캐럿"; }
+function rankCleanNick(s){ return (String(s||"").replace(/[<>]/g,"").trim().slice(0,12)) || i18nT("rk_anon"); }
 // 글로벌 제출/조회(Firebase RTDB REST). 실패해도 게임엔 영향 없음(로컬은 이미 저장됨).
 function rankSubmitGlobal(board, entry){
   const base=rankBase(); if(!base) return Promise.resolve(false);
@@ -1742,13 +1782,13 @@ function rankRegister(board, val, nick, t){
 function rankRowsHTML(list, board){
   const medals=["🥇","🥈","🥉"];
   const top=(list||[]).slice().sort(rankCmp(board)).slice(0,20);
-  if(!top.length) return '<div class="rk-empty">아직 기록이 없어요 · 첫 주인공이 되어보세요!</div>';
-  return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="rk-val">${rankValHTML(board,r)}</span></div>`).join("");
+  if(!top.length) return '<div class="rk-empty">'+i18nT("rk_empty")+'</div>';
+  return top.map((r,i)=>`<div class="rk-row"><span class="rk-no">${i+1}</span><span class="rk-medal">${medals[i]||""}</span><span class="rk-nick">${escapeHtml(r.nick||i18nT("rk_anon"))}</span><span class="rk-val">${rankValHTML(board,r)}</span></div>`).join("");
 }
 function rankRenderInto(board, el){
   if(!el) return;
   const local=loadRank()[board]||[];
-  el.innerHTML='<div class="rk-loading">불러오는 중…</div>';
+  el.innerHTML='<div class="rk-loading">'+i18nT("rk_loading")+'</div>';
   if(rankGlobalOn()){
     rankFetchGlobal(board).then(g=>{ const src=g?g:local; el.innerHTML=rankRowsHTML(src, board); el.dataset.src=g?"global":"local"; })
       .catch(()=>{ el.innerHTML=rankRowsHTML(local, board); el.dataset.src="local"; });
@@ -1758,8 +1798,8 @@ function rankRenderInto(board, el){
 const RANK_PREVIEW_MIN=10;
 function rankMiniRows(list, board){
   const top=(list||[]).slice().sort(rankCmp(board)).slice(0,5);
-  return top.map((r,i)=>{ const val=parseInt(r.val,10)||0; const mv=board==="solo_speed"?`${val}곡`:`${val}`;
-    return `<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||"익명캐럿")}</span><span class="irp-val">${mv}</span></div>`; }).join("");
+  return top.map((r,i)=>{ const val=parseInt(r.val,10)||0; const mv=board==="solo_speed"?`${val}${i18nT("sc_songs_unit")}`:`${val}`;
+    return `<div class="irp-row"><span class="irp-no">${i+1}</span><span class="irp-nick">${escapeHtml(r.nick||i18nT("rk_anon"))}</span><span class="irp-val">${mv}</span></div>`; }).join("");
 }
 function renderIntroRankPreview(){
   const box=document.getElementById("intro-rank-preview"); if(!box) return;
@@ -1768,9 +1808,9 @@ function renderIntroRankPreview(){
     solo=solo||[]; infinite=infinite||[];
     const showSolo=solo.length>=RANK_PREVIEW_MIN, showInf=infinite.length>=RANK_PREVIEW_MIN;
     if(!showSolo && !showInf){ box.style.display="none"; return; }   // 아직 10개 미만이면 숨김
-    let html='<div class="irp-title"><span class="irp-live"></span>🏆 실시간 랭킹</div><div class="irp-grid">';
-    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">🎧 혼자 · 20문제</div>${rankMiniRows(solo, "solo_speed")}</div>`;
-    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">♾️ 무한 · 연속</div>${rankMiniRows(infinite, "infinite")}</div>`;
+    let html='<div class="irp-title"><span class="irp-live"></span>'+i18nT("rk_live")+'</div><div class="irp-grid">';
+    if(showSolo) html+=`<div class="irp-card"><div class="irp-h">${i18nT("rk_solo_h")}</div>${rankMiniRows(solo, "solo_speed")}</div>`;
+    if(showInf)  html+=`<div class="irp-card"><div class="irp-h">${i18nT("rk_inf_h")}</div>${rankMiniRows(infinite, "infinite")}</div>`;
     html+='</div>';
     box.innerHTML=html; box.style.display="";
   }).catch(()=>{ /* 네트워크 실패 시 조용히 숨김(게임엔 영향 없음) */ });
@@ -1780,12 +1820,12 @@ function renderIntroRankPreview(){
 function renderRankSubmit(el, board, val, t){
   if(!el) return; el.style.display=""; el.className="rk-submit";
   const nick=(loadRank().nick||"");
-  const rec = board==="solo_speed" ? `${val}곡${t?` · ${t}초`:""}` : (board==="infinite"?`${val}곡 연속`:`${val}`);
-  el.innerHTML=`<div class="rk-sub-h">🏆 이번 기록 <b>${rec}</b> · 랭킹 등록</div>
-    <div class="rk-sub-row"><input id="rk-nick-in" maxlength="12" placeholder="닉네임(최대 12자)" value="${escapeHtml(nick)}"/><button type="button" id="rk-sub-go">등록</button></div>`;
+  const rec = board==="solo_speed" ? `${val}${i18nT("sc_songs_unit")}${t?` · ${t}${i18nT("unit_sec")}`:""}` : (board==="infinite"?i18nT("rk_streak").replace("{n}",val):`${val}`);
+  el.innerHTML=`<div class="rk-sub-h">${i18nT("rk_submit_h").replace("{rec}",rec)}</div>
+    <div class="rk-sub-row"><input id="rk-nick-in" maxlength="12" placeholder="${i18nT("rk_nick_ph")}" value="${escapeHtml(nick)}"/><button type="button" id="rk-sub-go">${i18nT("rk_submit_btn")}</button></div>`;
   const go=el.querySelector("#rk-sub-go"); const inp=el.querySelector("#rk-nick-in");
   const submit=()=>{ const nm=rankCleanNick(inp.value); rankRegister(board, val, nm, t);
-    el.innerHTML=`<div class="rk-done">✅ <b>${escapeHtml(nm)}</b> · ${rec} 등록! <button type="button" class="btn btn-ghost btn-sm" id="rk-view" style="margin-left:6px">랭킹 보기</button></div>`;
+    el.innerHTML=`<div class="rk-done">${i18nT("rk_done").replace("{nm}",escapeHtml(nm)).replace("{rec}",rec)} <button type="button" class="btn btn-ghost btn-sm" id="rk-view" style="margin-left:6px">${i18nT("rk_view")}</button></div>`;
     const v=el.querySelector("#rk-view"); if(v) v.addEventListener("click",()=>{ if(window.openRankModal) window.openRankModal(board); }); };
   if(go) go.addEventListener("click",submit);
   if(inp) inp.addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
@@ -2806,14 +2846,14 @@ function infiniteGameOver(n){
   if(!ov){ ov=document.createElement("div"); ov.id="infinite-over"; ov.className="io-overlay"; document.body.appendChild(ov); }
   ov.innerHTML=`<div class="io-card">
     <div class="io-emoji">${isNew?"🎉":"💀"}</div>
-    <div class="io-title">${isNew?"최고기록 경신!":"게임 오버"}</div>
-    <div class="io-score">${n}<span>곡 연속</span></div>
-    <div class="io-best">🏆 최고기록 ${best}곡</div>
-    <div class="io-miss">${missed?("정답: <b>"+escapeHtml(missed.name)+"</b>"):""}</div>
+    <div class="io-title">${isNew?i18nT("io_newbest"):i18nT("io_gameover")}</div>
+    <div class="io-score">${n}<span>${i18nT("io_inarow")}</span></div>
+    <div class="io-best">${i18nT("io_best").replace("{n}",best)}</div>
+    <div class="io-miss">${missed?(i18nT("gp_answer_label")+"<b>"+escapeHtml(missed.name)+"</b>"):""}</div>
     <div id="io-rank-submit" style="display:none"></div>
     <div class="io-btns">
-      <button class="btn btn-play" id="io-retry">🔄 다시 도전</button>
-      <button class="btn btn-ghost" id="io-quit">🏠 그만두기</button>
+      <button class="btn btn-play" id="io-retry">${i18nT("io_retry")}</button>
+      <button class="btn btn-ghost" id="io-quit">${i18nT("io_quit")}</button>
     </div></div>`;
   ov.style.display="flex";
   if(n>0){ try{ renderRankSubmit(document.getElementById("io-rank-submit"), "infinite", n); }catch(e){} }   // 무한 랭킹 등록
@@ -3141,7 +3181,7 @@ function renderRankRows(rank){
   let prevScore=null, rn=0;
   return rank.map((r,i)=>{
     if(prevScore===null || r.score!==prevScore){ rn=i+1; prevScore=r.score; }   // 동점이면 등수 유지
-    return `<div class="r"><span class="rank-no">${rn}위</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}점</span></div>`;
+    return `<div class="r"><span class="rank-no">${i18nT("rg_rank_fmt").replace("{n}",rn)}</span><span class="medal">${medals[rn-1]||""}</span><span class="rn">${escapeHtml(r.nm)}</span><span class="rs">${r.score}${i18nT("rg_pt")}</span></div>`;
   }).join("");
 }
 let lastResult=null;   // 마지막 결과(공유용): {correct, answered, rate, gradeEmoji, gradeTitle}
@@ -3162,12 +3202,12 @@ function renderResult(){
 
   const by={상:{c:0,t:0},중:{c:0,t:0},신곡:{c:0,t:0}};
   for(const k in marks){ const s=songById(k); if(!s)continue; if(!by[s.diff])continue; by[s.diff].t++; if(marks[k]==="correct")by[s.diff].c++; }
-  document.getElementById("r-breakdown").innerHTML=`난이도별 정답 · 상 ${by.상.c}/${by.상.t} &nbsp; 중 ${by.중.c}/${by.중.t} &nbsp; 신곡 ${by.신곡.c}/${by.신곡.t}`;
+  document.getElementById("r-breakdown").innerHTML=`${i18nT("r_bd_pre")} · ${i18nT("diff_high")} ${by.상.c}/${by.상.t} &nbsp; ${i18nT("diff_mid")} ${by.중.c}/${by.중.t} &nbsp; ${i18nT("diff_new")} ${by.신곡.c}/${by.신곡.t}`;
 
   // 라운드 리캡 — 이번 판 놓친 곡(최대 5) (W3)
   const missed=[]; for(const k in marks){ if(marks[k]==="wrong"){ const s=songById(k); if(s) missed.push(s.name); } }
   const recapEl=document.getElementById("r-recap");
-  if(missed.length){ recapEl.style.display=""; recapEl.innerHTML=`🎧 이번에 놓친 곡: <b>${missed.slice(0,5).map(escapeHtml).join(", ")}</b>${missed.length>5?` 외 ${missed.length-5}곡`:""}`; }
+  if(missed.length){ recapEl.style.display=""; recapEl.innerHTML=`${i18nT("r_missed")}: <b>${missed.slice(0,5).map(escapeHtml).join(", ")}</b>${missed.length>5?i18nT("r_missed_more").replace("{n}",missed.length-5):""}`; }
   else recapEl.style.display="none";
 
   // 개인 최고기록 (W3)
@@ -3175,9 +3215,9 @@ function renderResult(){
   const bestEl=document.getElementById("r-best");
   if((best.rate||0)>0 || (best.streak||0)>0){
     bestEl.style.display="";
-    bestEl.innerHTML=`${newBestFlag?"🎉 <b>최고 기록 갱신!</b> · ":"🏆 "}최고 정답률 <b>${best.rate||0}%</b> · 최다 연속 <b>${best.streak||0}</b>`;
+    bestEl.innerHTML=`${newBestFlag?i18nT("r_best_new")+" · ":"🏆 "}${i18nT("r_best_rate")} <b>${best.rate||0}%</b> · ${i18nT("r_best_streak")} <b>${best.streak||0}</b>`;
   } else bestEl.style.display="none";
-  if(newBestFlag){ sfxWin(); toast("🎉 최고 기록 갱신!"); }
+  if(newBestFlag){ sfxWin(); toast(i18nT("r_best_toast")); }
 
   // 개인(혼자) 랭킹 등록 — 팀·온라인·무한이 아닌 솔로 플레이에서 정답이 1곡 이상일 때
   const rs=document.getElementById("r-rank-submit");
@@ -3188,7 +3228,7 @@ function renderResult(){
       renderRankSubmit(rs, "solo_speed", c, secs);   // 20문제 완주 → 정답 수(주)·소요시간(부)로 랭킹 등록
     } else if(isSolo){
       rs.style.display=""; rs.className="rk-submit";
-      rs.innerHTML=`<div class="rk-sub-h">🏆 <b>20문제를 끝까지</b> 풀면 랭킹에 등록돼요 <span style="color:var(--muted)">(이번 정답 ${c}/${answered})</span></div>`;
+      rs.innerHTML=`<div class="rk-sub-h">${i18nT("r_rank_hint")} <span style="color:var(--muted)">(${i18nT("r_rank_thisrun")} ${c}/${answered})</span></div>`;
     } else { rs.style.display="none"; rs.innerHTML=""; }
   }
 
@@ -3206,12 +3246,12 @@ function renderResult(){
   }else tb.style.display="none";
 }
 function grade(rate,answered){
-  if(answered===0) return {emoji:"🎬",title:"아직 시작 전",desc:"게임 탭에서 채점을 시작해 보세요"};
-  if(rate>=95) return {emoji:"🏆",title:"캐럿 인증",desc:"완벽에 가까운 세븐틴 · 앨범 정주행을 마친 코어 팬"};
-  if(rate>=80) return {emoji:"💎",title:"코어 팬",desc:"수록곡까지 꿰뚫은 진성 캐럿"};
-  if(rate>=60) return {emoji:"⭐",title:"찐팬",desc:"웬만한 곡은 다 아는 실력"};
-  if(rate>=40) return {emoji:"🌱",title:"라이트 팬",desc:"조금만 더 들으면 코어 팬까지 금방!"};
-  return {emoji:"🐣",title:"입덕 준비생",desc:"이제부터 세븐틴 정주행 시작해볼까요?"};
+  if(answered===0) return {emoji:"🎬",title:i18nT("grade0_t"),desc:i18nT("grade0_d")};
+  if(rate>=95) return {emoji:"🏆",title:i18nT("grade95_t"),desc:i18nT("grade95_d")};
+  if(rate>=80) return {emoji:"💎",title:i18nT("grade80_t"),desc:i18nT("grade80_d")};
+  if(rate>=60) return {emoji:"⭐",title:i18nT("grade60_t"),desc:i18nT("grade60_d")};
+  if(rate>=40) return {emoji:"🌱",title:i18nT("grade40_t"),desc:i18nT("grade40_d")};
+  return {emoji:"🐣",title:i18nT("grade0f_t"),desc:i18nT("grade0f_d")};
 }
 document.getElementById("r-restart").addEventListener("click",()=>{
   gameActive=true;
@@ -4027,7 +4067,7 @@ const Room = (function(){
     const scopeEl=document.getElementById("rank-scope"); const listEl=document.getElementById("rank-list");
     function draw(){
       document.querySelectorAll("#rank-modal .rk-tab").forEach(t=>t.classList.toggle("active", t.dataset.board===board));
-      scopeEl.textContent = rankGlobalOn() ? "🌐 전 세계 랭킹 · 상위 20" : "💻 이 기기 기록 · 상위 20 (글로벌은 준비 중)";
+      scopeEl.textContent = rankGlobalOn() ? i18nT("rk_scope_global") : i18nT("rk_scope_local");
       rankRenderInto(board, listEl);
     }
     window.openRankModal=function(b){ board=(b==="solo")?"solo_speed":(b||"solo_speed"); rm.style.display="flex"; draw(); };

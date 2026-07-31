@@ -671,23 +671,23 @@
   <div class="ms-card">
     <button type="button" id="ms-close" class="guide-x" aria-label="닫기">✕</button>
     <div id="ms-step1">
-      <h2 class="guide-title">🎮 어떻게 놀까요?</h2>
-      <p class="ms-lead">모드를 고르면 <b>꼭 필요한 것만</b> 정하고 바로 시작해요.</p>
+      <h2 class="guide-title" data-i18n="ms_title">🎮 어떻게 놀까요?</h2>
+      <p class="ms-lead" data-i18n-html="ms_lead">모드를 고르면 <b>꼭 필요한 것만</b> 정하고 바로 시작해요.</p>
       <div class="ms-modes">
-        <button type="button" class="ms-mode" data-m="solo"><span class="ms-ic">🎧</span><span class="ms-txt"><b class="ms-nm">혼자</b><span class="ms-ds">듣고 4지선다 · 20문제</span></span></button>
-        <button type="button" class="ms-mode" data-m="infinite"><span class="ms-ic">♾️</span><span class="ms-txt"><b class="ms-nm">무한 도전</b><span class="ms-ds">틀리면 끝 · 연속 기록</span></span></button>
-        <button type="button" class="ms-mode" data-m="online-mc"><span class="ms-ic">📱</span><span class="ms-txt"><b class="ms-nm">온라인 4지선다</b><span class="ms-ds">각자 폰으로 참여</span></span></button>
-        <button type="button" class="ms-mode" data-m="online-buzzer"><span class="ms-ic">🖐</span><span class="ms-txt"><b class="ms-nm">온라인 부저</b><span class="ms-ds">먼저 누른 팀이 답</span></span></button>
+        <button type="button" class="ms-mode" data-m="solo"><span class="ms-ic">🎧</span><span class="ms-txt"><b class="ms-nm" data-i18n="ms_solo_nm">혼자</b><span class="ms-ds" data-i18n="ms_solo_ds">듣고 4지선다 · 20문제</span></span></button>
+        <button type="button" class="ms-mode" data-m="infinite"><span class="ms-ic">♾️</span><span class="ms-txt"><b class="ms-nm" data-i18n="ms_inf_nm">무한 도전</b><span class="ms-ds" data-i18n="ms_inf_ds">틀리면 끝 · 연속 기록</span></span></button>
+        <button type="button" class="ms-mode" data-m="online-mc"><span class="ms-ic">📱</span><span class="ms-txt"><b class="ms-nm" data-i18n="ms_omc_nm">온라인 4지선다</b><span class="ms-ds" data-i18n="ms_omc_ds">각자 폰으로 참여</span></span></button>
+        <button type="button" class="ms-mode" data-m="online-buzzer"><span class="ms-ic">🖐</span><span class="ms-txt"><b class="ms-nm" data-i18n="ms_obz_nm">온라인 부저</b><span class="ms-ds" data-i18n="ms_obz_ds">먼저 누른 팀이 답</span></span></button>
       </div>
-      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced" style="width:100%;margin-top:14px">⚙️ 세부 설정으로</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced" style="width:100%;margin-top:14px" data-i18n="ms_advanced">⚙️ 세부 설정으로</button>
     </div>
     <div id="ms-step2" style="display:none">
-      <button type="button" id="ms-back" class="btn btn-ghost btn-sm" style="margin-bottom:6px">← 모드 다시</button>
+      <button type="button" id="ms-back" class="btn btn-ghost btn-sm" style="margin-bottom:6px" data-i18n="ms_back">← 모드 다시</button>
       <h2 class="guide-title" id="ms-title" style="margin-bottom:6px">모드</h2>
       <p class="ms-lead" id="ms-sub" style="margin-bottom:12px"></p>
       <div id="ms-form"></div>
-      <button type="button" class="intro-start" id="ms-start" style="width:100%;margin-top:14px">▶ 바로 시작</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced2" style="width:100%;margin-top:8px">⚙️ 세부 설정에서 더 바꾸기</button>
+      <button type="button" class="intro-start" id="ms-start" style="width:100%;margin-top:14px" data-i18n="ms_start">▶ 바로 시작</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="ms-advanced2" style="width:100%;margin-top:8px" data-i18n="ms_advanced2">⚙️ 세부 설정에서 더 바꾸기</button>
     </div>
   </div>
 </div>
@@ -1400,6 +1400,35 @@ const I18N={
     start:"▶ Start", join:"🔗 Join a room", guide:"❓ How to play", rank:"🏆 Ranking", news:"📢 What's new",
     disclaimer:"Non-profit fan tool 💎 · Short lyric excerpts, official MV embeds · All rights belong to their owners" }
 };
+// 모드 시작 팝업 문자열
+Object.assign(I18N.ko, {
+  ms_title:"🎮 어떻게 놀까요?", ms_lead:'모드를 고르면 <b>꼭 필요한 것만</b> 정하고 바로 시작해요.',
+  ms_solo_nm:"혼자", ms_solo_ds:"듣고 4지선다 · 20문제", ms_inf_nm:"무한 도전", ms_inf_ds:"틀리면 끝 · 연속 기록",
+  ms_omc_nm:"온라인 4지선다", ms_omc_ds:"각자 폰으로 참여", ms_obz_nm:"온라인 부저", ms_obz_ds:"먼저 누른 팀이 답",
+  ms_advanced:"⚙️ 세부 설정으로", ms_back:"← 모드 다시", ms_start:"▶ 바로 시작", ms_advanced2:"⚙️ 세부 설정에서 더 바꾸기",
+  ms_t_solo:"🎧 혼자", ms_t_inf:"♾️ 무한 도전", ms_t_omc:"📱 온라인 4지선다", ms_t_obz:"🖐 온라인 부저",
+  ms_s_solo:"20문제를 듣고 맞혀요 · 끝까지 풀면 랭킹 등록!", ms_s_inf:"틀리면 끝! 몇 곡 연속으로 맞힐까요?",
+  ms_s_omc:"참가자가 각자 폰으로 접속해 보기를 골라요.", ms_s_obz:"먼저 부저를 누른 팀이 답하고 진행자가 판정해요.",
+  ms_f_fmt:"문제 형식", ms_o_mc:"4지선다", ms_o_subj:"주관식", ms_f_timer:"제한시간", ms_o_off:"끄기", ms_o_20s:"20초", ms_o_20s_over:"20초(초과=오답)",
+  ms_f_lyric:"가사", ms_o_hide:"가리기(권장)", ms_o_show:"보이기", ms_note_inf:"무한 모드는 <b>4지선다</b>로 진행돼요.",
+  ms_f_comp:"참가 구성", ms_o_team:"팀 대항", ms_o_solo:"개인전",
+  ms_note_omc:'시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장 → 각자 폰에서 보기 선택.',
+  ms_note_obz:'시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장 → 먼저 누른 팀이 답, 진행자가 정답/오답 판정.'
+});
+Object.assign(I18N.en, {
+  ms_title:"🎮 How do you want to play?", ms_lead:'Pick a mode, set <b>only what matters</b>, and start.',
+  ms_solo_nm:"Solo", ms_solo_ds:"Listen & pick · 20 songs", ms_inf_nm:"Endless", ms_inf_ds:"One miss ends it · streak",
+  ms_omc_nm:"Online multiple-choice", ms_omc_ds:"Everyone joins by phone", ms_obz_nm:"Online buzzer", ms_obz_ds:"First team to buzz answers",
+  ms_advanced:"⚙️ Detailed settings", ms_back:"← Back to modes", ms_start:"▶ Start now", ms_advanced2:"⚙️ More in detailed settings",
+  ms_t_solo:"🎧 Solo", ms_t_inf:"♾️ Endless", ms_t_omc:"📱 Online multiple-choice", ms_t_obz:"🖐 Online buzzer",
+  ms_s_solo:"Listen and guess 20 songs · finish to join the ranking!", ms_s_inf:"One miss and it's over — how many in a row?",
+  ms_s_omc:"Players join on their phones and pick answers.", ms_s_obz:"First team to buzz answers; the host judges.",
+  ms_f_fmt:"Question type", ms_o_mc:"Multiple choice", ms_o_subj:"Open (host scores)", ms_f_timer:"Time limit", ms_o_off:"Off", ms_o_20s:"20s", ms_o_20s_over:"20s (timeout=miss)",
+  ms_f_lyric:"Lyrics", ms_o_hide:"Hidden (rec.)", ms_o_show:"Shown", ms_note_inf:"Endless mode uses <b>multiple choice</b>.",
+  ms_f_comp:"Format", ms_o_team:"Teams", ms_o_solo:"Individual",
+  ms_note_omc:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> on the home screen → pick answers on their phones.',
+  ms_note_obz:'A <b>room code</b> appears. Players join via <b>🔗 Join a room</b> → first team to buzz answers, the host judges.'
+});
 let LANG="ko";
 function i18nDetectLang(){ try{ const u=new URLSearchParams(location.search).get("lang"); if(u&&I18N[u]) return u; const s=localStorage.getItem("svtq_lang"); if(s&&I18N[s]) return s; const n=(navigator.language||"ko").toLowerCase(); if(n.indexOf("en")===0) return "en"; }catch(e){} return "ko"; }
 function i18nT(k){ const v=I18N[LANG]&&I18N[LANG][k]; return v!=null?v:(I18N.ko[k]!=null?I18N.ko[k]:k); }
@@ -3663,23 +3692,23 @@ const Room = (function(){
   function toSetup(){ closeModeStart(); showSetup(); }
   function renderMsForm(m){
     msSel={};
-    const T={solo:"🎧 혼자", infinite:"♾️ 무한 도전", team:"⚔️ 팀전 (오프라인)", "online-mc":"📱 온라인 4지선다", "online-buzzer":"🖐 온라인 부저"};
-    const S={solo:"20문제를 듣고 맞혀요 · 끝까지 풀면 랭킹 등록!", infinite:"틀리면 끝! 몇 곡 연속으로 맞힐까요?", team:"한 화면(프로젝터)으로 팀을 나눠 대결해요.", "online-mc":"참가자가 각자 폰으로 접속해 보기를 골라요.", "online-buzzer":"먼저 부저를 누른 팀이 답하고 진행자가 판정해요."};
-    document.getElementById("ms-title").textContent=T[m]||"모드";
+    const T={solo:i18nT("ms_t_solo"), infinite:i18nT("ms_t_inf"), "online-mc":i18nT("ms_t_omc"), "online-buzzer":i18nT("ms_t_obz")};
+    const S={solo:i18nT("ms_s_solo"), infinite:i18nT("ms_s_inf"), "online-mc":i18nT("ms_s_omc"), "online-buzzer":i18nT("ms_s_obz")};
+    document.getElementById("ms-title").textContent=T[m]||"";
     document.getElementById("ms-sub").textContent=S[m]||"";
     const seg=(key,label,opts,def)=>{ msSel[key]=def; return `<div class="ms-field"><div class="ms-flabel">${label}</div><div class="ms-seg" data-key="${key}">`+opts.map(o=>`<button type="button" data-v="${o.v}" class="${o.v===def?"on":""}">${o.t}</button>`).join("")+`</div></div>`; };
     let html="";
     if(m==="solo"){
-      html+=seg("fmt","문제 형식",[{v:"mc",t:"4지선다"},{v:"subj",t:"주관식"}],"mc");
-      html+=seg("timer","제한시간",[{v:0,t:"끄기"},{v:1,t:"20초"}],0);
-      html+=seg("hide","가사",[{v:1,t:"가리기(권장)"},{v:0,t:"보이기"}],1);
+      html+=seg("fmt",i18nT("ms_f_fmt"),[{v:"mc",t:i18nT("ms_o_mc")},{v:"subj",t:i18nT("ms_o_subj")}],"mc");
+      html+=seg("timer",i18nT("ms_f_timer"),[{v:0,t:i18nT("ms_o_off")},{v:1,t:i18nT("ms_o_20s")}],0);
+      html+=seg("hide",i18nT("ms_f_lyric"),[{v:1,t:i18nT("ms_o_hide")},{v:0,t:i18nT("ms_o_show")}],1);
     } else if(m==="infinite"){
-      html+=seg("timer","제한시간",[{v:0,t:"끄기"},{v:1,t:"20초(초과=오답)"}],0);
-      html+=seg("hide","가사",[{v:1,t:"가리기(권장)"},{v:0,t:"보이기"}],1);
-      html+='<div class="ms-note">무한 모드는 <b>4지선다</b>로 진행돼요.</div>';
+      html+=seg("timer",i18nT("ms_f_timer"),[{v:0,t:i18nT("ms_o_off")},{v:1,t:i18nT("ms_o_20s_over")}],0);
+      html+=seg("hide",i18nT("ms_f_lyric"),[{v:1,t:i18nT("ms_o_hide")},{v:0,t:i18nT("ms_o_show")}],1);
+      html+='<div class="ms-note">'+i18nT("ms_note_inf")+'</div>';
     } else if(m==="online-mc" || m==="online-buzzer"){
-      html+=seg("comp","참가 구성",[{v:"team",t:"팀 대항"},{v:"solo",t:"개인전"}],"team");
-      html+='<div class="ms-note">시작하면 <b>방 코드</b>가 떠요. 참가자는 첫 화면 <b>🔗 방 참가</b>로 입장' + (m==="online-buzzer"?' → 먼저 누른 팀이 답, 진행자가 정답/오답 판정.':' → 각자 폰에서 보기 선택.') + '</div>';
+      html+=seg("comp",i18nT("ms_f_comp"),[{v:"team",t:i18nT("ms_o_team")},{v:"solo",t:i18nT("ms_o_solo")}],"team");
+      html+='<div class="ms-note">'+i18nT(m==="online-buzzer"?"ms_note_obz":"ms_note_omc")+'</div>';
     }
     const f=document.getElementById("ms-form"); f.innerHTML=html;
     f.querySelectorAll(".ms-seg").forEach(sg=>{ sg.addEventListener("click",e=>{ const btn=e.target.closest("button[data-v]"); if(!btn) return; sg.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===btn)); let v=btn.dataset.v; if(v==="0"||v==="1") v=+v; msSel[sg.dataset.key]=v; }); });

@@ -1542,6 +1542,11 @@ Object.assign(I18N.ko, {
   t_norenew:"남은 새 문제가 없어 전체에서 다시 뽑았어요", t_teamrandom:"🎲 팀 이름을 랜덤으로 지었어요", t_teammin:"최소 1개 팀이 필요합니다",
   t_notts:"이 브라우저는 음성 낭독을 지원하지 않습니다", t_nolyric:"입력된 가사가 없습니다", t_novoice:"이 기기엔 맞는 음성이 없어 낭독 대신 가사를 보여드려요 🙂",
   t_copied:"📋 복사됨 · 트위터에 붙여넣으세요", t_ig:"📸 결과 이미지 저장 + 캡션 복사됨 · 인스타 스토리에 올려보세요!", t_copiedclip:"클립보드에 복사했습니다",
+  share_cap:"세븐틴 가사 퀴즈 {a}문제 중 {c}개 정답! (정답률 {r}%){grade}\n가사만 듣고 세븐틴 곡 맞히기, 당신도 도전해보세요 🎧",
+  share_cap_none:"가사만 듣고 세븐틴 곡 맞히기 — 세븐틴 가사 퀴즈 🎧 당신도 도전!",
+  img_title:"세븐틴 가사 퀴즈", img_rate:"정답률 {r}%", img_challenge:"지금 도전!", img_tagline:"가사만 듣고 세븐틴 곡 맞히기 · 지금 도전!",
+  t_tw_img:"🖼 결과 이미지를 저장했어요 · 트윗 작성창에 첨부해 올려주세요(문구는 자동 입력됨)",
+  t_kko_copied:"📋 문구+링크+해시태그 복사됨 · 카카오톡에 붙여넣어 공유하세요", t_copy_done:"📋 결과 문구+링크+해시태그가 복사됐어요", t_copyfail:"복사 실패 — 길게 눌러 복사하세요",
   st_title:"게임 설정", st_sub:"모드를 고르고 옵션을 정한 뒤 시작하세요",
   st_howplay:'어떻게 플레이할까요? <span style="color:var(--muted);font-weight:400;font-size:12px">· 탭하면 옵션이 맞춰져요 · 아래에서 조절 후 시작</span>',
   st_teamcount:'👥 팀 수 <span style="color:var(--muted);font-weight:400;font-size:12px">· 팀 대결·온라인 대결을 이 수로 나눠요</span>',
@@ -1657,6 +1662,11 @@ Object.assign(I18N.en, {
   t_norenew:"No new songs left — redrew from all", t_teamrandom:"🎲 Team names randomized", t_teammin:"At least 1 team is required",
   t_notts:"This browser doesn't support voice read-aloud", t_nolyric:"No lyrics entered", t_novoice:"No matching voice on this device — showing lyrics instead 🙂",
   t_copied:"📋 Copied · paste into Twitter", t_ig:"📸 Result image saved + caption copied · post it to your IG Story!", t_copiedclip:"Copied to clipboard",
+  share_cap:"SEVENTEEN Lyrics Quiz — {c}/{a} correct! ({r}%){grade}\nGuess SEVENTEEN songs by ear — you should try it too 🎧",
+  share_cap_none:"Guess SEVENTEEN songs by ear — SEVENTEEN Lyrics Quiz 🎧 Try it!",
+  img_title:"SEVENTEEN Lyrics Quiz", img_rate:"{r}% correct", img_challenge:"Play now!", img_tagline:"Guess SEVENTEEN songs by ear · play now!",
+  t_tw_img:"🖼 Result image saved · attach it to your tweet (text is prefilled)",
+  t_kko_copied:"📋 Text+link+hashtags copied · paste into KakaoTalk to share", t_copy_done:"📋 Result text+link+hashtags copied", t_copyfail:"Copy failed — long-press to copy",
   st_title:"Game settings", st_sub:"Pick a mode, set options, then start",
   st_howplay:'How do you want to play? <span style="color:var(--muted);font-weight:400;font-size:12px">· tap to preset options · adjust below, then start</span>',
   st_teamcount:'👥 Number of teams <span style="color:var(--muted);font-weight:400;font-size:12px">· team & online battles split into this many</span>',
@@ -3378,8 +3388,8 @@ function shareCaption(){
   const r=lastResult||{correct:0,answered:0,rate:0,gradeEmoji:"🎧",gradeTitle:""};
   const grade=r.gradeTitle?` — ${r.gradeEmoji} ${r.gradeTitle}`:"";
   return r.answered
-    ? `세븐틴 가사 퀴즈 ${r.answered}문제 중 ${r.correct}개 정답! (정답률 ${r.rate}%)${grade}\n가사만 듣고 세븐틴 곡 맞히기, 당신도 도전해보세요 🎧`
-    : `가사만 듣고 세븐틴 곡 맞히기 — 세븐틴 가사 퀴즈 🎧 당신도 도전!`;
+    ? i18nT("share_cap").replace("{a}",r.answered).replace("{c}",r.correct).replace("{r}",r.rate).replace("{grade}",grade)
+    : i18nT("share_cap_none");
 }
 function shareHashline(){ return SHARE_TAGS.map(t=>"#"+t).join(" "); }
 function shareFull(){ return shareCaption()+"\n\n"+SERVICE_URL+"\n"+shareHashline(); }
@@ -3387,12 +3397,33 @@ async function copyText(t){
   try{ await navigator.clipboard.writeText(t); return true; }
   catch(e){ try{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand("copy"); ta.remove(); return ok; }catch(e2){ return false; } }
 }
-function shareTwitter(){
+function makeResultBlob(){ return new Promise(res=>{ try{ makeResultImage(res); }catch(e){ res(null); } }); }
+function downloadImageBlob(blob){ try{ const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="svt-quiz-result.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); }catch(e){} }
+// 네이티브 공유 시트로 이미지+문구 전송(모바일). 처리됨(공유/취소)=true, 미지원=false.
+async function shareImageNative(blob, cap){
+  try{
+    if(blob && navigator.canShare){
+      const file=new File([blob],"svt-quiz-result.png",{type:"image/png"});
+      if(navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file], text:cap}); return true; }
+        catch(e){ if(e && e.name==="AbortError") return true; }   // 사용자 취소 → 처리 완료로 간주
+      }
+    }
+  }catch(e){}
+  return false;
+}
+async function shareTwitter(){
+  const cap=shareCaption()+"\n\n"+shareHashline()+"\n"+SERVICE_URL;
+  const blob=await makeResultBlob();
+  if(await shareImageNative(blob, cap)) return;   // 모바일: 이미지 첨부한 공유 시트 → X 선택(트윗에 이미지 포함)
+  // 데스크톱 폴백: 인텐트로 문구 자동 입력 + 결과 이미지 저장(수동 첨부용) — 웹 인텐트는 이미지 첨부 불가
+  if(blob) downloadImageBlob(blob);
   try{
     const u="https://twitter.com/intent/tweet?text="+encodeURIComponent(shareCaption())
       +"&url="+encodeURIComponent(SERVICE_URL)
       +"&hashtags="+encodeURIComponent(SHARE_TAGS.join(","));
     window.open(u,"_blank","noopener,noreferrer");
+    toast(i18nT(blob?"t_tw_img":"t_copied"));
   }catch(e){ copyText(shareFull()).then(()=>toast(i18nT("t_copied"))); }
 }
 async function shareKakao(){
@@ -3400,14 +3431,14 @@ async function shareKakao(){
   // 모바일은 네이티브 공유 시트(카카오톡 선택 가능), 데스크톱은 클립보드 복사로 대체.
   const full=shareFull();
   try{
-    if(navigator.share){ await navigator.share({title:"세븐틴 가사 퀴즈", text:shareCaption()+"\n\n"+shareHashline(), url:SERVICE_URL}); return; }
+    if(navigator.share){ await navigator.share({title:i18nT("img_title"), text:shareCaption()+"\n\n"+shareHashline(), url:SERVICE_URL}); return; }
   }catch(e){ if(e && e.name==="AbortError") return; }
   const ok=await copyText(full);
-  toast(ok?"📋 문구+링크+해시태그 복사됨 · 카카오톡에 붙여넣어 공유하세요":"복사 실패 — 길게 눌러 복사하세요");
+  toast(ok?i18nT("t_kko_copied"):i18nT("t_copyfail"));
 }
 async function shareCopy(){
   const ok=await copyText(shareFull());
-  toast(ok?"📋 결과 문구+링크+해시태그가 복사됐어요":"복사 실패 — 길게 눌러 복사하세요");
+  toast(ok?i18nT("t_copy_done"):i18nT("t_copyfail"));
 }
 // 인스타 스토리용 결과 카드 이미지(1080×1920) 생성 — IG는 웹 인텐트가 없어 이미지 공유가 정석.
 function makeResultImage(cb){
@@ -3423,33 +3454,25 @@ function makeResultImage(cb){
     x.moveTo(cx+rad,cy); x.arcTo(cx+cw,cy,cx+cw,cy+ch,rad); x.arcTo(cx+cw,cy+ch,cx,cy+ch,rad); x.arcTo(cx,cy+ch,cx,cy,rad); x.arcTo(cx,cy,cx+cw,cy,rad); x.closePath(); x.fill();
     const r=lastResult||{correct:0,answered:0,rate:0,gradeEmoji:"🎧",gradeTitle:"세븐틴 가사 퀴즈"};
     x.textAlign="center";
-    x.fillStyle="#4A2E55"; x.font="800 66px sans-serif"; x.fillText("세븐틴 가사 퀴즈",W/2,600);
+    x.fillStyle="#4A2E55"; x.font="800 66px sans-serif"; x.fillText(i18nT("img_title"),W/2,600);
     x.fillStyle="#7A46A6"; x.font="700 34px sans-serif"; x.fillText("SVT LYRICS QUIZ",W/2,655);
     x.fillStyle="#D6337E"; x.font="900 210px sans-serif"; x.fillText(r.answered?`${r.correct}/${r.answered}`:"?",W/2,930);
-    x.fillStyle="#2B67CC"; x.font="800 62px sans-serif"; x.fillText(r.answered?`정답률 ${r.rate}%`:"지금 도전!",W/2,1030);
+    x.fillStyle="#2B67CC"; x.font="800 62px sans-serif"; x.fillText(r.answered?i18nT("img_rate").replace("{r}",r.rate):i18nT("img_challenge"),W/2,1030);
     x.fillStyle="#4A2E55"; x.font="800 68px sans-serif"; x.fillText(`${r.gradeEmoji} ${r.gradeTitle||""}`.trim(),W/2,1200);
     x.fillStyle="#6E6191"; x.font="600 38px sans-serif"; x.fillText("#세븐틴가사퀴즈  #SEVENTEEN  #캐럿",W/2,1360);
     x.fillStyle="#4A2E55"; x.font="700 40px sans-serif"; x.fillText("alfira0526.github.io/SVT_Lyrics",W/2,1450);
-    x.fillStyle="#6E6191"; x.font="500 34px sans-serif"; x.fillText("가사만 듣고 세븐틴 곡 맞히기 · 지금 도전!",W/2,1510);
+    x.fillStyle="#6E6191"; x.font="500 34px sans-serif"; x.fillText(i18nT("img_tagline"),W/2,1510);
     cv.toBlob(b=>cb(b), "image/png");
   }catch(e){ cb(null); }
 }
-function shareInstagram(){
-  makeResultImage(async (blob)=>{
-    const cap=shareCaption()+"\n\n"+shareHashline()+"\n"+SERVICE_URL;
-    try{
-      if(blob && navigator.canShare){
-        const file=new File([blob],"svt-quiz-result.png",{type:"image/png"});
-        if(navigator.canShare({files:[file]})){
-          try{ await navigator.share({files:[file], text:cap}); return; }catch(e){ if(e && e.name==="AbortError") return; }
-        }
-      }
-    }catch(e){}
-    // 폴백: 이미지 저장 + 캡션 복사(스토리에 직접 업로드 안내)
-    try{ if(blob){ const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="svt-quiz-result.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); } }catch(e){}
-    await copyText(cap);
-    toast(i18nT("t_ig"));
-  });
+async function shareInstagram(){
+  const cap=shareCaption()+"\n\n"+shareHashline()+"\n"+SERVICE_URL;
+  const blob=await makeResultBlob();
+  if(await shareImageNative(blob, cap)) return;   // 모바일: 이미지 첨부 공유 시트
+  // 폴백: 이미지 저장 + 캡션 복사(스토리에 직접 업로드 안내)
+  if(blob) downloadImageBlob(blob);
+  await copyText(cap);
+  toast(i18nT("t_ig"));
 }
 document.getElementById("sh-tw").addEventListener("click",shareTwitter);
 document.getElementById("sh-ig").addEventListener("click",shareInstagram);

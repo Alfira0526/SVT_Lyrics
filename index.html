@@ -908,7 +908,7 @@
         <span class="auto-status" id="g-auto-status">자동 진행 중</span>
       </div>
 
-      <div class="answer" id="g-answer">
+      <div class="answer" id="g-answer" role="status" aria-live="polite">
         <div class="song-name" id="g-answer-name"></div>
         <div class="part-label" id="g-answer-part"></div>
         <div class="video-wrap" id="g-video"></div>
@@ -1068,7 +1068,7 @@
   </section>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <dialog id="dlg-json">
   <div class="modal">
@@ -2373,9 +2373,13 @@ function startTimer(){
     els.timerFill.style.width=pct+"%";
     els.timerFill.className = timerLeft<=3?"danger":(timerLeft<=Math.ceil(config.timerSec/2)?"warn":"");
     if(timerLeft<=3 && timerLeft>0) sfxTick();   // 카운트다운 긴장(3·2·1)
-    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료!");
-      if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()) showAnswer();
-      if(isInfinite() && !answerShown()){ marks[order[pos]]="wrong"; updateCounters(); const survived=streak; bumpStreak(false); showAnswer(); infiniteGameOver(survived); }
+    if(timerLeft<=0){ stopTimer(); sfxWrong(); toast("⏰ 시간 종료! 오답 처리");
+      if(config.onlineRoom && Room.host.active && Room.host.phase==="playing" && !answerShown()){ showAnswer(); }
+      else if(isInfinite() && !answerShown()){ marks[order[pos]]="wrong"; updateCounters(); const survived=streak; bumpStreak(false); showAnswer(); infiniteGameOver(survived); }
+      else if(!config.onlineRoom && !answerShown()){   // 솔로/오프라인 팀전: 시간 종료 = 자동 오답 + 진행
+        if(config.teamMode){ if(config.mc && !teamRoundDone) finalizeTeamRound(); else showAnswer(); }
+        else { marks[order[pos]]="wrong"; updateCounters(); bumpStreak(false); showAnswer(); if(!autoRun) setTimeout(()=>{ if(answerShown()) next(); }, 1600); }
+      }
     }
   };
   els.timerFill.style.width=(timerLeft/config.timerSec*100)+"%";
@@ -2533,6 +2537,17 @@ document.getElementById("g-hint").addEventListener("click",revealHint);
 document.getElementById("g-video-reload").addEventListener("click",reloadVideo);
 document.getElementById("g-mark-correct").addEventListener("click",()=>mark("correct"));
 document.getElementById("g-mark-wrong").addEventListener("click",()=>mark("wrong"));
+// 4지선다 단축키: 게임 화면에서 A/B/C/D 또는 1~4 키로 보기 선택(데스크톱 최속 플레이)
+document.addEventListener("keydown",e=>{
+  if(!gameActive || !config.mc || answerShown()) return;
+  const gv=document.getElementById("view-game"); if(!gv || !gv.classList.contains("active")) return;
+  const tag=(e.target&&e.target.tagName)||""; if(/INPUT|TEXTAREA|SELECT/.test(tag) || e.metaKey || e.ctrlKey || e.altKey) return;
+  const map={a:0,b:1,c:2,d:3,"1":0,"2":1,"3":2,"4":3};
+  const i=map[(e.key||"").toLowerCase()];
+  if(i==null) return;
+  const btns=document.querySelectorAll("#g-mc .mc-opt");
+  if(btns[i] && !btns[i].disabled){ e.preventDefault(); if(config.teamMode) pickMcTeam(i); else pickMc(i); }
+});
 document.getElementById("g-noone").addEventListener("click",()=>{ if(order.length){ marks[order[pos]]="wrong"; turn=(turn+1)%(config.teamNames.length||1); updateCounters(); renderTeamBoard(); } next(); });
 document.getElementById("g-next").addEventListener("click",next);
 document.getElementById("g-prev").addEventListener("click",prev);

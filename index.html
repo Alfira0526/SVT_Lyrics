@@ -750,6 +750,8 @@
         <div id="rl-qr-cap" style="font-size:12px;color:var(--muted);margin-top:6px;display:none">📷 폰 카메라로 스캔하면 바로 참가 화면으로 이동해요</div>
         <div id="rl-link" style="font-size:11px;color:var(--serene-ink);word-break:break-all;margin-top:4px"></div>
       </div>
+      <div class="setup-label" style="margin-top:16px">🖥 나도 참가 (호스트) <span style="color:var(--muted);font-size:12px;font-weight:400">· 팀을 골라 함께 플레이</span></div>
+      <select class="num-input" id="rl-self-team" style="text-transform:none"><option value="">참가 안 함</option></select>
       <div class="setup-label" style="margin-top:16px">참가 팀 (<b id="rl-count">0</b>)</div>
       <div id="rl-teams" style="font-size:14px;line-height:1.9">아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.</div>
       <div class="video-wrap" id="rl-video" style="margin-top:14px"></div>
@@ -2003,6 +2005,15 @@ function renderMc(){
   // 온라인 방: 참가자가 각자 폰에서 고름 → 방장 화면엔 보기 그리드 숨김(방장은 진행 화면)
   if(config.onlineRoom && Room.host.active){
     if(!config.mc){ Room.hostRenderBuzz(); return; }   // 부저 모드(4지선다 OFF): 방장 부저 판정 패널
+    if(Room.host.selfTeam){   // 호스트가 팀으로 참여 → 방장 화면에서도 답 선택 가능
+      const answered=Room.hostAnswered(); const keys=["A","B","C","D"];
+      box.style.display="grid"; box.innerHTML="";
+      mcOptions.forEach((o,i)=>{ const b=document.createElement("button"); b.className="mc-opt"; b.type="button"; b.disabled=answered;
+        b.innerHTML=`<span class="mc-key">${keys[i]}</span><span class="mc-name">${escapeHtml(o.name)}</span><span class="mc-badges"></span>`;
+        b.addEventListener("click",()=>Room.hostSelfAnswer(i)); box.appendChild(b); });
+      if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML= answered ? "✅ 내 답 제출 완료 · 다른 팀 폰 대기" : ("🖥 <b>나("+escapeHtml(Room.host.selfTeam)+")</b> 답 선택 · 📱 다른 팀은 폰에서"); }
+      return;
+    }
     box.style.display="none"; box.innerHTML=""; if(turnEl){ turnEl.style.display="block"; turnEl.className="mc-turn"; turnEl.innerHTML="📱 각 팀이 <b>자기 폰</b>에서 답을 고르는 중… 상단 바에서 제출 현황 확인"; } return;
   }
   if(!config.mc || order.length===0 || mcOptions.length===0){ box.style.display="none"; box.innerHTML=""; if(turnEl) turnEl.style.display="none"; return; }
@@ -3321,10 +3332,11 @@ const Room = (function(){
   function gen(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<4;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
 
   /* ---- 호스트 ---- */
-  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0, buzzes:{}, buzzWinner:null, buzzWrong:{} };
+  const host={ active:false, phase:"lobby", code:null, tx:null, roster:{}, answers:{}, relay:false, slots:[], claims:{}, round:0, buzzes:{}, buzzWinner:null, buzzWrong:{}, selfTeam:null };
+  const HOST_DEV="__host__";   // 호스트가 팀으로 참여할 때 쓰는 가상 기기 id
   async function hostOpen(){
     if(!config.fbUrl) await loadMqtt();
-    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0; host.buzzes={}; host.buzzWinner=null; host.buzzWrong={};
+    host.active=true; host.phase="lobby"; host.code=gen(); host.roster={}; host.answers={}; host.relay=false; host.round=0; host.buzzes={}; host.buzzWinner=null; host.buzzWrong={}; host.selfTeam=null;
     host.slots=(config.teamNames||[]).slice(); host.claims={};   // 선택 가능한 팀(슬롯) · 팀당 1명 독점
     host.tx=makeTransport(host.code,(c)=>{ host.relay=c; lobbyConn(); hostBar(); if(c) hostPushSlots(); });
     host.tx.clear();   // 새 방 코드의 이전 잔여(retained/이벤트) 제거 → 재입장 시 옛 문항 노출 방지
@@ -3370,7 +3382,33 @@ const Room = (function(){
     const box=document.getElementById("rl-teams"); const cnt=document.getElementById("rl-count");
     const ids=Object.keys(host.roster);
     if(cnt) cnt.textContent=ids.length;
-    if(box) box.innerHTML = ids.length ? ids.map(id=>"• "+escapeHtml(host.roster[id].name)).join("<br>") : "아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.";
+    if(box) box.innerHTML = ids.length ? ids.map(id=>"• "+escapeHtml(host.roster[id].name)+(host.claims[id]===HOST_DEV?" <span style='color:var(--serene-ink)'>(나)</span>":"")).join("<br>") : "아직 참가한 팀이 없어요. 참가자는 <b>🔗 방 참가</b>에서 위 코드를 입력하세요.";
+    lobbyHostSelf();
+  }
+  // 호스트가 팀으로 참여 — 로비 셀렉트 렌더/변경
+  function lobbyHostSelf(){
+    const sel=document.getElementById("rl-self-team"); if(!sel) return;
+    const cur=host.selfTeam||"";
+    let html='<option value="">참가 안 함</option>';
+    (host.slots||[]).forEach(nm=>{ const takenByOther=host.claims[nm] && host.claims[nm]!==HOST_DEV;
+      html+=`<option value="${escapeHtml(nm)}"${nm===cur?" selected":""}${takenByOther?" disabled":""}>${escapeHtml(nm)}${takenByOther?" (참가자 사용중)":""}</option>`; });
+    sel.innerHTML=html; sel.value=cur;
+  }
+  function hostJoinSelf(name){
+    if(!host.active) return;
+    Object.keys(host.claims).forEach(nm=>{ if(host.claims[nm]===HOST_DEV){ delete host.claims[nm]; delete host.roster[nm]; } });   // 기존 내 팀 해제
+    host.selfTeam=null;
+    if(name && (host.slots||[]).indexOf(name)>=0 && !host.claims[name]){
+      host.claims[name]=HOST_DEV; host.roster[name]={name:name,dev:HOST_DEV,score:0}; host.selfTeam=name;
+    }
+    hostPushSlots(); hostSyncGuest(); lobbyTeams(); hostBar();
+  }
+  function hostAnswered(){ return !!(host.selfTeam && (host.answers[pos]||{})[host.selfTeam]!=null); }
+  function hostSelfAnswer(pick){
+    if(!host.active || host.phase!=="playing" || !host.selfTeam) return;
+    const qid=pos; if((host.answers[qid]||{})[host.selfTeam]!=null) return;   // 이미 제출
+    (host.answers[qid]=host.answers[qid]||{})[host.selfTeam]=pick;
+    hostBar(); renderMc(); maybeAutoReveal(qid);
   }
   function hostSyncGuest(){ if(host.phase==="playing"){ hostPushState(); hostPushRoster(); } else { host.tx.send({type:"lobby"}, true); hostPushRoster(); } }
   function hostStartPlaying(){ host.phase="playing"; document.getElementById("rl-video").innerHTML=""; hostPushState(); }
@@ -3625,7 +3663,7 @@ const Room = (function(){
     document.getElementById("rg-score").innerHTML=(me?`<b>${escapeHtml(me.name)}</b> ${me.score}점 · `:"")+"순위 "+rank.slice(0,5).map((t,i)=>`${i+1}.${escapeHtml(t.name)}(${t.score})`).join(" ");
   }
 
-  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, hostRenderBuzz, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered };
+  return { hostOpen, hostClose, hostEnd, hostIntermission, hostNextRound, hostStartPlaying, hostPushState, hostPushHint, hostPushSlots, hostReveal, hostRenderBuzz, host, guestConnect, guestClaim, guestLeave, guestSpeak, guest, lobbyTeams, teamsJoined, allAnswered, hostJoinSelf, hostSelfAnswer, hostAnswered };
 })();
 
 (function(){
@@ -3858,6 +3896,7 @@ const Room = (function(){
   });
   // 방장 로비: 게임 시작 / 취소
   document.getElementById("rl-start").addEventListener("click",startRoomPlay);
+  { const _rst=document.getElementById("rl-self-team"); if(_rst) _rst.addEventListener("change",e=>Room.hostJoinSelf(e.target.value)); }
   document.getElementById("rl-cancel").addEventListener("click",()=>{
     Room.hostClose(); gameActive=false; autoRun=false;
     document.getElementById("room-lobby").style.display="none";

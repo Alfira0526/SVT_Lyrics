@@ -1839,8 +1839,11 @@ function slotId(){ return "slot"+Date.now()+Math.floor(Math.random()*1000); }
 const STATS_KEY="svt_lyrics_quiz_stats_v1";
 const STATS_MAX=200;   // 세션 상한(오래된 것부터 폐기)
 function loadStats(){
-  try{ const o=JSON.parse(localStorage.getItem(STATS_KEY)); if(o&&o.v===1&&Array.isArray(o.sessions)&&o.modeCounts&&o.songStats) return o; }catch(e){}
-  return {v:1, sessions:[], modeCounts:{}, songStats:{}, best:{rate:0, streak:0}};
+  try{ const o=JSON.parse(localStorage.getItem(STATS_KEY)); if(o&&o.v===1&&Array.isArray(o.sessions)&&o.modeCounts&&o.songStats){
+    o.funnel=o.funnel||{}; o.langCounts=o.langCounts||{}; o.rankRegs=o.rankRegs||{};   // S2: 이전 저장본 하위호환(없으면 생성)
+    return o;
+  } }catch(e){}
+  return {v:1, sessions:[], modeCounts:{}, songStats:{}, best:{rate:0, streak:0}, funnel:{}, langCounts:{}, rankRegs:{}};
 }
 function saveStats(o){ try{ localStorage.setItem(STATS_KEY, JSON.stringify(o)); }catch(e){ if(typeof toast==="function") toast("저장 공간이 부족해 통계를 저장하지 못했어요"); } }
 
@@ -1890,6 +1893,7 @@ function rankRegister(board, val, nick, t){
   r[board]=(r[board]||[]).concat([entry]).sort(rankCmp(board)).slice(0,RANK_MAX);
   saveRank(r);
   rankSubmitGlobal(board, entry);   // 가능하면 글로벌로도(비동기·실패 무시)
+  try{ const st=loadStats(); st.rankRegs[board]=(st.rankRegs[board]||0)+1; saveStats(st); }catch(e){}   // S2: 랭킹 등록 이벤트
   return entry;
 }
 function rankRowsHTML(list, board){
@@ -1971,9 +1975,42 @@ function recordStats(){
     newBestFlag=false;
     if(answered>=3 && rate>(st.best.rate||0)){ st.best.rate=rate; newBestFlag=true; }
     if(sessionMaxStreak>(st.best.streak||0)){ st.best.streak=sessionMaxStreak; newBestFlag=true; }
-    saveStats(st);
+    // S2 퍼널: 이 판을 '완주'로 기록(시작→완주 전환)
+    funnelComplete(st); saveStats(st);
     return true;
   }catch(e){ return false; }   // 통계 실패는 결과 화면을 막지 않음
+}
+/* ---- S2 퍼널/이벤트 로깅(로컬 · 익명) — 모드별 완주율·이탈지점·언어·랭킹 등록 ---- */
+let _liveGame=null;   // 현재 진행 중 게임 {mode, done} — 완주/이탈 판정용
+function funnelBucket(st,mode){ return st.funnel[mode]||(st.funnel[mode]={starts:0,completes:0,abandons:0,dropPctSum:0,dropN:0}); }
+function funnelStart(){
+  try{
+    const st=loadStats();
+    if(_liveGame && !_liveGame.done){ funnelAbandonInto(st,_liveGame.mode,null); }   // 직전 판이 미완이면 이탈로 마감(중복 방지)
+    const mode=statsModeLabel(config);
+    funnelBucket(st,mode).starts++;
+    const lg=(""+(LANG||"ko")); st.langCounts[lg]=(st.langCounts[lg]||0)+1;   // 언어 사용 분포
+    saveStats(st);
+    _liveGame={mode, done:false};
+  }catch(e){}
+}
+function funnelComplete(st){
+  if(!_liveGame || _liveGame.done) return;
+  funnelBucket(st,_liveGame.mode).completes++;
+  _liveGame.done=true;
+}
+function funnelAbandonInto(st,mode,dropPct){
+  const b=funnelBucket(st,mode); b.abandons++;
+  if(dropPct!=null && isFinite(dropPct)){ b.dropPctSum+=Math.max(0,Math.min(100,dropPct)); b.dropN++; }
+}
+function funnelAbandon(){
+  try{
+    if(!_liveGame || _liveGame.done) return;
+    const st=loadStats();
+    const total=order.length||0, dp=total?Math.round((pos/total)*100):null;   // 이탈 지점(진행률 %)
+    funnelAbandonInto(st,_liveGame.mode,dp); saveStats(st);
+    _liveGame.done=true;
+  }catch(e){}
 }
 
 /* ---- 재미 요소(W3): 효과음 · 연속정답 · 축하 애니 · 최고기록 ---- */
@@ -2118,8 +2155,28 @@ function renderStats(){
     return {id, name:(s?s.name:id), diff:(s?s.diff:"–"), served:d.served, correct:d.correct, r};
   }).filter(x=>x.served>0).sort((a,b)=>a.r-b.r || b.served-a.served);
   const songBody=songRows.map(x=>`<tr><td>${escapeHtml(x.name)} <span style="color:var(--muted)">${escapeHtml(x.diff)}</span></td><td>${x.served}</td><td>${x.correct}</td><td class="stats-rate" style="color:${rateColor(x.r)}">${x.r}%</td></tr>`).join("");
+  // S2 퍼널: 모드별 시작→완주율·이탈지점
+  const fu=st.funnel||{};
+  const fKeys=Object.keys(fu).sort((a,b)=>fu[b].starts-fu[a].starts);
+  let totStart=0,totComp=0,totAb=0; fKeys.forEach(m=>{ totStart+=fu[m].starts; totComp+=fu[m].completes; totAb+=fu[m].abandons; });
+  const compRate=totStart?Math.round(totComp/totStart*100):0;
+  const funnelRows=fKeys.map(m=>{
+    const d=fu[m], cr=d.starts?Math.round(d.completes/d.starts*100):0;
+    const drop=d.dropN?Math.round(d.dropPctSum/d.dropN)+"%":"–";
+    return `<tr><td>${escapeHtml(m)}</td><td>${d.starts}</td><td>${d.completes}</td><td class="stats-rate" style="color:${rateColor(cr)}">${cr}%</td><td>${d.abandons}</td><td>${drop}</td></tr>`;
+  }).join("");
+  const funnelBlock = fKeys.length ? `
+    <div class="stats-scroll"><table class="stats-tbl"><caption>모드별 완주율 · 이탈지점 (퍼널)</caption>
+      <thead><tr><th>모드</th><th>시작</th><th>완주</th><th>완주율</th><th>이탈</th><th>평균 이탈지점</th></tr></thead><tbody>${funnelRows}</tbody></table></div>` : "";
+  // 언어 사용 분포 + 랭킹 등록
+  const lc=st.langCounts||{}, langTot=Object.values(lc).reduce((a,b)=>a+b,0);
+  const langLine = langTot ? Object.keys(lc).sort((a,b)=>lc[b]-lc[a]).map(l=>`${escapeHtml(l)} <b>${Math.round(lc[l]/langTot*100)}%</b>(${lc[l]})`).join(" · ") : "–";
+  const rr=st.rankRegs||{}, rrTot=Object.values(rr).reduce((a,b)=>a+b,0);
   box.innerHTML=`
     <p class="stats-sum">총 <b>${totGames}</b>판 · 누적 응답 <b>${ts}</b> · 전체 정답률 <b>${tRate}%</b></p>
+    <p class="stats-sum" style="margin-top:2px">시작 <b>${totStart}</b> · 완주 <b>${totComp}</b> · <b>완주율 ${compRate}%</b> · 이탈 <b>${totAb}</b> · 랭킹 등록 <b>${rrTot}</b></p>
+    <p class="stats-sum" style="margin-top:2px;color:var(--muted)">언어: ${langLine}</p>
+    ${funnelBlock}
     <div class="stats-scroll"><table class="stats-tbl"><caption>모드별 이용율 · 정답률</caption>
       <thead><tr><th>모드</th><th>판수(비중)</th><th>응답</th><th>정답률</th></tr></thead><tbody>${modeRows}</tbody></table></div>
     <div class="stats-scroll"><table class="stats-tbl"><caption>곡별 정답률 (낮은 순 · 가장 어려운 곡부터)</caption>
@@ -2972,7 +3029,7 @@ function infiniteGameOver(n){
   document.getElementById("io-retry").onclick=()=>{ ov.style.display="none"; restartInfinite(); };
   document.getElementById("io-quit").onclick=()=>{ ov.style.display="none"; goHome(); };
 }
-function restartInfinite(){ stopTTS(); stopTimer(); startNewGame(true); renderGame(); }
+function restartInfinite(){ stopTTS(); stopTimer(); funnelStart(); startNewGame(true); renderGame(); }
 function isBattle(){ return config.mode==="battle"; }
 // 대결(동시전) 종료: 고정 라운드 후 최고점 승리팀 연출. 1위 동점(득점>0)이면 서든데스 1문항.
 function battleVictory(){
@@ -3071,7 +3128,7 @@ document.getElementById("g-test-only").addEventListener("click",()=>{
 document.getElementById("g-shuffle").addEventListener("click",()=>{ buildOrder(true); renderGame(); toast(i18nT("t_reshuffle")); });
 document.getElementById("g-restart").addEventListener("click",()=>{
   if(!confirm(i18nT("t_restartconfirm"))) return;
-  startNewGame(true); renderGame(); toast(i18nT("t_restart"));
+  funnelStart(); startNewGame(true); renderGame(); toast(i18nT("t_restart"));
 });
 function stopEverything(){ autoRun=false; autoStopTimers(); stopTTS(); stopTimer(); }
 document.getElementById("g-end").addEventListener("click",()=>{
@@ -3086,12 +3143,15 @@ document.getElementById("g-end").addEventListener("click",()=>{
   document.querySelector('nav.tabs button[data-view="result"]').click();
 });
 function goHome(){
+  funnelAbandon();   // S2 퍼널: 완주 전 홈 이동 = 이탈(진행률 기록)
   stopEverything(); gameActive=false;
   if(Room.host.active) Room.hostEnd();
   document.getElementById("room-lobby").style.display="none";
   document.getElementById("intro").classList.remove("hide");
   window.scrollTo({top:0});
 }
+// 탭 닫기/이탈: 진행 중 게임이 미완이면 이탈로 기록(best-effort)
+window.addEventListener("pagehide",()=>{ try{ if(gameActive) funnelAbandon(); }catch(e){} });
 document.getElementById("g-home").addEventListener("click",()=>{
   if(gameActive && !confirm(i18nT("t_homeconfirm"))) return;
   goHome();
@@ -3367,6 +3427,7 @@ function grade(rate,answered){
 }
 document.getElementById("r-restart").addEventListener("click",()=>{
   gameActive=true;
+  funnelStart();
   startNewGame(true);
   if(Room.host.active){   // 온라인 방: 점수 초기화 + 라운드↑ → 참가자도 새 판으로 동반 이동
     Object.keys(Room.host.roster).forEach(k=>Room.host.roster[k].score=0);
@@ -4040,6 +4101,7 @@ const Room = (function(){
     if(!config.teamMode && !config.onlineRoom) config.mc=true;                       // 혼자·무한은 4지선다 고정(주관식 불가)
     quizUnitBoost = document.getElementById("intro-unit").checked;
     gameActive=true;
+    funnelStart();   // S2 퍼널: 게임 시작(모드·언어) 1회 기록
     if(config.onlineRoom){
       // 온라인 방: 자동 진행(제출 완료·시간초과 시 공개→다음), 로비에서 대기 후 시작.
       // mc는 강제하지 않음 — 4지선다 OFF면 부저(선착순) 모드로 동작.

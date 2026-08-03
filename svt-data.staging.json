@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1785715958047,
   "songs": [
     {
       "id": "s2",
@@ -366,6 +366,36 @@
       "name": "rat race",
       "part": "벌스 · V8 · 버논X디에잇 신곡",
       "diff": "신곡"
+    },
+    {
+      "id": "s71",
+      "name": "HBD",
+      "part": "후렴 · 그룹 전체",
+      "diff": "신곡"
+    },
+    {
+      "id": "s72",
+      "name": "봄, 여름, 가을, 겨울 (Spring, Summer, Fall, Winter)",
+      "part": "후렴 · 원우 솔로",
+      "diff": "신곡"
+    },
+    {
+      "id": "s73",
+      "name": "미쳐 미쳐 (Mi-cheo Mi-cheo)",
+      "part": "후렴 · 디에잇 솔로(피철인)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s74",
+      "name": "아프지 않은 이별은 없다 (Love Sick)",
+      "part": "벌스 · 디에잇 솔로(피철인) · narr. 이문세",
+      "diff": "신곡"
+    },
+    {
+      "id": "s75",
+      "name": "Shining Star",
+      "part": "후렴 · 버논 솔로",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -690,6 +720,32 @@
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:42",
       "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
+    },
+    "s71": {
+      "lyrics": "내일 없는 매일을 살고 있잖아 오늘 하룬 살고픈 대로 살 거야",
+      "mv": "https://youtu.be/rPgBSNdZKP4",
+      "time": "1:00"
+    },
+    "s72": {
+      "lyrics": "봄과 여름 가을 겨울 항상 우린 함께 / 계절보다 사랑스레 빛난 네 미소에",
+      "mv": "https://youtu.be/2kdopwq4njQ",
+      "time": "1:05"
+    },
+    "s73": {
+      "lyrics": "미쳐 미쳐 미쳤나 보다 너에게 미쳤나 보다",
+      "mv": "https://youtu.be/uh_DpK2xFiE",
+      "time": "0:50"
+    },
+    "s74": {
+      "lyrics": "너를 사랑하지 말걸 조금 좋아할걸 / 후회가 돼",
+      "mv": "https://youtu.be/Zt_37l7NiJw",
+      "time": "0:55"
+    },
+    "s75": {
+      "lyrics": "Shining star 너는 내 시리우스 / You're my shooting star on radio star",
+      "mv": "https://youtu.be/0qFsZeS4Onk",
+      "time": "1:10",
+      "read": "샤이닝 스타 너는 내 시리우스 / 유어 마이 슈팅 스타 온 레디오 스타"
     }
   },
   "album": {
@@ -936,6 +992,26 @@
     "s70": {
       "year": 2026,
       "type": "미니"
+    },
+    "s71": {
+      "year": 2025,
+      "type": "정규"
+    },
+    "s72": {
+      "year": 2026,
+      "type": "디지털 싱글"
+    },
+    "s73": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s74": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s75": {
+      "year": 2025,
+      "type": "정규"
     }
   },
   "config": {
@@ -961,6 +1037,45 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_test": [
+    "s71",
+    "s72",
+    "s73",
+    "s74",
+    "s75"
+  ],
+  "_review": {
+    "s71": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "confirm"
+      ]
+    },
+    "s72": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "confirm"
+      ]
+    },
+    "s73": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "confirm"
+      ]
+    },
+    "s74": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "confirm"
+      ]
+    },
+    "s75": {
+      "reason": "신규 추가 곡 — 검수 필요",
+      "fields": [
+        "confirm"
+      ]
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1786321261911,
   "songs": [
     {
       "id": "s2",
@@ -366,6 +366,36 @@
       "name": "rat race",
       "part": "벌스 · V8 · 버논X디에잇 신곡",
       "diff": "신곡"
+    },
+    {
+      "id": "s76",
+      "name": "놀아보세 (Party Rock Rock)",
+      "part": "훅 · 피철인(디노) 솔로",
+      "diff": "신곡"
+    },
+    {
+      "id": "s77",
+      "name": "SNAPBACK",
+      "part": "훅 · 호시 솔로 (영어 훅)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s78",
+      "name": "Rockstar (DK Solo)",
+      "part": "후렴 · 도겸 솔로",
+      "diff": "신곡"
+    },
+    {
+      "id": "s79",
+      "name": "Fiesta",
+      "part": "훅 · S.Coups X Mingyu (영어 훅)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s80",
+      "name": "Dream Serenade (SEUNGKWAN Solo)",
+      "part": "후렴 · 승관 솔로",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -690,6 +720,36 @@
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:42",
       "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
+    },
+    "s76": {
+      "lyrics": "놀아, 놀아, 놀아보세",
+      "mv": "https://youtu.be/Do9BOhk0u_w",
+      "time": "0:45"
+    },
+    "s77": {
+      "lyrics": "Your love still in my snapback",
+      "mv": "https://youtu.be/Ar11flLQ-bI",
+      "time": "0:40",
+      "lang": "en",
+      "read": "유어 러브 스틸 인 마이 스냅백"
+    },
+    "s78": {
+      "lyrics": "내 삶속에 넌 유일한 Rockstar",
+      "mv": "https://youtu.be/lt-DcYQq8kI",
+      "time": "0:50",
+      "read": "내 삶속에 넌 유일한 락스타"
+    },
+    "s79": {
+      "lyrics": "Fiesta Fiesta, we gon' party party like a rock star",
+      "mv": "https://youtu.be/GiLF9rQ81Uk",
+      "time": "0:05",
+      "lang": "en",
+      "read": "피에스타 피에스타, 위 곤 파티 파티 라이크 어 락 스타"
+    },
+    "s80": {
+      "lyrics": "넌 내게 빛이었다고",
+      "mv": "https://youtu.be/3PGy5yV1APA",
+      "time": "1:00"
     }
   },
   "album": {
@@ -936,6 +996,26 @@
     "s70": {
       "year": 2026,
       "type": "미니"
+    },
+    "s76": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s77": {
+      "year": 2026,
+      "type": "디지털 싱글"
+    },
+    "s78": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s79": {
+      "year": 2025,
+      "type": "미니"
+    },
+    "s80": {
+      "year": 2026,
+      "type": "미니"
     }
   },
   "config": {
@@ -961,6 +1041,50 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_test": [
+    "s76",
+    "s77",
+    "s78",
+    "s79",
+    "s80"
+  ],
+  "_review": {
+    "s76": {
+      "reason": "신규 추가 곡 — 공식 MV(PLEDIS 공지 교차확인)·가사(lyricsbull) 확인, time은 추정값 — 재생하며 훅 시작 지점 확인 필요",
+      "fields": [
+        "time"
+      ]
+    },
+    "s77": {
+      "reason": "신규 추가 곡 — MV는 공식 MV가 아닌 퍼포먼스 필름(Tumblr/Threads 교차확인), time 추정값 — 공식 MV 존재 여부·훅 시작 지점 확인 필요",
+      "fields": [
+        "mv",
+        "time"
+      ]
+    },
+    "s78": {
+      "reason": "신규 추가 곡 — MV가 공식 MV/오디오가 아닌 W Korea 방송 무대 라이브(단일 출처, get_video_details 미검증), 가사는 팬이 인쇄물을 직접 인용한 것 — 실재 여부·가사 원문·time 확인 필요",
+      "fields": [
+        "mv",
+        "lyrics",
+        "time"
+      ]
+    },
+    "s79": {
+      "reason": "신규 추가 곡 — 공식 MV 미확인(가사영상으로 임시 대체, tier 최하위), time 추정값 — 공식 MV 교체 여부·훅 시작 지점 확인 필요",
+      "fields": [
+        "mv",
+        "time"
+      ]
+    },
+    "s80": {
+      "reason": "신규 추가 곡 — MV는 공식 오디오(Bilibili 재업로드로 교차확인), 가사 원문은 한중 병기 가사 사이트에서 확인(1차 공식 출처 아님), time 추정값 — 가사 원문·훅 시작 지점 확인 필요",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
     }
   }
 }

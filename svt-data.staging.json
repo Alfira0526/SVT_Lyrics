@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1787530334194,
   "songs": [
     {
       "id": "s2",
@@ -366,6 +366,18 @@
       "name": "rat race",
       "part": "벌스 · V8 · 버논X디에잇 신곡",
       "diff": "신곡"
+    },
+    {
+      "id": "s71",
+      "name": "미쳐 미쳐 (Mi-cheo Mi-cheo)",
+      "part": "후렴 · 피철인(디노) 솔로",
+      "diff": "신곡"
+    },
+    {
+      "id": "s72",
+      "name": "I'll Be Back",
+      "part": "훅 · 버논 솔로 (영어)",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -690,6 +702,18 @@
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:42",
       "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
+    },
+    "s71": {
+      "lyrics": "미쳐 미쳐 미쳤나 보다 너에게 미쳤나 보다",
+      "mv": "https://youtu.be/uh_DpK2xFiE",
+      "time": "0:50"
+    },
+    "s72": {
+      "lyrics": "Since I'll be back",
+      "mv": "https://youtu.be/WEGJE7tw0Go",
+      "time": "0:55",
+      "lang": "en",
+      "read": "신스 아윌 비 백"
     }
   },
   "album": {
@@ -936,6 +960,14 @@
     "s70": {
       "year": 2026,
       "type": "미니"
+    },
+    "s71": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s72": {
+      "year": 2026,
+      "type": "디지털 싱글"
     }
   },
   "config": {
@@ -961,6 +993,25 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_test": [
+    "s71",
+    "s72"
+  ],
+  "_review": {
+    "s71": {
+      "reason": "신규 추가 곡(피철인/디노 솔로, 吉BOARD 미니앨범 수록 · 미쳐 미쳐) — MV는 HYBE LABELS 공식 채널의 공식 MV로 확인(oEmbed 검증). 가사는 실제 후렴 검증(뉴스/음원 사이트 교차확인). time(0:50)은 추정치 — 실제 재생하며 후렴 시작 지점 확인 필요.",
+      "fields": [
+        "time"
+      ]
+    },
+    "s72": {
+      "reason": "신규 추가 곡(버논 솔로, 입대 기념 깜짝 발매 · 2026.08.20) — MV는 공식 오디오(YouTube 자동생성 \"Vernon - Topic\" 채널, oEmbed 검증)이며 공식 MV는 아직 없음. 가사는 곡 제목이자 반복 후크인 \"Since I'll be back\" 구절만 확보(가사 사이트가 저작권 사유로 전문 인용을 거부해 정확한 줄바꿈·전체 표현은 미검증). time(0:55)은 추정치. 오너 확인 후 가사 원문·정확한 후렴 시작 지점 교체/확정 권장.",
+      "fields": [
+        "lyrics",
+        "time"
+      ]
     }
   }
 }

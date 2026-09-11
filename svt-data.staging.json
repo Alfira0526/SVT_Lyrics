@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1789085474567,
   "songs": [
     {
       "id": "s2",
@@ -611,7 +611,7 @@
     },
     "s57": {
       "lyrics": "Where am I running to now, blinded by shining lights pulling me close",
-      "mv": "https://youtu.be/gK43zTA7DWY?si=hnA5J5NWZXn2eI3G",
+      "mv": "https://youtu.be/oV_2853N4n4",
       "time": "1:05",
       "read": "웨어 앰 아이 러닝 투 나우, 블라인디드 바이 샤이닝 라이츠 풀링 미 클로즈"
     },
@@ -639,10 +639,10 @@
       "time": "0:54"
     },
     "s62": {
-      "lyrics": "She can't get out of bed when she home",
+      "lyrics": "She can't get out of bed when she's home",
       "mv": "https://youtu.be/pGxN5BYWssU",
       "time": "0:20",
-      "read": "쉬 캔트 겟 아웃 오브 베드 웬 쉬 홈"
+      "read": "쉬 캔트 겟 아웃 오브 베드 웬 쉬즈 홈"
     },
     "s63": {
       "lyrics": "하얗게 메마른 너의 그 표정에",
@@ -961,6 +961,14 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_review": {
+    "s57": {
+      "reason": "MV를 올바른 공식 MV로 교정함(기존 링크는 2025년 팬캠이었음) — 기존 time(1:05)이 새 영상에서도 유효한지 재확인 필요",
+      "fields": [
+        "time"
+      ]
     }
   }
 }

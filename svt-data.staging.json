@@ -1,5 +1,5 @@
 {
-  "rev": 1785316594806,
+  "rev": 1789949423274,
   "songs": [
     {
       "id": "s2",
@@ -366,6 +366,36 @@
       "name": "rat race",
       "part": "벌스 · V8 · 버논X디에잇 신곡",
       "diff": "신곡"
+    },
+    {
+      "id": "s71",
+      "name": "Fiesta",
+      "part": "1절 벌스 · 쿱스X민규 (영어)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s72",
+      "name": "Worth It",
+      "part": "훅 · 쿱스X민규 (영어)",
+      "diff": "신곡"
+    },
+    {
+      "id": "s73",
+      "name": "Pinocchio (Feat. So!YoON!)",
+      "part": "벌스 · 호시X우지",
+      "diff": "신곡"
+    },
+    {
+      "id": "s74",
+      "name": "Rockstar (DK Solo)",
+      "part": "벌스 · 도겸 솔로",
+      "diff": "신곡"
+    },
+    {
+      "id": "s75",
+      "name": "Guilty Pleasure",
+      "part": "벌스 · 도겸X승관 (D&S)",
+      "diff": "신곡"
     }
   ],
   "content": {
@@ -690,6 +720,37 @@
       "mv": "https://youtu.be/4dDKFQwRKmw",
       "time": "0:42",
       "read": "트라이나 메익 어 스매시 힛 / 틸 아임 인 더 캐스킷"
+    },
+    "s71": {
+      "lyrics": "Fiesta, fiesta / We gon' party, party like a rock star",
+      "mv": "https://youtu.be/iuY94GoPlj8",
+      "time": "0:50",
+      "lang": "en",
+      "read": "피에스타 피에스타 위 건 파티 파티 라이크 어 락스타"
+    },
+    "s72": {
+      "lyrics": "Babe, baby, you're worth it (Worth it) / Put it on me, nah, ah-ah",
+      "mv": "https://youtu.be/vZkXrdU5UuA",
+      "time": "0:45",
+      "lang": "en",
+      "read": "베이브 베이비 유어 워스 잇 (워스 잇) 풋 잇 온 미 나 아아"
+    },
+    "s73": {
+      "lyrics": "진심을 거짓말해서 / 사랑이 계속 자랐어",
+      "mv": "https://youtu.be/6cPXfnGxTco",
+      "time": "1:00"
+    },
+    "s74": {
+      "lyrics": "내 삶 속에 넌 유일한 rockstar",
+      "mv": "https://youtu.be/C-6VN7S6QDc",
+      "time": "0:35",
+      "read": "내 삶 속에 넌 유일한 락스타"
+    },
+    "s75": {
+      "lyrics": "거부할 수 없는 guilty pleasure love",
+      "mv": "https://youtu.be/mYVTvqhvFDA",
+      "time": "0:50",
+      "read": "거부할 수 없는 길티 플레저 러브"
     }
   },
   "album": {
@@ -936,6 +997,26 @@
     "s70": {
       "year": 2026,
       "type": "미니"
+    },
+    "s71": {
+      "year": 2025,
+      "type": "미니"
+    },
+    "s72": {
+      "year": 2025,
+      "type": "미니"
+    },
+    "s73": {
+      "year": 2025,
+      "type": "싱글"
+    },
+    "s74": {
+      "year": 2026,
+      "type": "미니"
+    },
+    "s75": {
+      "year": 2026,
+      "type": "미니"
     }
   },
   "config": {
@@ -961,6 +1042,47 @@
     "scope": {
       "by": "all",
       "val": ""
+    }
+  },
+  "_test": [
+    "s71",
+    "s72",
+    "s73",
+    "s74",
+    "s75"
+  ],
+  "_review": {
+    "s71": {
+      "reason": "가사·독음 검증 완료(공식 배포 가사 확인). MV는 공식 채널 미확인(팬 가사영상 임시 연결, 교체 필요) — 시간(0:50)은 추정값, 확인 필요.",
+      "fields": [
+        "mv",
+        "time"
+      ]
+    },
+    "s72": {
+      "reason": "가사 검증 완료. MV는 공식 안무영상(Moving ver.) 연결 — 시간(0:45)은 추정값, 확인 필요.",
+      "fields": [
+        "time"
+      ]
+    },
+    "s73": {
+      "reason": "가사 검증 완료(공식 배포 가사 확인). MV는 공식 채널 미확인(팬 가사영상 임시 연결, 교체 필요) — 시간(1:00)은 추정값, 확인 필요.",
+      "fields": [
+        "mv",
+        "time"
+      ]
+    },
+    "s74": {
+      "reason": "가사 검증 완료(공식 배포 가사 일부 확인). MV는 공식 오디오(DxS - Topic) 연결 — 시간(0:35)은 추정값, 확인 필요.",
+      "fields": [
+        "time"
+      ]
+    },
+    "s75": {
+      "reason": "가사 검증 완료. MV는 공식 오디오(DxS - Topic) 연결 — 시간(0:50)은 추정값, 확인 필요.",
+      "fields": [
+        "time"
+      ]
     }
   }
 }
